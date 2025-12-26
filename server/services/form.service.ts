@@ -1,0 +1,139 @@
+import { and, eq, exists, getTableColumns, sql } from "drizzle-orm";
+import { db } from "../db";
+import { forms, type CreateForm, type SelectForm } from "../db/forms.schema";
+import { generateImageId, generatePublicLink } from "../lib/utils";
+import { R2Service } from "./r2.service";
+import { ErrorResponse } from "../types/error";
+import { v4 as uuidv4 } from "uuid";
+
+const r2Service = new R2Service();
+export class FormService {
+  // TODO - add proper return type when used properties
+  async getAllForms(properties?: { [k in keyof SelectForm]?: boolean }) {
+    if (!properties) {
+      const response = await db.select().from(forms);
+      return response;
+    }
+    const isEmpty = Object.keys(properties).length === 0;
+    const response = await db.query.forms.findMany({
+      columns: isEmpty ? undefined : properties,
+    });
+
+    return response;
+  }
+  // TODO - add proper return type when used properties
+  async getFormById(
+    formId: string,
+    // TODO add some way to not get certain data from the db like secure some columns
+    properties?: { [k in keyof SelectForm]?: boolean }
+  ) {
+    if (!properties) {
+      const response = await db.query.forms.findFirst({
+        where: eq(forms.id, formId),
+      });
+      return response;
+    }
+
+    const allColumns = getTableColumns(forms);
+    const selectedColumns: { [k in keyof SelectForm]?: boolean } = {};
+
+    for (const [columnName, include] of Object.entries(properties)) {
+      const column = allColumns[columnName as keyof typeof allColumns];
+      if (column) {
+        selectedColumns[columnName as keyof typeof selectedColumns] = include;
+      }
+    }
+
+    const isEmpty = Object.keys(selectedColumns).length === 0;
+    const response = await db.query.forms.findFirst({
+      where: eq(forms.id, formId),
+      columns: isEmpty ? undefined : selectedColumns,
+    });
+    return response;
+  }
+  async createForm({
+    formConfiguration,
+    formPreviewFile,
+  }: {
+    formConfiguration: {
+      title: string;
+      description?: string;
+      settings: any;
+      pages: CreateForm["configuration"];
+    };
+    formPreviewFile: File | undefined;
+  }) {
+    const formId = uuidv4();
+    const previewKey = generateImageId("form-previews", formId);
+
+    const previewLink = await r2Service.upload(formPreviewFile!, previewKey);
+
+    const insertForm: CreateForm = {
+      id: formId as CreateForm["id"],
+      title: formConfiguration.title,
+      description: formConfiguration.description,
+      configuration: {
+        settings: formConfiguration.settings,
+        pages: formConfiguration.pages,
+      },
+      isPublished: false,
+      publicLink: generatePublicLink(),
+      previewLink: previewLink,
+      previewKey: previewKey,
+    };
+
+    const result = await db
+      .insert(forms)
+      .values(insertForm)
+      .returning({ insertionId: forms.id });
+
+    return result[0];
+  }
+
+  async publishForm(formId: string) {
+    const result = await db
+      .update(forms)
+      .set({ isPublished: true })
+      .where(eq(forms.id, formId))
+      .returning({ insertionId: forms.id });
+    return result[0];
+  }
+
+  async deleteForm(formId: string) {
+    // TODO - add proper return type when used properties
+    const form = await this.getFormById(formId, {
+      previewKey: true,
+    });
+    if (!form) throw new ErrorResponse("Form not found", 404);
+
+    const previewKey = form.previewKey;
+
+    const previewDeleteResponse = await r2Service.delete(previewKey!);
+
+    if (previewDeleteResponse.$metadata.httpStatusCode !== 204) {
+      console.error("Failed to delete form preview");
+      throw new ErrorResponse("Failed to delete form preview", 500);
+    }
+
+    const result = await db
+      .delete(forms)
+      .where(eq(forms.id, formId))
+      .returning({
+        deletionId: forms.id,
+      });
+
+    return result[0];
+  }
+  async getFormByPublicLink(publicLink: string) {
+    const result = await db
+      .select({ exists: sql`1` })
+      .from(forms)
+      .where(and(eq(forms.publicLink, publicLink), eq(forms.isPublished, true)))
+      .limit(1);
+
+    console.log({ result });
+
+    const isPublisedValidLink = result.length > 0;
+    return isPublisedValidLink;
+  }
+}
