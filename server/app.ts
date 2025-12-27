@@ -41,7 +41,7 @@ app.onError((err, ctx) => {
 // serve static client from backend in production if the request does not start with /api
 // app.use("/favicon.ico", serveStatic({ path: "./client/dist/favicon.ico" }));
 app.use("*", serveStatic({ root: "./build/client" }));
-app.get("*", serveStatic({ root: "./build/client/index.html" }));
+app.get("*", serveStatic({ path: "./build/client/index.html" }));
 
 export default app;
 export type AppType = typeof apiRoute;
