@@ -33,10 +33,9 @@ import {
 import { Button } from "./ui/button";
 import { BRAND } from "@/lib/constants";
 import { Link } from "@tanstack/react-router";
-import { userQueryOptions } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { useUserDetails } from "@/hooks/use-users";
 
 export function AppSidebar() {
   const { state, openMobile, setOpen } = useSidebar();
@@ -187,7 +186,7 @@ export function AppSidebar() {
 
 const AppSidebarFooter = () => {
   const { state, openMobile } = useSidebar();
-  const getUserDetails = useQuery(userQueryOptions.getUserDetails);
+  const getUserDetails = useUserDetails();
 
   console.log(
     "app-sidebar-footer",

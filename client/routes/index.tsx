@@ -16,14 +16,17 @@ import {
   MessageSquare,
   ChevronRight,
 } from "lucide-react";
+import { usersApi } from "@/api/users";
 
 export const Route = createFileRoute("/")({
   beforeLoad: async ({ context }) => {
     const queryClient = context.queryClient;
     try {
-      const response = await queryClient.fetchQuery(
-        userQueryOptions.getUserDetails
-      );
+      const response = await queryClient.fetchQuery({
+        queryKey: ["getUserDetails"],
+        queryFn: usersApi.getUserDetails,
+        staleTime: Infinity,
+      });
       return response;
     } catch {
       // If error (e.g. 401), we just return null/undefined so we stay on landing page
@@ -409,11 +412,10 @@ function DemoPoll() {
               onClick={() => setSelected(opt)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium border-2 transition-all relative overflow-hidden ${
-                selected === opt
-                  ? "bg-indigo-50/50 border-indigo-500 text-indigo-900"
-                  : "bg-white border-slate-100 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
-              }`}
+              className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium border-2 transition-all relative overflow-hidden ${selected === opt
+                ? "bg-indigo-50/50 border-indigo-500 text-indigo-900"
+                : "bg-white border-slate-100 text-slate-600 hover:border-indigo-200 hover:bg-slate-50"
+                }`}
             >
               <div className="flex items-center justify-between relative z-10">
                 <span>{opt}</span>
