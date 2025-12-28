@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { userQueryOptions } from "@/lib/api";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
