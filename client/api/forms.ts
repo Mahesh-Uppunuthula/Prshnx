@@ -11,6 +11,7 @@ export const formsApi = {
   createForm: async (form: FormData) => {
     console.log({ form });
 
+    // POST query has to be made via fetch to preserve form-preview URL
     const saveFormQuery = await fetch("/api/v1/forms", {
       method: "POST",
       body: form,
