@@ -3,10 +3,10 @@ import { logger } from "hono/logger";
 import { serveStatic } from "hono/bun";
 import { ErrorResponse } from "./types/error";
 import apiRoute from "./routes/api";
-import publicFormRoute from "./routes/form";
 
 export type Bindings = {
   PORT: number;
+  BASE_URL: string;
   KINDE_AUTH_DOMAIN: string;
   KINDE_CLIENT_ID: string;
   KINDE_CLIENT_SECRET: string;
@@ -25,16 +25,14 @@ const app = new Hono<{ Bindings: Bindings }>();
 app.use(logger());
 // server api routes when request starts with /api
 
-app.route("/api", apiRoute);
-app.route("/f", publicFormRoute); // TODO may need this in frontend so might add to AppType
+app.route("/", apiRoute);
 
 app.onError((err, ctx) => {
+  console.error("Error: " + JSON.stringify(err));
   if (err instanceof ErrorResponse) {
-    console.error("Error response: ", JSON.stringify(err));
     return ctx.json(err, err.status);
   }
 
-  console.log("Unknown error: " + err);
   return ctx.json(ctx.error, 500);
 });
 

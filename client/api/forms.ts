@@ -4,7 +4,7 @@ import { hc } from "hono/client";
 const client = hc<AppType>("/");
 export const formsApi = {
   getAllForms: async () => {
-    const getAllFormsQuery = await client.api.v1.forms.$get();
+    const getAllFormsQuery = await client.api.protected.v1.forms.$get();
     if (!getAllFormsQuery.ok) throw new Error("Failed to fetch forms");
     return await getAllFormsQuery.json();
   },
@@ -12,7 +12,7 @@ export const formsApi = {
     console.log({ form });
 
     // POST query has to be made via fetch to preserve form-preview URL
-    const saveFormQuery = await fetch("/api/v1/forms", {
+    const saveFormQuery = await fetch("/api/protected/v1/forms", {
       method: "POST",
       body: form,
     });
@@ -22,7 +22,7 @@ export const formsApi = {
     return await saveFormQuery.json();
   },
   deleteForm: async (formId: string) => {
-    const deleteFormQuery = await client.api.v1.forms[":id"].$delete({
+    const deleteFormQuery = await client.api.protected.v1.forms[":id"].$delete({
       param: {
         id: formId,
       },

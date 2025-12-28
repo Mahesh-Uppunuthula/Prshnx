@@ -10,9 +10,9 @@ async function main() {
     console.log("Migrating database...");
     await migrate(db, { migrationsFolder: "server/migrations" });
     console.log("Database migrated successfully");
+    process.exit(0);
   } catch (error) {
     console.error(error);
-  } finally {
     process.exit(1);
   }
 }
