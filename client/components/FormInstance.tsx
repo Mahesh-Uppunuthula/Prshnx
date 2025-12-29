@@ -267,7 +267,7 @@ export default function FormInstance() {
                 <img
                   className="w-full aspect-video max-h-40 bg-center object-cover"
                   // src={"public/images/sample-banner-2.webp"}
-                  src={"public/images/smiely_face.png"}
+                  src={"/images/smiely_face.png"}
                 />
               </div>
             )}

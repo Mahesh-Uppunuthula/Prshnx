@@ -8,6 +8,7 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
+  publicDir: "client/public",
   plugins: [
     tanstackRouter({
       target: "react",
