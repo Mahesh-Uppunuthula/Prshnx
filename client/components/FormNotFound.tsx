@@ -1,4 +1,6 @@
+import { Link } from "@tanstack/react-router"
 import { motion } from "framer-motion"
+import { Button } from "./ui/button"
 export function FormNotFound() {
     return (
         <div className="flex min-h-screen w-full flex-col items-center justify-center bg-background px-4 py-12 text-foreground">
@@ -6,11 +8,13 @@ export function FormNotFound() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
-                className="flex max-w-md flex-col items-center text-center"
+                className="flex max-w-md flex-col items-center text-center select-none"
             >
-                <div className="mb-6 flex h-40 w-40 items-center justify-center rounded-3xl bg-muted ring-1 ring-border/50">
+                <div className="mb-6 flex items-center justify-center rounded-3xl ">
                     {/* <FileQuestion className="h-10 w-10 text-muted-foreground/80" strokeWidth={1.5} /> */}
+                    <span className="text-emerald-500 text-7xl font-medium bg-emerald-100 p-6 rounded-md ">4</span>
                     <span className="text-7xl">🌵</span>
+                    <span className="text-emerald-500 text-7xl font-medium bg-emerald-100 p-6 rounded-md ">4</span>
                     {/* <span>
                         <img src="/images/page-eaten.svg" className="w-full h-full" alt="" />
                     </span> */}
@@ -31,6 +35,14 @@ export function FormNotFound() {
                     </Link>
                 </Button> */}
             </motion.div>
+            {/* <footer className="mt-6 text-sm text-muted-foreground">
+                © {new Date().getFullYear()} Prshnx. All rights reserved.
+            </footer> */}
+            <footer className="my-2">
+                <Link to="/">
+                    <Button variant={"ghost"}>Take me home</Button>
+                </Link>
+            </footer>
         </div>
     )
 }
