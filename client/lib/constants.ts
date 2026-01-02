@@ -75,3 +75,13 @@ export const builtInComponentNamesSet = new Set<ComponentVariants>([
   // "radio-button",
   "time-input",
 ]);
+
+export const QUERY_KEYS = {
+  embed: {
+    getFormConfigById: (publicFormId: string) => [
+      "embed",
+      "getFormConfigById",
+      publicFormId,
+    ],
+  },
+};

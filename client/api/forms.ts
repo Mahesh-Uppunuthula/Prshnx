@@ -30,4 +30,16 @@ export const formsApi = {
     if (!deleteFormQuery.ok) throw new Error(`Failed to delete form ${formId}`);
     return await deleteFormQuery.json();
   },
+  getFormEmbed: async (formId: string) => {
+    const getFormEmbedQuery = await client.api.public.form[
+      ":publicFormId"
+    ].embed.$get({
+      param: {
+        publicFormId: formId,
+      },
+    });
+    if (!getFormEmbedQuery.ok)
+      throw new Error(`Failed to fetch form embed data for ${formId}`);
+    return await getFormEmbedQuery.json();
+  },
 };

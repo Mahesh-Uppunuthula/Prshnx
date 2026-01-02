@@ -6,6 +6,7 @@ import type {
   Page,
 } from "@/types/form-builder.types";
 import type { MultiPageForm } from "@/store/form-builder.store";
+import { FormConfiguration } from "@/types/form.types";
 
 export function createFormElement(type: ComponentVariants): FormElement {
   const id = `${type}_${nanoid().slice(0, 5)}`;
@@ -176,11 +177,7 @@ export function toStructuredPages(
   title: MultiPageForm["title"],
   pageSettings: MultiPageForm["pageSettings"],
   pages: Map<string, Page>
-): {
-  title: string;
-  settings: MultiPageForm["pageSettings"];
-  pages: Page[];
-} {
+): FormConfiguration {
   return {
     title: title,
     settings: pageSettings,

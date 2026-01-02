@@ -37,3 +37,11 @@ export const useDeleteForm = () => {
     },
   });
 };
+
+export const useFormEmbed = (formId: string) => {
+  return useQuery({
+    queryKey: ["form-embed", formId],
+    queryFn: () => formsApi.getFormEmbed(formId),
+    enabled: !!formId,
+  });
+};
