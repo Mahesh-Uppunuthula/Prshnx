@@ -1,3 +1,4 @@
+// vite.config.ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import devServer from "@hono/vite-dev-server";
@@ -6,7 +7,6 @@ import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 
-// https://vite.dev/config/
 export default defineConfig({
   publicDir: "client/public",
   plugins: [
@@ -38,5 +38,15 @@ export default defineConfig({
   },
   build: {
     outDir: "build/client",
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, "index.html"),
+        widget: path.resolve(__dirname, "client/widget/widget.ts"),
+      },
+      output: {
+        entryFileNames: (chunk) =>
+          chunk.name === "widget" ? "widget.js" : "assets/[name]-[hash].js",
+      },
+    },
   },
 });
