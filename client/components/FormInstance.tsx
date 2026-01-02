@@ -2,6 +2,7 @@ import { z, ZodAny } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
+  MultiPageForm,
   // useActivePage,
   useMultiPageFormBuilder,
 } from "@/store/form-builder.store";
@@ -31,7 +32,7 @@ import { DatePicker } from "./ui/date-picker";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import type { DateInterval, DateRange } from "react-day-picker";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import Show from "./utils/Show";
 import { Check, Hexagon, LucideTextCursorInput } from "lucide-react";
@@ -48,6 +49,7 @@ import {
 } from "./ui/select";
 import { FakeToggle } from "./create-choice-labels";
 import { getAlphabetPrefix } from "@/lib/helper";
+import { FormConfiguration } from "@/types/form.types";
 
 function renderChoice(
   choice: SelectionProperties["choiceLabels"][0],
@@ -199,10 +201,20 @@ function getDatePickerDisabledDates(
   }
 }
 
-export default function FormInstance() {
-  const pageSettings = useMultiPageFormBuilder((s) => s.pageSettings);
-  const pages = useMultiPageFormBuilder((s) => s.pages);
-  const pagesIds = [...pages.keys()];
+type FormInstanceProps = {
+  devMode: boolean;
+  configuration: FormConfiguration
+}
+
+export default function FormInstance({ configuration, devMode }: FormInstanceProps) {
+  // const pageSettings = useMultiPageFormBuilder((s) => s.pageSettings);
+  // const pages = useMultiPageFormBuilder((s) => s.pages);
+  const pages = configuration.pages;
+  const settings = configuration.settings;
+
+  const pagesIds = useMemo(() => {
+    return pages.map((page) => page.id);
+  }, [pages]);
 
   const [activePageIdx, setActivePageIdx] = useState(() => {
     console.log("setting activePageIdx");
@@ -210,7 +222,11 @@ export default function FormInstance() {
   });
   const [showThankYouPage, setShowThankYouPage] = useState(false);
 
-  const activePage = pages.get(pagesIds[activePageIdx])!;
+  // const activePage = pages.get(pagesIds[activePageIdx])!;
+  const activePage = useMemo(() => {
+    return pages.find((page) => page.id === pagesIds[activePageIdx])!;
+  }, [pages, pagesIds, activePageIdx]);
+
   const elements = activePage.body.elements!;
 
   // const activePage = useActivePage();
@@ -243,6 +259,7 @@ export default function FormInstance() {
   }, [pagesIds.length]);
 
   const handleContinue = useCallback(() => {
+    if (!devMode) return;
     form.clearErrors();
     goToNextPage();
   }, [form, goToNextPage]);
@@ -256,13 +273,13 @@ export default function FormInstance() {
     <div className="w-full h-full flex justify-center place-items-center">
       {/* form container */}
       <div
-        className="w-full min-w-fit max-w-1/2 min-h-1/2 h-[98%] flex flex-col justify-center border 
+        className="w-full min-w-fit max-w-1/2 min-h-1/2 h-[98%] p-4 flex flex-col justify-center border 
         rounded shadow-xl"
       >
         <Show when={!showThankYouPage} fallback={<></>}>
           <div>
             {/* page cover */}
-            {pageSettings.cover && (
+            {settings.cover && (
               <div className="w-full h-fit relative group">
                 <img
                   className="w-full aspect-video max-h-40 bg-center object-cover"
@@ -272,17 +289,17 @@ export default function FormInstance() {
               </div>
             )}
             {/* page logo */}
-            {pageSettings.logo && (
+            {settings.logo && (
               <div
                 className={cn("w-full h-fit min-h-10 relative pl-2", {
-                  "min-h-20": !pageSettings.cover,
+                  "min-h-20": !settings.cover,
                 })}
               >
                 <div
                   className={cn(
                     "w-20 h-20 group absolute top-[-100%] ml-[15%] flex justify-center place-items-center p-2 bg-black text-white rounded-full",
                     {
-                      "top-0 ml-0": !pageSettings.cover,
+                      "top-0 ml-0": !settings.cover,
                     }
                   )}
                 >
@@ -292,7 +309,7 @@ export default function FormInstance() {
             )}
           </div>
         </Show>
-        <Show when={!showThankYouPage} fallback={<ThankYouPage />}>
+        <Show when={!showThankYouPage} fallback={<ThankYouPage devMode={devMode} />}>
           <Form key={activePage.id} {...form}>
             <form
               className="w-full max-w-[98%] h-full max-h-[95%] p-2 overflow-auto flex flex-col gap-4"
@@ -618,7 +635,7 @@ export default function FormInstance() {
               <Button className="mt-5" type="submit">
                 {activePage.action.cta.label}
               </Button>
-              {hasErrors && (
+              {devMode && hasErrors && (
                 <Tooltip>
                   <TooltipTrigger>
                     <Button
@@ -647,9 +664,9 @@ function FormElement() {
   return <Input />;
 }
 
-function ThankYouPage() {
+function ThankYouPage({ devMode }: { devMode: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center bg-white px-4">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-white p-5 rounded">
       {/* Success Icon */}
       <div className="bg-cyan-100 p-4 rounded-full mb-6">
         <Check className="text-cyan-500 w-8 h-8" strokeWidth={3} />
@@ -677,7 +694,7 @@ function ThankYouPage() {
             </Button>
           </Link>
         </TooltipTrigger>
-        <TooltipContent side="bottom">
+        <TooltipContent hidden={!devMode} side="bottom">
           You can remove {BRAND.name} branding by upgrading to {BRAND.name} pro
         </TooltipContent>
       </Tooltip>

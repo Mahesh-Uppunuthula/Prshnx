@@ -5,12 +5,22 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toStructuredPages } from "@/lib/helper";
+import { useMultiPageFormBuilder } from "@/store/form-builder.store";
 import { ArrowLeft } from "lucide-react";
+import { useMemo } from "react";
 
 type FormPreviewProps = {
   goBack: () => void;
 };
 export default function FormPreview({ goBack }: FormPreviewProps) {
+  const title = useMultiPageFormBuilder((s) => s.title);
+  const pageSettings = useMultiPageFormBuilder((s) => s.pageSettings);
+  const pages = useMultiPageFormBuilder((s) => s.pages);
+  const structuredConfiguration = useMemo(() => {
+    const _config = toStructuredPages(title, pageSettings, pages);
+    return _config
+  }, [pages, pageSettings]);
   return (
     <div className="w-full h-screen p-1">
       {/* nav bar */}
@@ -26,7 +36,7 @@ export default function FormPreview({ goBack }: FormPreviewProps) {
         </Tooltip>
       </div>
       <div className="w-full h-[95%]">
-        <FormInstance />
+        <FormInstance configuration={structuredConfiguration} devMode />
       </div>
     </div>
   );
