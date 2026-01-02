@@ -57,7 +57,16 @@ export function toHumanReadableFormat(isoDate: string) {
   ];
 
   const rounded = Math.floor(value);
-  const unitLabel = unit.replace(/s$/, ""); // singular form 
+  const unitLabel = unit.replace(/s$/, ""); // singular form
 
   return `${rounded} ${unitLabel}${rounded !== 1 ? "s" : ""}`;
+}
+
+export function copyToClipboard(text: string) {
+  try {
+    navigator.clipboard.writeText(text);
+    console.log("Copied to clipboard", text);
+  } catch (error) {
+    console.error("Failed to copy to clipboard", error);
+  }
 }

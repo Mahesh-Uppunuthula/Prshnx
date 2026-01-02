@@ -12,7 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn, toHumanReadableFormat } from "@/lib/utils";
+import { cn, copyToClipboard, toHumanReadableFormat } from "@/lib/utils";
 import type { SelectForm } from "@server/db/forms.schema";
 import {
   Circle,
@@ -50,7 +50,7 @@ export default function FormCard({ form }: FormCardProps) {
       event.stopPropagation();
       switch (action) {
         case "copy-link":
-          // copy link
+          copyToClipboard(form.publicLink!); // TODO add the correct route along with base url
           break;
         case "preview":
           // preview code
@@ -125,7 +125,7 @@ export default function FormCard({ form }: FormCardProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom">
             <DropdownMenuItem
-              onClick={handleFormCardAction("preview", form.id)}
+              onClick={handleFormCardAction("copy-link", form.id)}
             >
               <Copy /> Copy link
             </DropdownMenuItem>
