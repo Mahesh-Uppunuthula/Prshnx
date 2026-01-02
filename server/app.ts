@@ -38,6 +38,12 @@ app.onError((err, ctx) => {
 
 // serve static client from backend in production if the request does not start with /api
 // app.use("/favicon.ico", serveStatic({ path: "./client/dist/favicon.ico" }));
+app.use(
+  "/widget.js",
+  serveStatic({
+    path: "./build/client/widget.js",
+  })
+);
 app.use("*", serveStatic({ root: "./build/client" }));
 app.get("*", serveStatic({ path: "./build/client/index.html" }));
 

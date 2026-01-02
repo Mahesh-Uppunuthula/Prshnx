@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import z from "zod";
 import { FormService } from "../services/form.service";
+import { asyncHandler } from "../lib/utils";
+import { getFormEmbed } from "../controllers/embed.controller";
 
 const formService = new FormService();
 const publicFormRoute = new Hono()
@@ -16,6 +18,7 @@ const publicFormRoute = new Hono()
       await formService.getFormByPublicLink(publicFormId);
     if (!isPublishedValidLink) return c.notFound();
     return c.json({ isPublishedValidLink });
-  });
+  })
+  .get("/:publicFormId/embed", asyncHandler(getFormEmbed));
 
 export default publicFormRoute;
