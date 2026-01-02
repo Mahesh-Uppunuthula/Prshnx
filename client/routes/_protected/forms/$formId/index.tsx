@@ -41,6 +41,7 @@ import {
   Share2,
   Users,
   Sparkles,
+  Pencil,
 } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
@@ -51,8 +52,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
 
+const tabs = ["overview", "responses", "share", "settings"];
 const searchSchema = z.object({
-  tab: z.enum(["overview", "responses"]).optional().catch("overview"),
+  tab: z.enum(tabs).optional().catch("overview"),
 });
 
 export const Route = createFileRoute("/_protected/forms/$formId/")({
@@ -83,7 +85,7 @@ function FormDashboard() {
         navigate({
           search: (prev) => ({
             ...prev,
-            tab: value as "overview" | "responses",
+            tab: value as "overview" | "responses" | "share" | "settings",
           }),
         })
       }
@@ -118,6 +120,12 @@ function FormDashboard() {
         <TabsContent value="responses" className="mt-0">
           <RecentResponses />
         </TabsContent>
+        <TabsContent value="share" className="mt-0">
+          share
+        </TabsContent>
+        <TabsContent value="settings" className="mt-0">
+          settings
+        </TabsContent>
       </main>
     </Tabs>
   );
@@ -128,13 +136,13 @@ function DashboardHeader({ formId }: { formId: string }) {
     <header className="sticky top-0 z-10 border-b bg-background px-6 py-3">
       <div className="flex items-center justify-between max-w-[1600px] mx-auto w-full relative">
         <div className="flex items-center gap-4">
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
             className="-ml-2 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
-          </Button>
+          </Button> */}
 
           <Breadcrumb>
             <BreadcrumbList>
@@ -149,6 +157,7 @@ function DashboardHeader({ formId }: { formId: string }) {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbPage className="font-semibold text-foreground flex items-center gap-2">
+                  {/* Form {formId.slice(0, 8)}... */}
                   Form {formId.slice(0, 8)}...
                   <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
                     Active
@@ -167,42 +176,48 @@ function DashboardHeader({ formId }: { formId: string }) {
             <TabsTrigger value="responses" className="px-4 text-xs">
               Responses
             </TabsTrigger>
+            <TabsTrigger value="share" className="px-4 text-xs">
+              Share
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="px-4 text-xs">
+              Settings
+            </TabsTrigger>
           </TabsList>
         </div>
 
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
+            className="text-gray-400 text-gray-500 hover:text-gray-700"
           >
-            <Eye className="mr-2 h-4 w-4 text-gray-500" />
+            <Eye className="h-4 w-4" />
             Preview
           </Button>
+
           <Button
-            variant="outline"
             size="sm"
-            className="bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
+            variant={"ghost"}
+            className="text-gray-400 text-gray-500 hover:text-gray-700"
           >
-            <Share2 className="mr-2 h-4 w-4 text-gray-500" />
-            Share
+            <Pencil className="h-4 w-4" />
+            Edit
           </Button>
-          <div className="h-4 w-px bg-gray-200 mx-1" />
-          <Button
-            size="sm"
-            className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
+          {/* <div className="h-4 w-px bg-gray-200 mx-1" /> */}
+          {/* <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-400 text-gray-500 hover:text-gray-700"
           >
-            <Compass className="mr-2 h-4 w-4" />
-            Next Steps
-            <ChevronDown className="ml-2 h-3 w-3 text-gray-400" />
+            <Share2 className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 text-gray-500 hover:text-gray-700"
           >
             <Settings className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </div>
       </div>
     </header>
@@ -379,7 +394,7 @@ function CompletionRateCard() {
   const completionRateChangePercentage = Math.floor(
     ((currentWeekCompletionRate - lastWeekCompletionRate) /
       lastWeekCompletionRate) *
-      100
+    100
   );
 
   function getRating(completionRate: number) {
@@ -432,7 +447,7 @@ function CompletionRateCard() {
             <span>{isPositiveChange ? "+" : "-"}</span>
             {Math.abs(
               currentWeekCompletionRatePercentage -
-                lastWeekCompletionRatePercentage
+              lastWeekCompletionRatePercentage
             )}
           </span>
         </div>
