@@ -25,13 +25,13 @@ import {
   LogOut,
   LucideTextCursorInput,
   MessageSquare,
+  Plus,
   SparklesIcon,
   TriangleAlert,
   User,
-  Wrench,
 } from "lucide-react";
 import { Button } from "./ui/button";
-import { BRAND } from "@/lib/constants";
+import { BRAND, NEW_FORM_ID } from "@/lib/constants";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -125,18 +125,19 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </Link>
           <Link
-            to="/form-builder"
+            to={`/forms/${NEW_FORM_ID}`}
             activeProps={{
               className: "bg-muted text-foreground",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <SidebarMenuButton
-              tooltip={"Form Builder"}
+              tooltip={"Create New Form"}
               className="w-full flex place-items-center text-foreground cursor-pointer"
             >
-              <Wrench />
-              Form Builder
+              {/* <Wrench /> */}
+              <Plus />
+              Create Form
             </SidebarMenuButton>
           </Link>
         </SidebarGroup>

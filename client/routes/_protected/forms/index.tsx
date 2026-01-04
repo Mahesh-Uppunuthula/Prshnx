@@ -5,6 +5,7 @@ import Show from "@/components/utils/Show";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FolderOpen, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NEW_FORM_ID } from "@/lib/constants";
 
 export const Route = createFileRoute("/_protected/forms/")({
   component: Forms,
@@ -27,7 +28,7 @@ function Forms() {
         <div className="w-full h-full flex flex-col gap-4">
           <nav className="w-full h-[7%] px-2 flex justify-between place-items-center">
             <h1 className="text-xl font-medium">Forms</h1>
-            <Link to={"/form-builder"}>
+            <Link to={`/forms/${NEW_FORM_ID}`}>
               <Button size={"sm"} className="rounded">
                 <Plus />
                 Form
