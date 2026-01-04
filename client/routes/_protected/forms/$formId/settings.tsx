@@ -1,3 +1,4 @@
+import FormStepperDemo from "@/components/FormStepperDemo";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_protected/forms/$formId/settings")({
@@ -5,5 +6,10 @@ export const Route = createFileRoute("/_protected/forms/$formId/settings")({
 });
 
 function Settings() {
-  return <div>Settings</div>;
+  const { formId } = Route.useParams();
+  console.log({ formId });
+  return <div>
+    {/* settings */}
+    <FormStepperDemo formId={formId} />
+  </div>;
 }
