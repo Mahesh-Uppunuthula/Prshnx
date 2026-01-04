@@ -85,3 +85,5 @@ export const QUERY_KEYS = {
     ],
   },
 };
+
+export const NEW_FORM_ID = "new";
