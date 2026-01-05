@@ -15,7 +15,7 @@ const publicFormRoute = new Hono()
   .get("/:publicFormId", async (c) => {
     const publicFormId = c.req.param("publicFormId");
     const isPublishedValidLink =
-      await formService.getFormByPublicLink(publicFormId);
+      await formService.isValidPublicLink(publicFormId);
     if (!isPublishedValidLink) return c.notFound();
     return c.json({ isPublishedValidLink });
   })

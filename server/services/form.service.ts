@@ -124,7 +124,7 @@ export class FormService {
 
     return result[0];
   }
-  async getFormByPublicLink(publicLink: string) {
+  async isValidPublicLink(publicLink: string) {
     const result = await db
       .select({ exists: sql`1` })
       .from(forms)
