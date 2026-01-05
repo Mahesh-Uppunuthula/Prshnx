@@ -3,10 +3,10 @@ import { hc } from "hono/client";
 
 const client = hc<AppType>("/");
 export const embedApi = {
-  getFormConfigById: async (publicFormId: string) => {
+  getFormConfigurationByPublicLink: async (publicLink: string) => {
     const response = await client.api.public.form[":publicFormId"].embed.$get({
       param: {
-        publicFormId: publicFormId,
+        publicFormId: publicLink,
       },
     });
     if (!response.ok) {

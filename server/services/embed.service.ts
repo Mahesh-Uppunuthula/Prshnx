@@ -2,6 +2,7 @@ import { db } from "../db";
 import { forms } from "../db/forms.schema";
 import { and, eq } from "drizzle-orm";
 
+// TODO not needed, it can use form service for sending form configuration
 export class EmbedService {
   async getFormEmbed(publicLink: string) {
     console.log({ publicLink });

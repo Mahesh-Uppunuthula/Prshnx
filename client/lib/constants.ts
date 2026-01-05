@@ -78,10 +78,10 @@ export const builtInComponentNamesSet = new Set<ComponentVariants>([
 
 export const QUERY_KEYS = {
   embed: {
-    getFormConfigById: (publicFormId: string) => [
+    getFormConfigurationByPublicLink: (publicLink: string) => [
       "embed",
-      "getFormConfigById",
-      publicFormId,
+      "getFormConfigurationByPublicLink",
+      publicLink,
     ],
   },
 };
