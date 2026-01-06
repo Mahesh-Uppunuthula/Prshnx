@@ -45,3 +45,10 @@ export const deleteForm = async (c: Context) => {
   const result = await formService.deleteForm(formId);
   return c.json(result);
 };
+
+export const getFormConfigurationById = async (c: Context) => {
+  const formId = c.req.param("id");
+  const result = await formService.getFormConfigurationById(formId);
+  console.log({ result });
+  return c.json(result);
+};

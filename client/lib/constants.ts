@@ -77,6 +77,13 @@ export const builtInComponentNamesSet = new Set<ComponentVariants>([
 ]);
 
 export const QUERY_KEYS = {
+  forms: {
+    getFormConfigurationById: (formId: string) => [
+      "forms",
+      "getFormConfigurationById",
+      formId,
+    ],
+  },
   embed: {
     getFormConfigurationByPublicLink: (publicLink: string) => [
       "embed",

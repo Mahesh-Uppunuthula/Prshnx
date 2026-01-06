@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getFormConfigByIdQueryOptions } from "@/hooks/query-options";
+import { getFormConfigByPublicLinkQueryOptions } from "@/hooks/query-options";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import FormInstance from "@/components/FormInstance";
@@ -8,7 +8,7 @@ export const Route = createFileRoute("/embed/$formId")({
     loader: async ({ params, context }) => {
         const { formId } = params;
         try {
-            const res = await context.queryClient.fetchQuery(getFormConfigByIdQueryOptions(formId));
+            const res = await context.queryClient.fetchQuery(getFormConfigByPublicLinkQueryOptions(formId));
             console.log("Asdf", res);
             return res;
         } catch (error) {
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/embed/$formId")({
 
 function EmbedPage() {
     const { formId } = Route.useParams();
-    const { data } = useSuspenseQuery(getFormConfigByIdQueryOptions(formId));
+    const { data } = useSuspenseQuery(getFormConfigByPublicLinkQueryOptions(formId));
 
     useEffect(() => {
         // const height = document.body.scrollHeight;

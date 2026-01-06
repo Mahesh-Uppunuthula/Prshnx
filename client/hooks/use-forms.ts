@@ -1,4 +1,5 @@
 import { formsApi } from "@/api/forms";
+import { NEW_FORM_ID, QUERY_KEYS } from "@/lib/constants";
 import type { SelectForm } from "@server/db/forms.schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -43,5 +44,13 @@ export const useFormEmbed = (formId: string) => {
     queryKey: ["form-embed", formId],
     queryFn: () => formsApi.getFormEmbed(formId),
     enabled: !!formId,
+  });
+};
+
+export const useFormConfigurationById = (formId: string) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.forms.getFormConfigurationById(formId),
+    queryFn: () => formsApi.getFormConfigurationById(formId),
+    enabled: !!formId || formId !== NEW_FORM_ID,
   });
 };

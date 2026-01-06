@@ -42,4 +42,16 @@ export const formsApi = {
       throw new Error(`Failed to fetch form embed data for ${formId}`);
     return await getFormEmbedQuery.json();
   },
+  getFormConfigurationById: async (formId: string) => {
+    const getFormConfigurationByIdQuery = await client.api.protected.v1.forms[
+      ":id"
+    ].configuration.$get({
+      param: {
+        id: formId,
+      },
+    });
+    if (!getFormConfigurationByIdQuery.ok)
+      throw new Error(`Failed to fetch form configuration data for ${formId}`);
+    return await getFormConfigurationByIdQuery.json();
+  },
 };

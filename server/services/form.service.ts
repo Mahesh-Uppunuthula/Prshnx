@@ -131,9 +131,29 @@ export class FormService {
       .where(and(eq(forms.publicLink, publicLink), eq(forms.isPublished, true)))
       .limit(1);
 
-    console.log({ result });
-
     const isPublisedValidLink = result.length > 0;
     return isPublisedValidLink;
+  }
+
+  async getFormConfigurationById(formId: string) {
+    const form = await this.getFormById(formId, {
+      id: true,
+      configuration: true,
+    });
+    console.log({ form });
+    return form;
+  }
+
+  async getFormConfigurationByPublicLink(publicLink: string) {
+    const isValidPublicLink = await this.isValidPublicLink(publicLink);
+    if (!isValidPublicLink) throw new ErrorResponse("Invalid public link", 404);
+    const form = await db.query.forms.findFirst({
+      where: eq(forms.publicLink, publicLink),
+      columns: {
+        id: true,
+        configuration: true,
+      },
+    });
+    return form;
   }
 }
