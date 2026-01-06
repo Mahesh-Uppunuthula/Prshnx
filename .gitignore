@@ -8,6 +8,7 @@ out
 dist
 *.tgz
 build
+build/*
 
 dist
 dist-ssr
