@@ -1,22 +1,35 @@
 import { and, eq, exists, getTableColumns, sql } from "drizzle-orm";
 import { db } from "../db";
-import { forms, type CreateForm, type SelectForm } from "../db/forms.schema";
+import {
+  forms,
+  UpdateForm,
+  type CreateForm,
+  type SelectForm,
+} from "../db/schemas/forms.schema";
 import { generateImageId, generatePublicLink } from "../lib/utils";
 import { R2Service } from "./r2.service";
 import { ErrorResponse } from "../types/error";
 import { v4 as uuidv4 } from "uuid";
+import { UserType } from "@kinde-oss/kinde-typescript-sdk";
 
 const r2Service = new R2Service();
 export class FormService {
   // TODO - add proper return type when used properties
-  async getAllForms(properties?: { [k in keyof SelectForm]?: boolean }) {
+  async getUserForms(
+    ownerId: UserType["id"],
+    properties?: { [k in keyof SelectForm]?: boolean },
+  ) {
     if (!properties) {
-      const response = await db.select().from(forms);
+      const response = await db
+        .select()
+        .from(forms)
+        .where(eq(forms.ownerId, ownerId));
       return response;
     }
     const isEmpty = Object.keys(properties).length === 0;
     const response = await db.query.forms.findMany({
       columns: isEmpty ? undefined : properties,
+      where: eq(forms.ownerId, ownerId),
     });
 
     return response;
@@ -25,7 +38,7 @@ export class FormService {
   async getFormById(
     formId: string,
     // TODO add some way to not get certain data from the db like secure some columns
-    properties?: { [k in keyof SelectForm]?: boolean }
+    properties?: { [k in keyof SelectForm]?: boolean },
   ) {
     if (!properties) {
       const response = await db.query.forms.findFirst({
@@ -52,9 +65,11 @@ export class FormService {
     return response;
   }
   async createForm({
+    ownerId,
     formConfiguration,
     formPreviewFile,
   }: {
+    ownerId: string;
     formConfiguration: {
       title: string;
       description?: string;
@@ -66,7 +81,10 @@ export class FormService {
     const formId = uuidv4();
     const previewKey = generateImageId("form-previews", formId);
 
-    const previewLink = await r2Service.upload(formPreviewFile!, previewKey);
+    let previewLink: string | null = null;
+    if (formPreviewFile) {
+      previewLink = await r2Service.upload(formPreviewFile!, previewKey);
+    }
 
     const insertForm: CreateForm = {
       id: formId as CreateForm["id"],
@@ -80,6 +98,7 @@ export class FormService {
       publicLink: generatePublicLink(),
       previewLink: previewLink,
       previewKey: previewKey,
+      ownerId: ownerId,
     };
 
     const result = await db
@@ -88,6 +107,51 @@ export class FormService {
       .returning({ insertionId: forms.id });
 
     return result[0];
+  }
+  async updateForm({
+    ownerId,
+    formId,
+    formConfiguration,
+    formPreviewFile,
+  }: {
+    ownerId: string;
+    formId: string;
+    formConfiguration: {
+      title: string;
+      description?: string;
+      settings: any;
+      pages: CreateForm["configuration"];
+    };
+    formPreviewFile: File | undefined;
+  }) {
+    // check if form exists
+    const form = await this.getFormById(formId);
+    if (!form) throw new ErrorResponse("Form not found", 404);
+
+    // update form preview
+    const previewKey = form.previewKey;
+
+    let previewLink: string | null = null;
+    if (formPreviewFile) {
+      previewLink = await r2Service.upload(formPreviewFile!, previewKey!);
+    }
+
+    // update form configuration
+    const updateForm: UpdateForm = {
+      title: formConfiguration.title,
+      description: formConfiguration.description,
+      configuration: {
+        settings: formConfiguration.settings,
+        pages: formConfiguration.pages,
+      },
+    };
+
+    const [result] = await db
+      .update(forms)
+      .set(updateForm)
+      .where(and(eq(forms.id, formId), eq(forms.ownerId, ownerId)))
+      .returning({ insertionId: forms.id });
+    return result;
   }
 
   async publishForm(formId: string) {
@@ -136,10 +200,7 @@ export class FormService {
   }
 
   async getFormConfigurationById(formId: string) {
-    const form = await this.getFormById(formId, {
-      id: true,
-      configuration: true,
-    });
+    const form = await this.getFormById(formId);
     console.log({ form });
     return form;
   }

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { formResponses } from "../db/form.response.schema";
+import { formResponses } from "../db/schemas/form.response.schema";
 
 export class FormResponseService {
   // TODO - before fetching responses check if the formId belongs to the user

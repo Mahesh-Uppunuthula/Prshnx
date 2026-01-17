@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { forms } from "../db/forms.schema";
+import { forms } from "../db/schemas/forms.schema";
 import { and, eq } from "drizzle-orm";
 
 // TODO not needed, it can use form service for sending form configuration
