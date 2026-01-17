@@ -1,6 +1,6 @@
 import { json, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 import { forms } from "./forms.schema";
-import { generateISOTimestamp } from "../lib/utils";
+import { generateISOTimestamp } from "../../lib/utils";
 
 const currentTimeStamp = generateISOTimestamp();
 export const formResponses = pgTable("form-responses", {
