@@ -1,6 +1,6 @@
 {
-  "id": "0026aa83-58b2-4eeb-a38b-1c964651b259",
-  "prevId": "2dffee38-4591-4003-818c-e0474a3c0cad",
+  "id": "a36abae2-8d89-4225-8406-7fb2ad36a664",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -31,14 +31,14 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-12-28T16:44:36.891Z'"
+          "default": "'2026-01-17T08:26:23.019Z'"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-12-28T16:44:36.891Z'"
+          "default": "'2026-01-17T08:26:23.019Z'"
         }
       },
       "indexes": {},
@@ -85,6 +85,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "ownerId": {
+          "name": "ownerId",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "isPublished": {
           "name": "isPublished",
           "type": "boolean",
@@ -121,14 +127,14 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-12-28T16:44:36.889Z'"
+          "default": "'2026-01-17T08:26:23.018Z'"
         },
         "updatedAt": {
           "name": "updatedAt",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2025-12-28T16:44:36.889Z'"
+          "default": "'2026-01-17T08:26:23.018Z'"
         }
       },
       "indexes": {},
