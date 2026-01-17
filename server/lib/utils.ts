@@ -8,25 +8,26 @@ export function asyncHandler<T extends (...args: any) => Promise<any> | void>(
     try {
       return await fn(...args);
     } catch (error) {
+      console.error("AsyncHandler Error: ", error);
       if (error instanceof ErrorResponse) {
         throw new ErrorResponse(error.message, error.status, error.type);
-      } else if (error instanceof Error) {
+      }
+      if (error instanceof Error) {
         throw new ErrorResponse(error.message);
       }
-
       const errorText = JSON.stringify(error);
-      console.error("Unknown Error: ", errorText);
+      console.error("AsyncHandler Unknown Error: ", errorText);
       throw new ErrorResponse(errorText.length ? errorText : "Unknown Error");
     }
   };
 }
 
-export function generateImageId(imageType: "form-previews", fileName: string) {
+export function generateImageId(folder: "form-previews", fileId: string) {
   /**
    * For assets it is going to store as
-   * form-previews/{randomId}_{uuid of the form}
+   * form-previews/{fileId}
    */
-  return `${imageType}/${uuidv4()}_${fileName}}`;
+  return `${folder}/${fileId}`;
 }
 
 export function generateISOTimestamp() {

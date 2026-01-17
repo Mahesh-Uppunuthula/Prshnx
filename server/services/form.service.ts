@@ -78,16 +78,21 @@ export class FormService {
     };
     formPreviewFile: File | undefined;
   }) {
-    const formId = uuidv4();
-    const previewKey = generateImageId("form-previews", formId);
+    const formPreviewImageId = uuidv4();
+    const formPreviewImageKey = generateImageId(
+      "form-previews",
+      formPreviewImageId,
+    );
 
     let previewLink: string | null = null;
     if (formPreviewFile) {
-      previewLink = await r2Service.upload(formPreviewFile!, previewKey);
+      previewLink = await r2Service.upload(
+        formPreviewFile!,
+        formPreviewImageKey,
+      );
     }
 
     const insertForm: CreateForm = {
-      id: formId as CreateForm["id"],
       title: formConfiguration.title,
       description: formConfiguration.description,
       configuration: {
@@ -97,7 +102,7 @@ export class FormService {
       isPublished: false,
       publicLink: generatePublicLink(),
       previewLink: previewLink,
-      previewKey: previewKey,
+      previewKey: formPreviewImageKey,
       ownerId: ownerId,
     };
 
@@ -125,15 +130,15 @@ export class FormService {
     formPreviewFile: File | undefined;
   }) {
     // check if form exists
-    const form = await this.getFormById(formId);
-    if (!form) throw new ErrorResponse("Form not found", 404);
+    const existingForm = await this.getFormById(formId, { previewKey: true });
+    if (!existingForm) throw new ErrorResponse("Form not found", 404);
 
     // update form preview
-    const previewKey = form.previewKey;
+    const previewKey = existingForm.previewKey;
 
-    let previewLink: string | null = null;
-    if (formPreviewFile) {
-      previewLink = await r2Service.upload(formPreviewFile!, previewKey!);
+    if (formPreviewFile && previewKey) {
+      // no need to update preview link as it is stored against the same preview key
+      await r2Service.upload(formPreviewFile!, previewKey);
     }
 
     // update form configuration

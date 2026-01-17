@@ -4,6 +4,7 @@ import { asyncHandler } from "../../lib/utils";
 import {
   deleteForm,
   getFormConfigurationById,
+  updateForm,
 } from "../../controllers/form.controller";
 import responses from "../responses";
 
@@ -19,6 +20,7 @@ const $formId = new Hono()
     await next();
   })
   .get("/configuration", asyncHandler(getFormConfigurationById))
+  .put("/", asyncHandler(updateForm))
   .delete("/", asyncHandler(deleteForm))
   .route("/responses", responses);
 

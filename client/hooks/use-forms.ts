@@ -1,11 +1,11 @@
 import { formsApi } from "@/api/forms";
 import { NEW_FORM_ID, QUERY_KEYS } from "@/lib/constants";
-import type { SelectForm } from "@server/db/forms.schema";
+import type { SelectForm } from "@server/db/schemas/forms.schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useForms = () => {
   return useQuery({
-    queryKey: ["forms"],
+    queryKey: QUERY_KEYS.forms.getAllForms,
     queryFn: formsApi.getAllForms,
   });
 };
@@ -13,10 +13,10 @@ export const useForms = () => {
 export const useSaveForm = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["save-form"],
+    mutationKey: QUERY_KEYS.forms.saveForm,
     mutationFn: formsApi.createForm,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["forms"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.forms.getAllForms });
     },
     // onError: (error) => {
     //   console.error(error);
@@ -24,17 +24,31 @@ export const useSaveForm = () => {
   });
 };
 
+export const useUpdateForm = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: QUERY_KEYS.forms.updateForm,
+    mutationFn: formsApi.updateForm,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.forms.getAllForms });
+    },
+  });
+};
+
 export const useDeleteForm = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["delete-form"],
+    mutationKey: QUERY_KEYS.forms.deleteForm,
     mutationFn: formsApi.deleteForm,
     onSuccess: (data) => {
       const deletedFormId = data.deletionId;
-      queryClient.setQueryData(["forms"], (oldData: SelectForm[]) => {
-        console.log({ oldData });
-        return oldData.filter((form) => form.id !== deletedFormId);
-      });
+      queryClient.setQueryData(
+        QUERY_KEYS.forms.getAllForms,
+        (oldData: SelectForm[]) => {
+          console.log({ oldData });
+          return oldData.filter((form) => form.id !== deletedFormId);
+        },
+      );
     },
   });
 };
@@ -51,6 +65,6 @@ export const useFormConfigurationById = (formId: string) => {
   return useQuery({
     queryKey: QUERY_KEYS.forms.getFormConfigurationById(formId),
     queryFn: () => formsApi.getFormConfigurationById(formId),
-    enabled: !!formId || formId !== NEW_FORM_ID,
+    enabled: !!formId && formId !== NEW_FORM_ID,
   });
 };

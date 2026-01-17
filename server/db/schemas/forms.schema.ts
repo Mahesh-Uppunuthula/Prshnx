@@ -2,7 +2,7 @@ import { boolean, json, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 import { generateISOTimestamp } from "../../lib/utils";
 const currentTimeStamp = generateISOTimestamp();
 export const forms = pgTable("forms", {
-  id: uuid().primaryKey(),
+  id: uuid().primaryKey().defaultRandom(),
   title: varchar().notNull(),
   description: varchar(),
   ownerId: varchar({ length: 36 }).notNull(),

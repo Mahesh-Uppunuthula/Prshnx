@@ -4,8 +4,10 @@ export const BRAND = {
 
 import type {
   ComponentVariants,
+  Page,
   StaticFormElements,
 } from "@/types/form-builder.types";
+import { generatePageId } from "./helper";
 
 export const builtInStaticFormElements: StaticFormElements = {
   text: {
@@ -83,6 +85,10 @@ export const QUERY_KEYS = {
       "getFormConfigurationById",
       formId,
     ],
+    getAllForms: ["forms"],
+    saveForm: ["forms", "saveForm"],
+    updateForm: ["forms", "updateForm"],
+    deleteForm: ["forms", "deleteForm"],
   },
   embed: {
     getFormConfigurationByPublicLink: (publicLink: string) => [
@@ -94,3 +100,33 @@ export const QUERY_KEYS = {
 };
 
 export const NEW_FORM_ID = "new";
+
+export const emptyPage: Page = {
+  id: generatePageId(),
+  action: {
+    cta: {
+      type: "cta",
+      actionType: "submit",
+      label: "Submit",
+      hasArrow: false,
+      background: {
+        type: "color",
+        value: "#000000",
+      },
+      textColor: {
+        type: "color",
+        value: "#ffffff",
+      },
+      borderRadius: "small",
+      alignment: "right",
+    },
+  },
+  header: {
+    title: "Untitled Page",
+    description: "",
+  },
+  body: {
+    elements: [],
+    // orderedElementIds: [],
+  },
+};
