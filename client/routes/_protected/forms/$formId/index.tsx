@@ -150,7 +150,7 @@ function FormDashboardContent({
   const firstPageId = pages.keys().next().value!;
   const firstPageHasElements = pages.get(firstPageId)!.body.elements.length > 0;
 
-  console.log({ isDirty });
+  // callbacks
   const dispatch = useCallback(
     async (action: DispatchAction) => {
       switch (action.type) {
@@ -262,7 +262,6 @@ function FormDashboardContent({
       navigate,
     ],
   );
-
   const handlePreviewExit = useCallback(() => {
     setPreview(false);
   }, []);

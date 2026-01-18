@@ -6,6 +6,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { FolderOpen, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NEW_FORM_ID } from "@/lib/constants";
+import { FormCardSkeleton } from "@/components/FormCardSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_protected/forms/")({
   component: Forms,
@@ -14,7 +16,7 @@ export const Route = createFileRoute("/_protected/forms/")({
 function Forms() {
   const { data: formData, isPending, error } = useForms();
 
-  if (isPending) return <div>Loading...</div>;
+  if (isPending) return <LoadingState />;
   if (error) return <div>{error.message}</div>;
 
   return (
@@ -42,6 +44,24 @@ function Forms() {
         </div>
       </section>
     </Show>
+  );
+}
+
+function LoadingState() {
+  return (
+    <section className="py-1 px-3 h-screen">
+      <div className="w-full h-full flex flex-col gap-4">
+        <nav className="w-full h-[7%] px-2 flex justify-between place-items-center">
+          <Skeleton className="w-24 h-10 rounded" />
+          <Skeleton className="w-24 h-10 rounded" />
+        </nav>
+        <div className="w-full h-[93%] p-2 flex flex-wrap gap-8 overflow-y-auto">
+          {Array.from({ length: 8 }).map((_, key) => (
+            <FormCardSkeleton key={key} />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
