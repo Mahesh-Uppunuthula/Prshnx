@@ -1,6 +1,12 @@
-import { boolean, json, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
-import { generateISOTimestamp } from "../../lib/utils";
-const currentTimeStamp = generateISOTimestamp();
+import {
+  boolean,
+  json,
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+} from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 export const forms = pgTable("forms", {
   id: uuid().primaryKey().defaultRandom(),
   title: varchar().notNull(),
@@ -16,11 +22,11 @@ export const forms = pgTable("forms", {
     .notNull(),
   previewLink: varchar(),
   previewKey: varchar(),
-  createdAt: varchar().default(currentTimeStamp).notNull(),
-  updatedAt: varchar()
-    .default(currentTimeStamp)
-    .notNull()
-    .$onUpdate(() => generateISOTimestamp()),
+  createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp({ mode: "string" })
+    .defaultNow()
+    .$onUpdate(() => sql`now()`) // Use SQL function to get current timestamp
+    .notNull(),
 });
 
 export type UpdateForm = Pick<
@@ -28,4 +34,10 @@ export type UpdateForm = Pick<
   "title" | "description" | "configuration"
 >;
 export type CreateForm = typeof forms.$inferInsert;
-export type SelectForm = typeof forms.$inferSelect;
+export type SelectForm = Omit<
+  typeof forms.$inferSelect,
+  "createdAt" | "updatedAt"
+> & {
+  createdAt: string;
+  updatedAt: string;
+}; // TODO - use drizzle-zod to convert all this
