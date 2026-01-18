@@ -8,10 +8,12 @@ import { cn } from "@/lib/utils";
 import FormPlaygroundItem from "./form-playground-item";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "./ui/button";
-import {
-  // useFormBuilder,
-  useMultiPageFormBuilder,
-} from "@/store/form-builder.store";
+// import {
+//   // useFormBuilder,
+//   useMultiPageFormBuilder,
+// } from "@/store/form-builder.store";
+
+import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
 
 function SortabbleItem({
   item,
@@ -30,13 +32,13 @@ function SortabbleItem({
       },
     });
 
-  const deletePageElement = useMultiPageFormBuilder((s) => s.deletePageElement);
+  const deletePageElement = useMultiPageFormStore((s) => s.deletePageElement);
 
-  // const activeFormElement = useMultiPageFormBuilder(
+  // const activeFormElement = useMultiPageFormStore(
   //   (s) => s.activeFormElement
   // );
-  const activeFormElement = useMultiPageFormBuilder((s) => s.activeFormElement);
-  const setActiveFormElement = useMultiPageFormBuilder(
+  const activeFormElement = useMultiPageFormStore((s) => s.activeFormElement);
+  const setActiveFormElement = useMultiPageFormStore(
     (s) => s.setActiveFormElement
   );
 
@@ -75,8 +77,7 @@ function SortabbleItem({
           "bg-secondary": showOptions,
         }
       )}
-      onClick={() => setActiveFormElement(item.id, item.type)}
-    >
+      onClick={() => setActiveFormElement(item.id, item.type)}>
       {showOptions && (
         <motion.div className="w-fit absolute top-[-40px] self-end p-2 border-foreground flex gap-2 justify-start place-items-center bg-foreground text-muted-foreground rounded-t-md [&>button:hover]:bg-muted [&>button:hover]:text-foreground [&>button]:p-1 [&>button]:rounded [&>button]:size-6">
           {/* <motion.div className="w-fit absolute top-[-40px] self-end p-2 border-primary-regular flex gap-2 justify-start place-items-center bg-primary-regular text-foreground rounded-t-md [&>button:hover]:bg-white [&>button:hover]:text-primary-regular [&>button]:p-1 [&>button]:rounded"> */}
@@ -87,8 +88,7 @@ function SortabbleItem({
             {...listeners}
             className={cn(
               `text-muted-foreground cursor-grab acive:cursor-grabbing`
-            )}
-          >
+            )}>
             <LuGripVertical />
           </Button>
           <Button size="icon" className="bg-destructive" onClick={handleDelete}>

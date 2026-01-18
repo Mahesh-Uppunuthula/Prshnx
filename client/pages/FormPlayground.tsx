@@ -41,11 +41,7 @@ import type {
   StaticFormElements,
   FormElement,
 } from "@/types/form-builder.types";
-import {
-  useActivePage,
-  // useFormBuilder,
-  useMultiPageFormBuilder,
-} from "@/store/form-builder.store";
+import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
 import FormStaticElementDragOverlay from "@/components/form-static-element-drag-overlay";
 import FormDynamicElementDragOverlay from "@/components/form-dynamic-element-drag-overlay";
 import Toolkit from "@/components/toolkit";
@@ -64,7 +60,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const Columns: Record<string, Column> = {
+const Columns: Record<"staticColumn" | "dynamicColumn", Column> = {
   staticColumn: {
     id: "staticColumn",
     label: "Static",
@@ -75,7 +71,7 @@ const Columns: Record<string, Column> = {
     label: "Dynamic",
     type: "dynamic",
   },
-};
+} as const;
 
 type FormPlaygroundProps = {
   formRef: React.Ref<HTMLDivElement>;
@@ -92,15 +88,20 @@ function FormPlayground({ formRef }: FormPlaygroundProps) {
   // const pages = useMultiPageFormBuilder((s) => s.pages);
   // const elements = pages.get(activePageId)?.body.elements ?? [];
 
-  const activePage = useActivePage();
+  // const formConfig =  // TODO - write a query to fetch if the id is not new
+
+  const activePage = useMultiPageFormStore((s) => {
+    const activePageId = s.activePageId;
+    return s.pages.get(activePageId)!;
+  });
   const elements = activePage.body.elements;
 
   // const reorder = useFormBuilder((state) => state.reorder);
-  const reorderPageElements = useMultiPageFormBuilder(
+  const reorderPageElements = useMultiPageFormStore(
     (state) => state.reorderPageElements
   );
 
-  const addPageElement = useMultiPageFormBuilder((s) => s.addPageElement);
+  const addPageElement = useMultiPageFormStore((s) => s.addPageElement);
   // const addElement = useFormBuilder((state) => state.addElement);
 
   const [activeComponent, setActiveComponent] = useState<null | {
@@ -181,13 +182,31 @@ function FormPlayground({ formRef }: FormPlaygroundProps) {
   };
 
   return (
+    // <div className="w-full h-[100%]">
+    //   {/* skeleton */}
+    //   <div className="w-full h-full max-h-full grid grid-cols-5 gap-2">
+    //     <div className="w-full h-full overflow-auto col-span-1 border rounded px-3 py-2 flex flex-col gap-4">
+    //       <Skeleton className="w-full h-full" />
+    //       <Skeleton className="w-full h-full" />
+    //       <Skeleton className="w-full h-full" />
+    //     </div>
+    //     <div className="w-full h-full col-span-3 overflow-auto border-t px-3">
+    //       <Skeleton className="w-full h-[6%] my-3" />
+    //       <div className="w-full h-[90%] flex flex-col gap-5">
+    //         <Skeleton className="w-full h-[25%]" />
+    //         <Skeleton className="w-full h-[25%]" />
+    //         <Skeleton className="w-full h-[25%]" />
+    //       </div>
+    //     </div>
+    //     <Skeleton className="w-full h-full col-span-1 overflow-auto border-t" />
+    //   </div>
+    // </div>
     <div className="w-full h-full grid grid-cols-5">
       {/* form elements / pages sidebar */}
       <DndContext
         onDragEnd={handleDragEnd}
         onDragStart={handleDragStart}
-        sensors={sensors}
-      >
+        sensors={sensors}>
         <section className="h-full max-h-full overflow-auto col-span-1 border rounded px-1 py-2">
           <ElementsPanel
             column={Columns.staticColumn}
@@ -207,8 +226,7 @@ function FormPlayground({ formRef }: FormPlaygroundProps) {
             activeComponent && activeComponent.parent === "static"
               ? null
               : { duration: 200, easing: "linear" }
-          }
-        >
+          }>
           {activeComponent !== null &&
             (activeComponent.parent === "static" ? (
               <FormStaticElementDragOverlay
@@ -278,8 +296,7 @@ function DraggableElements({ items }: DraggableElementsProps) {
           <Accordion
             type="multiple"
             defaultValue={Object.keys(builtInStaticFormElements)}
-            className="w-full h-full overflow-hidden"
-          >
+            className="w-full h-full overflow-hidden">
             <div className="w-full h-full overflow-auto flex flex-col gap-3 place-items-center ">
               {Object.entries(items).map(([category, elements]) => {
                 return (
@@ -291,8 +308,7 @@ function DraggableElements({ items }: DraggableElementsProps) {
                       <AccordionContent>
                         <div
                           key={category}
-                          className="w-full h-fit px-2 flex flex-col gap-2 my-1"
-                        >
+                          className="w-full h-fit px-2 flex flex-col gap-2 my-1">
                           {Object.entries(elements).map(([, item]) => (
                             <DraggableItem key={item.id} item={item} />
                           ))}
@@ -357,14 +373,14 @@ function renderElement(element: FormElement) {
 
 // type FormPagesProps = {};
 function FormPages() {
-  const activePageId = useMultiPageFormBuilder((s) => s.activePageId);
-  const addPage = useMultiPageFormBuilder((s) => s.addPage);
-  // const duplicatePage = useMultiPageFormBuilder((s) => s.duplicatePage);
-  const setActivePageId = useMultiPageFormBuilder((s) => s.setActivePageId);
+  const activePageId = useMultiPageFormStore((s) => s.activePageId);
+  const addPage = useMultiPageFormStore((s) => s.addPage);
+  // const duplicatePage = useMultiPageFormStore((s) => s.duplicatePage);
+  const setActivePageId = useMultiPageFormStore((s) => s.setActivePageId);
 
-  const deletePage = useMultiPageFormBuilder((s) => s.deletePage);
+  const deletePage = useMultiPageFormStore((s) => s.deletePage);
 
-  const pagesMap = useMultiPageFormBuilder((s) => s.pages);
+  const pagesMap = useMultiPageFormStore((s) => s.pages);
   const pages = Array.from(pagesMap.values());
 
   const handleAddPage = useCallback(() => {
@@ -412,8 +428,7 @@ function FormPages() {
                 "border-primary/50": page.id === activePageId,
               }
             )}
-            onClick={handleSetActivePage(page.id)}
-          >
+            onClick={handleSetActivePage(page.id)}>
             <span
               className={cn(
                 "absolute top-1 left-2 text-sm flex gap-2 place-items-center w-[80%]",
@@ -421,13 +436,11 @@ function FormPages() {
                   "font-medium": page.header.title.length > 0,
                   "font-light": page.header.title.length === 0,
                 }
-              )}
-            >
+              )}>
               <span>{pIdx + 1}.</span>
               <span
                 title={page.header.title}
-                className="w-fit max-w-full whitespace-nowrap overflow-hidden text-ellipsis"
-              >
+                className="w-fit max-w-full whitespace-nowrap overflow-hidden text-ellipsis">
                 {page.header.title.length > 0 ? page.header.title : "Untitled"}
               </span>
             </span>
@@ -448,8 +461,7 @@ function FormPages() {
                   <DropdownMenuItem
                     variant="destructive"
                     disabled={pages.length === 1}
-                    onClick={handlePageAction("delete", page.id)}
-                  >
+                    onClick={handlePageAction("delete", page.id)}>
                     <Trash />
                     Delete
                   </DropdownMenuItem>
@@ -464,8 +476,7 @@ function FormPages() {
                   <div className="w-full h-full flex justify-center place-items-center text-sm text-foreground/40">
                     empty page
                   </div>
-                }
-              >
+                }>
                 <div className="w-full max-w-full text-ellipsis flex flex-col gap-2 scale-50">
                   {page.body.elements.slice(0, 4).map((element) => (
                     // <div key={element.id} className="scale-50">
@@ -475,8 +486,7 @@ function FormPages() {
                     <div
                       className={cn(
                         `w-full h-full p-2 bg-white rounded flex flex-col gap-4 border`
-                      )}
-                    >
+                      )}>
                       <div className="w-full flex flex-col gap-[2px]">
                         <div className="w-full flex gap-0 place-items-center">
                           <Label className="w-full max-w-[90%] font-medium whitespace-nowrap overflow-hidden text-ellipsis">
@@ -517,8 +527,7 @@ function FormPages() {
       </div>
       <div
         className="w-[100%] aspect-video my-2 p-2 hover:shadow-xl hover:bg-secondary transition-all border-2 border-dashed rounded shadow"
-        onClick={handleAddPage}
-      >
+        onClick={handleAddPage}>
         <span className="w-full h-full cursor-pointer  text-muted-foreground text-sm flex gap-2 place-items-center justify-center">
           <Plus size={15} />
           Add Page

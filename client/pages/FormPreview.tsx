@@ -6,7 +6,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toStructuredPages } from "@/lib/helper";
-import { useMultiPageFormBuilder } from "@/store/form-builder.store";
+// import { useMultiPageFormBuilder } from "@/store/form-builder.store";
+import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
 import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
 
@@ -14,9 +15,9 @@ type FormPreviewProps = {
   goBack: () => void;
 };
 export default function FormPreview({ goBack }: FormPreviewProps) {
-  const title = useMultiPageFormBuilder((s) => s.title);
-  const pageSettings = useMultiPageFormBuilder((s) => s.pageSettings);
-  const pages = useMultiPageFormBuilder((s) => s.pages);
+  const title = useMultiPageFormStore((s) => s.title);
+  const pageSettings = useMultiPageFormStore((s) => s.pageSettings);
+  const pages = useMultiPageFormStore((s) => s.pages);
   const structuredConfiguration = useMemo(() => {
     const _config = toStructuredPages(title, pageSettings, pages);
     return _config

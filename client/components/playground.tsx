@@ -27,8 +27,9 @@ import { useCallback, useState, type ChangeEvent } from "react";
 import { useDndContext, useDroppable } from "@dnd-kit/core";
 import {
   useActivePage,
-  useMultiPageFormBuilder,
+  // useMultiPageFormBuilder,
 } from "@/store/form-builder.store";
+import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
 import Switch from "./utils/Switch";
 import { Bs123, BsCalendar2Date } from "react-icons/bs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -55,15 +56,15 @@ export default function Playground({
     action: activePageAction,
   } = useActivePage();
 
-  const pageSettings = useMultiPageFormBuilder((s) => s.pageSettings);
-  const setPageHeader = useMultiPageFormBuilder((s) => s.setPageHeader);
-  const updatePageAction = useMultiPageFormBuilder((s) => s.updatePageAction);
-  const updatePageSettings = useMultiPageFormBuilder(
+  const pageSettings = useMultiPageFormStore((s) => s.pageSettings);
+  const setPageHeader = useMultiPageFormStore((s) => s.setPageHeader);
+  const updatePageAction = useMultiPageFormStore((s) => s.updatePageAction);
+  const updatePageSettings = useMultiPageFormStore(
     (s) => s.updatePageSettings
   );
 
-  const activeFormElement = useMultiPageFormBuilder((s) => s.activeFormElement);
-  const setActiveFormElement = useMultiPageFormBuilder(
+  const activeFormElement = useMultiPageFormStore((s) => s.activeFormElement);
+  const setActiveFormElement = useMultiPageFormStore(
     (s) => s.setActiveFormElement
   );
 
@@ -372,7 +373,7 @@ const ItemsList = ({
   column: Column;
 }) => {
   const { active } = useDndContext();
-  const addPageElement = useMultiPageFormBuilder((s) => s.addPageElement);
+  const addPageElement = useMultiPageFormStore((s) => s.addPageElement);
   console.log({ active }, active?.data?.current?.from);
 
   const quickOptions: FormElement["type"][] = [

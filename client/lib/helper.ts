@@ -5,7 +5,10 @@ import type {
   FormElement,
   Page,
 } from "@/types/form-builder.types";
-import type { MultiPageForm } from "@/store/form-builder.store";
+import {
+  MultiPageFormState,
+  type MultiPageForm,
+} from "@/store/form-builder.store";
 import { FormConfiguration } from "@/types/form.types";
 
 export function createFormElement(type: ComponentVariants): FormElement {
@@ -182,5 +185,40 @@ export function toStructuredPages(
     title: title,
     settings: pageSettings,
     pages: [...pages.values()],
+  };
+}
+
+export function isFormEmpty(pages: MultiPageForm["pages"]) {
+  for (const page of pages.values()) {
+    if (page.body.elements.length > 0) return false;
+  }
+  return true;
+}
+export function generatePageId() {
+  return `page-${nanoid()}`;
+}
+export function updateMap<K, V>(map: Map<K, V>, id: K, fn: (value: V) => V) {
+  const clone = new Map(map);
+  const val = clone.get(id);
+  if (val === undefined) return clone;
+  return clone.set(id, fn(val));
+}
+export function pageArraytoMap(pages: Page[]): MultiPageForm["pages"] {
+  const map = new Map() as MultiPageForm["pages"];
+  for (const page of pages) {
+    map.set(page.id, page);
+  }
+  return map;
+}
+
+export function toMultiPageForm(
+  multiFormConfiguration: FormConfiguration
+): MultiPageFormState {
+  return {
+    title: multiFormConfiguration.title,
+    pages: pageArraytoMap(multiFormConfiguration.pages),
+    activePageId: multiFormConfiguration.pages[0]?.id!, // guranteed to have at least one page
+    activeFormElement: null,
+    pageSettings: multiFormConfiguration.settings,
   };
 }

@@ -20,8 +20,7 @@ function Forms() {
   return (
     <Show
       when={Array.isArray(formData) && formData.length > 0}
-      fallback={<EmtpyPage />}
-    >
+      fallback={<EmtpyPage />}>
       {/* parent */}
       <section className="py-1 px-3 h-screen">
         {/* container  */}
@@ -54,8 +53,7 @@ function EmtpyPage() {
         {/* Meh emoji */}
         <div
           role="img"
-          className="w-full flex justify-center place-items-center my-5"
-        >
+          className="w-full flex justify-center place-items-center my-5">
           <span className="inline-block align-top">
             {/* <Meh className="size-40 fill-muted-foreground/10 text-muted-foreground/50" /> */}
             <FolderOpen className="size-20" strokeWidth={1} />
@@ -71,7 +69,7 @@ function EmtpyPage() {
           </p>
         </div>
         <div className="my-2">
-          <Link to={"/form-builder"}>
+          <Link to={`/forms/${NEW_FORM_ID}`}>
             <Button>
               <Plus /> Create new form
             </Button>

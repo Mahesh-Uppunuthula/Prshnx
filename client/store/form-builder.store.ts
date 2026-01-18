@@ -7,8 +7,15 @@ import type {
   FormElement,
   Page,
 } from "@/types/form-builder.types";
-import { cloneMapAnd, createFormElement } from "@/lib/helper";
-import { nanoid } from "nanoid";
+import {
+  cloneMapAnd,
+  createFormElement,
+  generatePageId,
+  updateMap,
+} from "@/lib/helper";
+import { FormConfiguration } from "@/types/form.types";
+import { emptyPage } from "@/lib/constants";
+import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
 
 export const useActiveFormElement = create<{
   activeFormElementId: string | null;
@@ -172,36 +179,7 @@ export const useFormBuilder = create<
   ...createFormBodySlice(...props),
 }));
 
-const emptyPage: Page = {
-  id: generatePageId(),
-  action: {
-    cta: {
-      type: "cta",
-      actionType: "submit",
-      label: "Submit",
-      hasArrow: false,
-      background: {
-        type: "color",
-        value: "#000000",
-      },
-      textColor: {
-        type: "color",
-        value: "#ffffff",
-      },
-      borderRadius: "small",
-      alignment: "right",
-    },
-  },
-  header: {
-    title: "Untitled Page",
-    description: "",
-  },
-  body: {
-    elements: [],
-    // orderedElementIds: [],
-  },
-};
-export type MultiPageForm = {
+export type MultiPageFormState = {
   title: string;
   pages: Map<string, Page>;
   activePageId: Page["id"];
@@ -216,7 +194,9 @@ export type MultiPageForm = {
     /** Thank you page is the last page that respondents will see after submitting the form */
     thankYouPageId?: Page["id"];
   };
+};
 
+export type MultiPageFormActions = {
   // generic page actions
   addPage: () => void;
   // duplicatePage: (id: string) => void;
@@ -245,11 +225,13 @@ export type MultiPageForm = {
   updatePageAction: (updatedFields: Partial<Page["action"]["cta"]>) => void;
 
   updatePageSettings: (
-    updatedFields: Partial<MultiPageForm["pageSettings"]>
+    updatedFields: Partial<MultiPageFormState["pageSettings"]>
   ) => void;
 
   setTitle: (title: string) => void;
+  // seedConfiguration: (formConfig: FormConfiguration) => void;
 };
+export type MultiPageForm = MultiPageFormState & MultiPageFormActions;
 
 /**
  * This store is used to create a multi-page form
@@ -471,8 +453,8 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
         activeFormElement:
           filteredPageElements.length > 0
             ? {
-                id: filteredPageElements[0].id,
-                type: filteredPageElements[0].type,
+                id: filteredPageElements[0]!.id,
+                type: filteredPageElements[0]!.type,
               }
             : null,
       };
@@ -577,24 +559,32 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
     set({
       title,
     }),
+  // seedConfiguration: (formConfig: FormConfiguration) => {
+  //   console.log("inside seedConfiguration", { formConfig });
+  //   const pages: MultiPageForm["pages"] = new Map();
+  //   formConfig.pages.forEach((page) => {
+  //     pages.set(page.id, page);
+  //   });
+  //   set({
+  //     title: formConfig.title,
+  //     pages: pages,
+  //     activePageId: pages.keys().next().value, // first page id
+  //     activeFormElement: null,
+  //     pageSettings: formConfig.settings,
+  //   });
+  // },
 }));
 
+// export const useActivePage = () =>
+//   useMultiPageFormBuilder((state) => {
+//     const page = state.pages.get(state.activePageId)!;
+//     return page;
+//   });
 export const useActivePage = () =>
-  useMultiPageFormBuilder((state) => {
+  useMultiPageFormStore((state) => {
     const page = state.pages.get(state.activePageId)!;
     return page;
   });
-
-function updateMap<K, V>(map: Map<K, V>, id: K, fn: (value: V) => V) {
-  const clone = new Map(map);
-  const val = clone.get(id);
-  if (val === undefined) return clone;
-  return clone.set(id, fn(val));
-}
-
-function generatePageId() {
-  return `page-${nanoid()}`;
-}
 
 // const x: <k extends keyof Page>(id: string, options?: { [P in k]: true }) => void = ("asdf", {}) => {
 

@@ -5,8 +5,9 @@ import { Switch } from "@/components/ui/switch";
 import SwitchComponents from "@/components/utils/Switch";
 import {
   useActivePage,
-  useMultiPageFormBuilder,
+  // useMultiPageFormBuilder,
 } from "@/store/form-builder.store";
+import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
 import type {
   BaseFieldProperties,
   ComponentVariants,
@@ -221,13 +222,13 @@ function Toolkit() {
   //   (state) => state.activeFormElement
   // );
 
-  const activePageId = useMultiPageFormBuilder((s) => s.activePageId);
-  const pages = useMultiPageFormBuilder((s) => s.pages);
+  const activePageId = useMultiPageFormStore((s) => s.activePageId);
+  const pages = useMultiPageFormStore((s) => s.pages);
 
-  const activeFormElement = useMultiPageFormBuilder((s) => s.activeFormElement);
-  const updatePageAction = useMultiPageFormBuilder((s) => s.updatePageAction);
+  const activeFormElement = useMultiPageFormStore((s) => s.activeFormElement);
+  const updatePageAction = useMultiPageFormStore((s) => s.updatePageAction);
 
-  const updatePageElementProperties = useMultiPageFormBuilder(
+  const updatePageElementProperties = useMultiPageFormStore(
     (s) => s.updatePageElementProperties
   );
   const activePage = useActivePage();
@@ -442,8 +443,7 @@ function Toolkit() {
                 updatePageElementProperties(formElement.id, {
                   restrictDate: value as DateInputProperties["restrictDate"],
                 });
-              }}
-            >
+              }}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Restrict Date" />
               </SelectTrigger>
@@ -523,8 +523,7 @@ function Toolkit() {
                           updatePageElementProperties(formElement.id, {
                             dateRange: undefined,
                           });
-                        }}
-                      >
+                        }}>
                         clear selection
                       </Button>
                     </div>
@@ -612,8 +611,7 @@ function Toolkit() {
                 updatePageElementProperties(formElement.id, {
                   selectionType: value as SelectionProperties["selectionType"],
                 });
-              }}
-            >
+              }}>
               <ToggleGroupItem value="single" aria-label="Toggle Single">
                 Single
               </ToggleGroupItem>
@@ -641,8 +639,7 @@ function Toolkit() {
                   updatePageElementProperties(formElement.id, {
                     optionPrefix: value as SelectionProperties["optionPrefix"],
                   });
-                }}
-              >
+                }}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
@@ -752,8 +749,7 @@ function Toolkit() {
                     value: ctaObj.background.value,
                   },
                 });
-              }}
-            >
+              }}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Background Type" />
               </SelectTrigger>
@@ -763,8 +759,7 @@ function Toolkit() {
                   {PageCtaBackgroundOptions.map((option) => (
                     <SelectItem
                       value={option.value}
-                      disabled={option.value !== "color"}
-                    >
+                      disabled={option.value !== "color"}>
                       {option.label}
                     </SelectItem>
                   ))}
@@ -835,8 +830,7 @@ function Toolkit() {
                 updatePageAction({
                   borderRadius: value as PageCTA["borderRadius"],
                 });
-              }}
-            >
+              }}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Border Radius" />
               </SelectTrigger>
@@ -864,8 +858,7 @@ function Toolkit() {
                 updatePageAction({
                   alignment: value as PageCTA["alignment"],
                 });
-              }}
-            >
+              }}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Alignment" />
               </SelectTrigger>

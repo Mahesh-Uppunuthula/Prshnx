@@ -5,7 +5,8 @@ import type {
 } from "@/types/form-builder.types";
 import { cn } from "@/lib/utils";
 import InlineEdit from "./custom/InlineEdit";
-import { useMultiPageFormBuilder } from "@/store/form-builder.store";
+// import { useMultiPageFormBuilder } from "@/store/form-builder.store";
+import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
 import type { ChangeEvent } from "react";
 import { motion } from "framer-motion";
 import CreateChoiceLabels from "./create-choice-labels";
@@ -23,7 +24,7 @@ const FormPlaygroundItem: React.FC<FormPlaygroundItemProps> = ({
   // const updateElementProperties = useFormBuilder(
   //   (state) => state.updateElementProperties
   // );
-  const updatePageElementProperties = useMultiPageFormBuilder(
+  const updatePageElementProperties = useMultiPageFormStore(
     (state) => state.updatePageElementProperties
   );
 

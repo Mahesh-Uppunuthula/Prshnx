@@ -1,4 +1,5 @@
-import { useMultiPageFormBuilder } from "@/store/form-builder.store";
+// import { useMultiPageFormBuilder } from "@/store/form-builder.store";
+import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
 import {
   Collapsible,
   CollapsibleContent,
@@ -24,7 +25,7 @@ export default function CreateChoiceLabels({ item }: CreateChoiceLabelsProps) {
   const [showOptions, setShowOptions] = useState(false);
   const { choiceLabels, optionPrefix } = item.properties;
   // const updatedFormElements = useFormBuilder((s) => s.updateElementProperties);
-  const updatePageElementProperties = useMultiPageFormBuilder(
+  const updatePageElementProperties = useMultiPageFormStore(
     (s) => s.updatePageElementProperties
   );
 
@@ -67,8 +68,7 @@ export default function CreateChoiceLabels({ item }: CreateChoiceLabelsProps) {
               return (
                 <li
                   key={idx}
-                  className="flex gap-2 justify-between place-items-center my-2 text-xs group hover:bg-secondary"
-                >
+                  className="flex gap-2 justify-between place-items-center my-2 text-xs group hover:bg-secondary">
                   <div className="w-full flex gap-2 place-items-center">
                     <Prefix optionIndex={idx} optionPrefix={optionPrefix} />
                     <InlineEdit
@@ -97,8 +97,7 @@ export default function CreateChoiceLabels({ item }: CreateChoiceLabelsProps) {
                         updatePageElementProperties(item.id, {
                           choiceLabels: existingChoiceLabels,
                         });
-                      }}
-                    >
+                      }}>
                       <Copy />
                     </Button>
                     <Button
@@ -111,8 +110,7 @@ export default function CreateChoiceLabels({ item }: CreateChoiceLabelsProps) {
                         updatePageElementProperties(item.id, {
                           choiceLabels: existingChoiceLabels,
                         });
-                      }}
-                    >
+                      }}>
                       <Trash />
                     </Button>
                   </div>
@@ -124,8 +122,7 @@ export default function CreateChoiceLabels({ item }: CreateChoiceLabelsProps) {
             size={"sm"}
             className="text-xs my-1"
             variant={"outline"}
-            onClick={addEmptyOption}
-          >
+            onClick={addEmptyOption}>
             <Plus />
             Add option
           </Button>
@@ -164,8 +161,7 @@ export function FakeToggle({ content }: FakeToggleProps) {
     <Button
       variant={"outline"}
       size={"sm"}
-      className="w-6 h-6 text-xs p-2 rounded flex justify-center place-items-center"
-    >
+      className="w-6 h-6 text-xs p-2 rounded flex justify-center place-items-center">
       {content}
     </Button>
   );

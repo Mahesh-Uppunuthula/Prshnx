@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 
-import { cn } from "@/lib/utils";
+import { cn, createFirstPageScreenShot } from "@/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
-import { Eye, Pencil, Circle } from "lucide-react";
+import { Eye, Pencil, Circle, Save } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -18,14 +18,24 @@ import {
 } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
-import { lazy, Suspense, useEffect, useRef } from "react";
-import { NEW_FORM_ID } from "@/lib/constants";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef } from "react";
+import { emptyPage, NEW_FORM_ID } from "@/lib/constants";
 import InlineEdit from "@/components/custom/InlineEdit";
-import { useMultiPageFormBuilder } from "@/store/form-builder.store";
+// import { useMultiPageFormStore } from "@/store/form-builder.store";
+import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
 import { FormHealth } from "@/components/FormHealth";
 import { Insights } from "@/components/FormInsights";
 import { PerformanceTrendChart } from "@/components/FormPerformanceTrendChart";
 import FormPlayground from "@/pages/FormPlayground";
+import { isFormEmpty, toStructuredPages } from "@/lib/helper";
+import {
+  useFormConfigurationById,
+  useSaveForm,
+  useUpdateForm,
+} from "@/hooks/use-forms";
+import { toast } from "sonner";
+import { MultiPageFormProvider } from "@/context/MultiPageFormProvider";
+import { FormConfiguration } from "@/types/form.types";
 const FormOverview = lazy(() => import("@/components/FormOverview"));
 const FormResponses = lazy(() => import("@/components/FormResponses"));
 
@@ -34,31 +44,215 @@ const searchSchema = z.object({
   tab: z.enum(tabs).optional().default("overview").catch("overview"),
 });
 
+type DispatchAction =
+  | { type: "saveForm" }
+  | { type: "previewForm" }
+  | { type: "seedMultiPageFormStore" }
+  | { type: "updateForm" };
+
 export const Route = createFileRoute("/_protected/forms/$formId/")({
   component: FormDashboard,
   validateSearch: (search) => searchSchema.parse(search),
 });
 
 function FormDashboard() {
+  // router states
   const { formId } = Route.useParams();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const tab = search.tab || "overview";
 
-  const formRef = useRef<HTMLDivElement>(null);
+  // queries
+  const { data: formConfig, isLoading } = useFormConfigurationById(formId);
+
+  const initialForm: FormConfiguration | undefined = useMemo(() => {
+    if (!formConfig) {
+      console.log("multipageformprovider", "formConfig not found");
+      return undefined;
+    }
+    console.log("multipageformprovider", { formConfig });
+    const res = {
+      title: formConfig.title,
+      pages: formConfig.configuration.pages,
+      settings: formConfig.configuration.settings,
+    };
+
+    console.log("multipageformprovider", { res });
+    return res;
+  }, [formConfig]);
 
   useEffect(() => {
     navigate({
       search: {
-        tab: formId === NEW_FORM_ID ? "build" : tab,
+        tab: formId === NEW_FORM_ID ? "build" : search.tab || "overview",
       },
     });
   }, [formId]);
 
+  // For existing forms, wait until data is loaded before rendering provider
+  // This prevents the provider from being created with empty data and then recreated
+  const isExistingForm = formId !== NEW_FORM_ID;
+  if (isExistingForm && isLoading) {
+    return <div>Loading form configuration...</div>;
+  }
+
+  return (
+    <MultiPageFormProvider initialForm={initialForm}>
+      <FormDashboardContent formId={formId} isLoading={isLoading} />
+    </MultiPageFormProvider>
+  );
+}
+
+type FormDashboardContentProps = {
+  formId: string;
+  isLoading: boolean;
+};
+
+function FormDashboardContent({
+  formId,
+  isLoading,
+}: FormDashboardContentProps) {
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
+
+  // refs
+  const formRef = useRef<HTMLDivElement>(null);
+
+  // mutations
+  const { mutate: saveForm, isPending: isSavingForm } = useSaveForm();
+  const { mutate: updateForm, isPending: isUpdatingForm } = useUpdateForm();
+
+  // store states
+  const formTitle = useMultiPageFormStore((s) => s.title);
+  const pages = useMultiPageFormStore((s) => s.pages);
+  const pageSettings = useMultiPageFormStore((s) => s.pageSettings);
+
+  const setActivePageId = useMultiPageFormStore((s) => s.setActivePageId);
+  const setActiveFormElement = useMultiPageFormStore(
+    (s) => s.setActiveFormElement,
+  );
+
+  // computed states
+  const tab = search.tab || "overview";
+  const firstPageId = pages.keys().next().value!;
+  const firstPageHasElements = pages.get(firstPageId)!.body.elements.length > 0;
+
+  const dispatch = useCallback(
+    async (action: DispatchAction) => {
+      switch (action.type) {
+        case "saveForm":
+          {
+            console.log("dispatch", "saveForm", formRef, formRef.current);
+            if (!formRef || !formRef.current) return;
+
+            // set first page for preview
+            setActivePageId(pages.keys().next().value!);
+            setActiveFormElement("dummy-id", "cta");
+
+            // create the form preview screenshot
+            const formPreviewResponse = firstPageHasElements
+              ? await createFirstPageScreenShot(formRef)
+              : null;
+
+            const formData = new FormData();
+            formData.append(
+              "form",
+              JSON.stringify(toStructuredPages(formTitle, pageSettings, pages)),
+            );
+            if (formPreviewResponse && formPreviewResponse.success)
+              formData.append(
+                "preview",
+                formPreviewResponse.data,
+                `${formTitle}_preview.png`,
+              );
+
+            saveForm(formData, {
+              onSuccess: (data) => {
+                toast.success("Form saved successfully", {
+                  closeButton: true,
+                  description: "asdfasf asdfasdf asfas",
+                });
+                navigate({
+                  to: `/forms/${data.insertionId}`,
+                  search: {
+                    tab: "overview",
+                  },
+                });
+              },
+              onError: (error) => {
+                toast.error(error.message);
+              },
+            });
+          }
+          break;
+        case "updateForm":
+          {
+            console.log("dispatch", "updateForm", formRef, formRef.current);
+            if (!formRef || !formRef.current) return;
+
+            // set first page for preview
+            setActivePageId(pages.keys().next().value!);
+            setActiveFormElement("dummy-id", "cta");
+
+            // create the form preview screenshot
+            const formPreviewResponse = firstPageHasElements
+              ? await createFirstPageScreenShot(formRef)
+              : null;
+
+            const formData = new FormData();
+            formData.append(
+              "form",
+              JSON.stringify(toStructuredPages(formTitle, pageSettings, pages)),
+            );
+            if (formPreviewResponse && formPreviewResponse.success)
+              formData.append(
+                "preview",
+                formPreviewResponse.data,
+                `${formTitle}_preview.png`,
+              );
+
+            console.log({ formId });
+            updateForm(
+              { formId, form: formData },
+              {
+                onSuccess: () => {
+                  toast.success("Form updated successfully", {
+                    closeButton: true,
+                  });
+                  navigate({
+                    to: `/forms/${formId}`,
+                    search: {
+                      tab: "overview",
+                    },
+                  });
+                },
+                onError: (error) => {
+                  toast.error(error.message);
+                },
+              },
+            );
+          }
+          break;
+        case "previewForm":
+        case "seedMultiPageFormStore":
+          break;
+      }
+    },
+    [
+      formTitle,
+      pageSettings,
+      pages,
+      firstPageHasElements,
+      setActivePageId,
+      setActiveFormElement,
+      saveForm,
+      navigate,
+    ],
+  );
+
   return (
     <Tabs
       value={tab}
-      onValueChange={(value) =>
+      onValueChange={(value) => {
         navigate({
           search: (prev: any) => ({
             ...prev,
@@ -69,12 +263,15 @@ function FormDashboard() {
               | "share"
               | "settings",
           }),
-        })
-      }
-      className="h-screen bg-gray-50/50 text-foreground flex flex-col font-sans"
-    >
+        });
+      }}
+      className="h-screen bg-gray-50/50 text-foreground flex flex-col font-sans">
       {/* Top Navigation / Header */}
-      <DashboardHeader formId={formId} />
+      <DashboardHeader
+        formId={formId}
+        dispatch={dispatch}
+        isFormUpdating={isSavingForm || isUpdatingForm}
+      />
 
       <main className="w-full h-[91%] flex-1 mx-auto space-y-6 ">
         <TabsContent value="overview" className="space-y-6 mt-0">
@@ -106,9 +303,13 @@ function FormDashboard() {
             <FormResponses />
           </Suspense>
         </TabsContent>
-        <TabsContent value="build" className="mt-0">
+        <TabsContent value="build" className="mt-0 h-full">
           <Suspense fallback={<div> form-builder page Loading...</div>}>
-            <FormPlayground formRef={formRef} />
+            {isLoading ? (
+              <div>playground loading...</div>
+            ) : (
+              <FormPlayground formRef={formRef} />
+            )}
           </Suspense>
         </TabsContent>
         <TabsContent value="share" className="mt-0">
@@ -122,11 +323,26 @@ function FormDashboard() {
   );
 }
 
-function DashboardHeader({ formId }: { formId: string }) {
+type DashboardHeaderProps = {
+  formId: string;
+  dispatch: (action: DispatchAction) => void;
+  isFormUpdating: boolean;
+};
+function DashboardHeader({
+  formId,
+  dispatch,
+  isFormUpdating,
+}: DashboardHeaderProps) {
   const newForm = formId === NEW_FORM_ID;
-  const title = useMultiPageFormBuilder((s) => s.title);
-  const setTitle = useMultiPageFormBuilder((s) => s.setTitle);
-  const isPublished = false; // TODO - fetch published status from form details
+  const title = useMultiPageFormStore((s) => s.title);
+  const setTitle = useMultiPageFormStore((s) => s.setTitle);
+  const pages = useMultiPageFormStore((s) => s.pages);
+  // const { isPending: isSaving } = useSaveForm();
+
+  const isEmptyForm = useMemo(() => isFormEmpty(pages), [pages]);
+  const { data: formConfig } = useFormConfigurationById(formId);
+  const isPublished = !!formConfig?.isPublished;
+  // const a = useMultiPageFormStore((s) => s.isPublished);
   return (
     <header className="h-[9%] sticky top-0 z-10 border-b bg-background px-6 py-3">
       <div className="flex items-center justify-between mx-auto w-full relative">
@@ -144,8 +360,7 @@ function DashboardHeader({ formId }: { formId: string }) {
               <BreadcrumbItem>
                 <BreadcrumbLink
                   href="/forms"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
+                  className="text-muted-foreground hover:text-foreground transition-colors">
                   Forms
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -161,7 +376,7 @@ function DashboardHeader({ formId }: { formId: string }) {
                           {
                             "bg-gray-300 text-gray-300": !isPublished,
                             "bg-emerald-500 text-emerald-500": isPublished,
-                          }
+                          },
                         )}
                       />
                     </TooltipTrigger>
@@ -189,15 +404,13 @@ function DashboardHeader({ formId }: { formId: string }) {
             <TabsTrigger
               value="overview"
               className="px-4 text-xs"
-              disabled={newForm}
-            >
+              disabled={newForm}>
               Overview
             </TabsTrigger>
             <TabsTrigger
               value="responses"
               className="px-4 text-xs"
-              disabled={newForm}
-            >
+              disabled={newForm}>
               Responses
             </TabsTrigger>
             <TabsTrigger value="build" className="px-4 text-xs">
@@ -206,38 +419,35 @@ function DashboardHeader({ formId }: { formId: string }) {
             <TabsTrigger
               value="share"
               className="px-4 text-xs"
-              disabled={newForm}
-            >
+              disabled={newForm}>
               Share
             </TabsTrigger>
             <TabsTrigger
               value="settings"
               className="px-4 text-xs"
-              disabled={newForm}
-            >
+              disabled={newForm}>
               Settings
             </TabsTrigger>
           </TabsList>
         </div>
 
         <div className="flex items-center gap-2 ">
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={newForm}
-          >
+          <Button variant="ghost" size="sm" disabled={isEmptyForm}>
             <Eye />
             {/* TODO - add logic to enable preview only if atleast one page and one element exists */}
             Preview
           </Button>
-
-          {!newForm && (
+          {!isEmptyForm && (
             <Button
               size="sm"
-              variant={"ghost"}
-            >
-              <Pencil />
-              Edit
+              onClick={() =>
+                dispatch({
+                  type: newForm ? "saveForm" : "updateForm",
+                })
+              }
+              disabled={isFormUpdating}>
+              <Save />
+              {isFormUpdating ? "Saving..." : "Save"}
             </Button>
           )}
           {/* <div className="h-4 w-px bg-gray-200 mx-1" /> */}
