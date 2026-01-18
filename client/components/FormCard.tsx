@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn, copyToClipboard, toHumanReadableFormat } from "@/lib/utils";
-import type { SelectForm } from "@server/db/forms.schema";
+import type { SelectForm } from "@server/db/schemas/forms.schema";
 import {
   Circle,
   Copy,
@@ -38,7 +38,7 @@ export default function FormCard({ form }: FormCardProps) {
   const { mutate: deleteForm, isPending: deletingForm } = useDeleteForm();
   const navigate = useNavigate();
   const lastEdited = useMemo(() => {
-    return toHumanReadableFormat(form.updatedAt);
+    return toHumanReadableFormat(form.updatedAt, {addAgo: true});
   }, [form.updatedAt]);
 
   const openFormOverviewPage = useCallback(() => {
@@ -63,29 +63,28 @@ export default function FormCard({ form }: FormCardProps) {
           break;
       }
     },
-    [deleteForm]
+    [deleteForm],
   );
   return (
     <div
       key={form.id}
       className={cn(
         "group w-80 max-h-70 aspect-video rounded transition-all ring-1 ring-slate-200 cursor-pointer flex flex-col gap-1 p-2",
-        "hover:shadow-xl"
+        "hover:shadow-xl",
       )}
-      onClick={openFormOverviewPage}
-    >
+      onClick={openFormOverviewPage}>
       {/* header */}
       <div className="h-full bg-slate-100 relative">
         {/* form preview */}
         <div
           className={cn(
-            "absolute top-[60%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center place-items-center w-[70%] h-full scale-75"
-          )}
-        >
+            "absolute top-[60%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex justify-center place-items-center w-[70%] h-full scale-75",
+          )}>
           <Show
             when={!!form.previewLink}
-            fallback={<span className="text-muted-foreground">No Preview</span>}
-          >
+            fallback={
+              <span className="text-muted-foreground">No Preview</span>
+            }>
             <div className="w-full h-full overflow-hidden">
               <img
                 src={form.previewLink!}
@@ -99,8 +98,7 @@ export default function FormCard({ form }: FormCardProps) {
             "bg-emerald-100 text-emerald-500": form.isPublished,
             "bg-muted-foreground/10 text-muted-foreground/50":
               !form.isPublished,
-          })}
-        >
+          })}>
           <Circle
             strokeWidth={1}
             className={cn({
@@ -118,20 +116,17 @@ export default function FormCard({ form }: FormCardProps) {
             <Button
               size={"icon"}
               variant={"secondary"}
-              className="absolute top-2 right-2 invisible group-hover:visible rounded text-muted-foreground"
-            >
+              className="absolute top-2 right-2 invisible group-hover:visible rounded text-muted-foreground">
               <Ellipsis size={16} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom">
             <DropdownMenuItem
-              onClick={handleFormCardAction("copy-link", form.id)}
-            >
+              onClick={handleFormCardAction("copy-link", form.id)}>
               <Copy /> Copy link
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={handleFormCardAction("preview", form.id)}
-            >
+              onClick={handleFormCardAction("preview", form.id)}>
               <Eye /> Preview
             </DropdownMenuItem>
             {/* <DropdownMenuItem>
@@ -142,8 +137,7 @@ export default function FormCard({ form }: FormCardProps) {
             </DropdownMenuItem>
             <DropdownMenuItem
               variant="destructive"
-              onClick={handleFormCardAction("delete", form.id)}
-            >
+              onClick={handleFormCardAction("delete", form.id)}>
               {deletingForm ? <Spinner /> : <Trash />}
               Delete
             </DropdownMenuItem>
@@ -172,11 +166,11 @@ export default function FormCard({ form }: FormCardProps) {
           <TooltipTrigger>
             <div className="flex gap-2 place-items-center text-sm text-muted-foreground p-1 hover:bg-secondary rounded">
               <History size={16} strokeWidth={1} />
-              <span>{lastEdited} ago</span>
+              <span>{lastEdited}</span>
             </div>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            Last edited {lastEdited} ago
+            Last edited {lastEdited}
           </TooltipContent>
         </Tooltip>
       </div>

@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export async function createFirstPageScreenShot(
-  formRef: React.RefObject<HTMLDivElement | null>
+  formRef: React.RefObject<HTMLDivElement | null>,
 ): Promise<{ success: false; error: string } | { success: true; data: Blob }> {
   if (!formRef || !formRef.current)
     return { success: false, error: "Invalid formRef" };
@@ -31,9 +31,47 @@ export async function createFirstPageScreenShot(
   return { success: true, data: screenshot! };
 }
 
-export function toHumanReadableFormat(isoDate: string) {
+// export function toHumanReadableFormat(isoDate: string) {
+//   const now = DateTime.now().setZone("UTC");
+//   const dateTime = DateTime.fromISO(isoDate);
+
+//   const diff = now
+//     .diff(dateTime, ["years", "months", "days", "hours", "minutes"])
+//     .rescale();
+
+//   // Handle "just now"
+//   if (diff.as("minutes") < 1) return "just now";
+
+//   // Limit to topmost non-zero unit (e.g., show only "2 hours" not "2 hours, 5 min")
+//   const parts: Record<string, number> = {
+//     years: diff.years,
+//     months: diff.months,
+//     days: diff.days,
+//     hours: diff.hours,
+//     minutes: diff.minutes,
+//   };
+
+//   const [unit, value] = Object.entries(parts).find(([, v]) => v >= 1) || [
+//     "minutes",
+//     0,
+//   ];
+
+//   const rounded = Math.floor(value);
+//   const unitLabel = unit.replace(/s$/, ""); // singular form
+
+//   return `${rounded} ${unitLabel}${rounded !== 1 ? "s" : ""}`;
+// }
+type ToHumanReadableFormatOptions = {
+  addAgo?: boolean;
+};
+export function toHumanReadableFormat(
+  utcDateString: string,
+  options?: ToHumanReadableFormatOptions,
+) {
+  const addAgo = options?.addAgo ?? false;
+  console.log("utcDateString", utcDateString);
   const now = DateTime.now().setZone("UTC");
-  const dateTime = DateTime.fromISO(isoDate);
+  const dateTime = DateTime.fromSQL(utcDateString, { zone: "UTC" });
 
   const diff = now
     .diff(dateTime, ["years", "months", "days", "hours", "minutes"])
@@ -59,7 +97,11 @@ export function toHumanReadableFormat(isoDate: string) {
   const rounded = Math.floor(value);
   const unitLabel = unit.replace(/s$/, ""); // singular form
 
-  return `${rounded} ${unitLabel}${rounded !== 1 ? "s" : ""}`;
+  const label = `${rounded} ${unitLabel}${rounded !== 1 ? "s" : ""}`;
+  if(addAgo) {
+    return `${label} ago`;
+  }
+  return label;
 }
 
 export function copyToClipboard(text: string) {
