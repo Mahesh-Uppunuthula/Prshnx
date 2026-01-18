@@ -19,7 +19,17 @@ export const formsApi = {
 
     if (!saveFormQuery.ok) throw new Error("Failed to create form");
 
-    return await saveFormQuery.json();
+    const createFormResponse = await saveFormQuery.json();
+    return createFormResponse;
+  },
+  updateForm: async ({ formId, form }: { formId: string; form: FormData }) => {
+    const updateFormQuery = await fetch(`/api/protected/v1/forms/${formId}`, {
+      method: "PUT",
+      body: form,
+    });
+    if (!updateFormQuery.ok) throw new Error(`Failed to update form ${formId}`);
+    const updateFormResponse = await updateFormQuery.json();
+    return updateFormResponse;
   },
   deleteForm: async (formId: string) => {
     const deleteFormQuery = await client.api.protected.v1.forms[":id"].$delete({
