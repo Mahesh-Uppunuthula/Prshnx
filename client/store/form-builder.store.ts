@@ -13,7 +13,6 @@ import {
   generatePageId,
   updateMap,
 } from "@/lib/helper";
-import { FormConfiguration } from "@/types/form.types";
 import { emptyPage } from "@/lib/constants";
 import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
 
@@ -28,7 +27,7 @@ export const useActiveFormElement = create<{
 type FormHeaderActions = {
   setField: <k extends keyof Form["header"]>(
     fieldName: k,
-    value: Form["header"][k]
+    value: Form["header"][k],
   ) => void;
 };
 const createFormHeaderSlice: StateCreator<
@@ -50,11 +49,11 @@ type FormBodyActions = {
   deleteElement: (id: string) => void;
   updateElementProperties: (
     id: string,
-    updatedFields: Partial<FieldProperties>
+    updatedFields: Partial<FieldProperties>,
   ) => void;
 };
 const createFormBodySlice: StateCreator<Form["body"] & FormBodyActions> = (
-  set
+  set,
 ) => ({
   orderedElementIds: [],
   elements: [],
@@ -84,7 +83,7 @@ const createFormBodySlice: StateCreator<Form["body"] & FormBodyActions> = (
   },
   updateElementProperties: (
     id: string,
-    updatedFields: Partial<FieldProperties>
+    updatedFields: Partial<FieldProperties>,
   ) => {
     set((state) => {
       const updatedElements = state.elements.map((element) => {
@@ -194,6 +193,8 @@ export type MultiPageFormState = {
     /** Thank you page is the last page that respondents will see after submitting the form */
     thankYouPageId?: Page["id"];
   };
+  isDirty: boolean;
+  lastSavedForm: Omit<MultiPageFormState, "isDirty" | "lastSavedForm">;
 };
 
 export type MultiPageFormActions = {
@@ -204,31 +205,32 @@ export type MultiPageFormActions = {
   setActivePageId: (id: string) => void;
   setActiveFormElement: (
     id: string,
-    type: "cta" | FormElement["type"] | "cta"
+    type: "cta" | FormElement["type"] | "cta",
   ) => void;
 
   // page specific actions
   reorderPageElements: (sourceIndex: number, destinationIndex: number) => void;
   setPageHeader: <k extends keyof Page["header"]>(
     fieldName: k,
-    value: Page["header"][k]
+    value: Page["header"][k],
   ) => void;
 
   addPageElement: (type: ComponentVariants) => void;
   deletePageElement: (id: string) => void;
   updatePageElementProperties: (
     id: string,
-    updatedFields: Partial<FieldProperties>
+    updatedFields: Partial<FieldProperties>,
   ) => void;
 
   // page action
   updatePageAction: (updatedFields: Partial<Page["action"]["cta"]>) => void;
 
   updatePageSettings: (
-    updatedFields: Partial<MultiPageFormState["pageSettings"]>
+    updatedFields: Partial<MultiPageFormState["pageSettings"]>,
   ) => void;
 
   setTitle: (title: string) => void;
+  markSaved: () => void;
   // seedConfiguration: (formConfig: FormConfiguration) => void;
 };
 export type MultiPageForm = MultiPageFormState & MultiPageFormActions;
@@ -249,6 +251,18 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
     logo: undefined,
     thankYouPageId: undefined,
   },
+  isDirty: false,
+  lastSavedForm: {
+    title: "Untitled Form",
+    pages: new Map([[emptyPage.id, emptyPage]]),
+    activePageId: emptyPage.id,
+    activeFormElement: null,
+    pageSettings: {
+      cover: undefined,
+      logo: undefined,
+      thankYouPageId: undefined,
+    },
+  },
   setActivePageId: (pageId: string) => {
     set((state) => {
       if (!state.pages.has(pageId)) return state;
@@ -259,7 +273,7 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
   },
   setActiveFormElement: (
     id: FormElement["id"],
-    type: "cta" | FormElement["type"]
+    type: "cta" | FormElement["type"],
   ) => {
     set({
       activeFormElement: {
@@ -294,6 +308,7 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
       return {
         pages: newPages,
         activePageId: pageId,
+        isDirty: true, // mark as dirty
       };
     });
   },
@@ -338,7 +353,7 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
       /** don't delete the last page */
       if (state.pages.size === 1) return state;
       const postDeletePages = cloneMapAnd(state.pages, (pages) =>
-        pages.delete(pageId)
+        pages.delete(pageId),
       );
       const [lastEntryKey, lastEntryValue] = [...postDeletePages].pop()!;
 
@@ -373,12 +388,13 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
         pages: updatedPages,
         /** default to first page */
         activePageId: updatedPages.keys().next().value,
+        isDirty: true, // mark as dirty
       };
     });
   },
   setPageHeader: <k extends keyof Page["header"]>(
     fieldName: k,
-    value: Page["header"][k]
+    value: Page["header"][k],
   ) => {
     set((state) => ({
       pages: updateMap(state.pages, get().activePageId, (page) => ({
@@ -388,6 +404,7 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
           [fieldName]: value,
         },
       })),
+      isDirty: true, // mark as dirty
     }));
   },
 
@@ -400,7 +417,7 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
           elements: arrayMove(
             page.body.elements,
             sourceIndex,
-            destinationIndex
+            destinationIndex,
           ),
           // orderedElementIds: arrayMove(
           //   page.body.orderedElementIds,
@@ -409,6 +426,7 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
           // ),
         },
       })),
+      isDirty: true, // mark as dirty
     }));
   },
   addPageElement: (type: ComponentVariants) => {
@@ -422,6 +440,7 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
         },
       })),
       activeFormElement: { id: newElement.id, type: newElement.type },
+      isDirty: true, // mark as dirty
     }));
   },
   deletePageElement: (elementId: string) => {
@@ -429,12 +448,12 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
       const activePageElements = get().pages.get(get().activePageId)!.body
         .elements;
       const filteredPageElements = activePageElements.filter(
-        (item) => item.id !== elementId
+        (item) => item.id !== elementId,
       );
       console.log(
         "activePageElements.length > 0",
         activePageElements,
-        activePageElements.length
+        activePageElements.length,
       );
 
       return {
@@ -442,7 +461,7 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
           ...page,
           body: {
             elements: page.body.elements.filter(
-              (item) => item.id !== elementId
+              (item) => item.id !== elementId,
             ),
             // orderedElementIds: page.body.orderedElementIds.filter(
             //   (item) => item !== elementId
@@ -457,12 +476,13 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
                 type: filteredPageElements[0]!.type,
               }
             : null,
+        isDirty: true, // mark as dirty
       };
     });
   },
   updatePageElementProperties: (
     elementId: string,
-    updatedFields: Partial<FieldProperties>
+    updatedFields: Partial<FieldProperties>,
   ) => {
     set((state) => ({
       pages: updateMap(state.pages, get().activePageId, (page) => ({
@@ -529,6 +549,7 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
           }),
         },
       })),
+      isDirty: true, // mark as dirty
     }));
   },
   updatePageAction: (updatedField: Partial<Page["action"]["cta"]>) => {
@@ -546,19 +567,33 @@ export const useMultiPageFormBuilder = create<MultiPageForm>()((set, get) => ({
     }));
   },
   updatePageSettings: (
-    updatedField: Partial<MultiPageForm["pageSettings"]>
+    updatedField: Partial<MultiPageForm["pageSettings"]>,
   ) => {
     set((state) => ({
       pageSettings: {
         ...state.pageSettings,
         ...updatedField,
       },
+      isDirty: true, // mark as dirty
     }));
   },
   setTitle: (title: string) =>
     set({
       title,
+      isDirty: true, // mark as dirty
     }),
+  markSaved: () => {
+    set((state) => ({
+      isDirty: false,
+      lastSavedForm: {
+        title: state.title,
+        pages: state.pages,
+        activePageId: state.activePageId,
+        activeFormElement: state.activeFormElement,
+        pageSettings: state.pageSettings,
+      },
+    }));
+  },
   // seedConfiguration: (formConfig: FormConfiguration) => {
   //   console.log("inside seedConfiguration", { formConfig });
   //   const pages: MultiPageForm["pages"] = new Map();

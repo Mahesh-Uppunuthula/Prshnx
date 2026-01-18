@@ -145,7 +145,7 @@ export function createFormElement(type: ComponentVariants): FormElement {
 }
 
 export function convertISOtoJSDate(
-  isoString: string | undefined
+  isoString: string | undefined,
 ): Date | undefined {
   if (!isoString) return undefined;
   return DateTime.fromISO(isoString).toJSDate();
@@ -165,7 +165,7 @@ export function getAlphabetPrefix(index: number) {
 
 export function cloneMapAnd<K, V>(
   map: Map<K, V>,
-  fn: (clone: Map<K, V>) => void
+  fn: (clone: Map<K, V>) => void,
 ) {
   const clone = new Map(map);
   fn(clone);
@@ -179,7 +179,7 @@ export function getPageActionButtonId(pageId: string) {
 export function toStructuredPages(
   title: MultiPageForm["title"],
   pageSettings: MultiPageForm["pageSettings"],
-  pages: Map<string, Page>
+  pages: Map<string, Page>,
 ): FormConfiguration {
   return {
     title: title,
@@ -212,8 +212,8 @@ export function pageArraytoMap(pages: Page[]): MultiPageForm["pages"] {
 }
 
 export function toMultiPageForm(
-  multiFormConfiguration: FormConfiguration
-): MultiPageFormState {
+  multiFormConfiguration: FormConfiguration,
+): Omit<MultiPageFormState, "isDirty" | "lastSavedForm"> {
   return {
     title: multiFormConfiguration.title,
     pages: pageArraytoMap(multiFormConfiguration.pages),

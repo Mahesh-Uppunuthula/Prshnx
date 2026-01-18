@@ -137,6 +137,8 @@ function FormDashboardContent({
   const formTitle = useMultiPageFormStore((s) => s.title);
   const pages = useMultiPageFormStore((s) => s.pages);
   const pageSettings = useMultiPageFormStore((s) => s.pageSettings);
+  const isDirty = useMultiPageFormStore((s) => s.isDirty);
+  const markSaved = useMultiPageFormStore((s) => s.markSaved);
 
   const setActivePageId = useMultiPageFormStore((s) => s.setActivePageId);
   const setActiveFormElement = useMultiPageFormStore(
@@ -148,6 +150,7 @@ function FormDashboardContent({
   const firstPageId = pages.keys().next().value!;
   const firstPageHasElements = pages.get(firstPageId)!.body.elements.length > 0;
 
+  console.log({ isDirty });
   const dispatch = useCallback(
     async (action: DispatchAction) => {
       switch (action.type) {
@@ -179,9 +182,9 @@ function FormDashboardContent({
 
             saveForm(formData, {
               onSuccess: (data) => {
+                markSaved();
                 toast.success("Form saved successfully", {
                   closeButton: true,
-                  description: "asdfasf asdfasdf asfas",
                 });
                 navigate({
                   to: `/forms/${data.insertionId}`,
@@ -221,12 +224,11 @@ function FormDashboardContent({
                 formPreviewResponse.data,
                 `${formTitle}_preview.png`,
               );
-
-            console.log({ formId });
             updateForm(
               { formId, form: formData },
               {
                 onSuccess: () => {
+                  markSaved();
                   toast.success("Form updated successfully", {
                     closeButton: true,
                   });
@@ -287,7 +289,10 @@ function FormDashboardContent({
         <DashboardHeader
           formId={formId}
           dispatch={dispatch}
-          isFormUpdating={isSavingForm || isUpdatingForm}
+          state={{
+            isSyncing: isSavingForm || isUpdatingForm,
+            isSyncDisabled: isSavingForm || isUpdatingForm || !isDirty,
+          }}
         />
 
         <main className="w-full h-[91%] flex-1 mx-auto space-y-6 ">
@@ -344,19 +349,16 @@ function FormDashboardContent({
 type DashboardHeaderProps = {
   formId: string;
   dispatch: (action: DispatchAction) => void;
-  isFormUpdating: boolean;
+  state: {
+    isSyncing: boolean;
+    isSyncDisabled: boolean;
+  };
 };
-function DashboardHeader({
-  formId,
-  dispatch,
-  isFormUpdating,
-}: DashboardHeaderProps) {
+function DashboardHeader({ formId, dispatch, state }: DashboardHeaderProps) {
   const newForm = formId === NEW_FORM_ID;
   const title = useMultiPageFormStore((s) => s.title);
   const setTitle = useMultiPageFormStore((s) => s.setTitle);
   const pages = useMultiPageFormStore((s) => s.pages);
-  // const { isPending: isSaving } = useSaveForm();
-
   const isEmptyForm = useMemo(() => isFormEmpty(pages), [pages]);
   const { data: formConfig } = useFormConfigurationById(formId);
   const isPublished = !!formConfig?.isPublished;
@@ -467,9 +469,10 @@ function DashboardHeader({
                   type: newForm ? "saveForm" : "updateForm",
                 })
               }
-              disabled={isFormUpdating}>
+              variant={state.isSyncDisabled ? "outline" : "default"}
+              disabled={state.isSyncDisabled}>
               <Save />
-              {isFormUpdating ? "Saving..." : "Save"}
+              {state.isSyncing ? "Saving..." : "Save"}
             </Button>
           )}
           {/* <div className="h-4 w-px bg-gray-200 mx-1" /> */}

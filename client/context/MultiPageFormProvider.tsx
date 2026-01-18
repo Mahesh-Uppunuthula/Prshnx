@@ -40,7 +40,7 @@ export function MultiPageFormProvider({
         logo: undefined,
         thankYouPageId: undefined,
       },
-    }
+    },
   );
   console.log("Inside multipageformprovider ", { mulitPageForm });
   const [store] = useState(() =>
@@ -49,7 +49,14 @@ export function MultiPageFormProvider({
       pages: mulitPageForm.pages,
       activePageId: mulitPageForm.pages.keys().next().value!, // guaranteed to have at least one page
       activeFormElement: null,
-
+      isDirty: false,
+      lastSavedForm: {
+        title: mulitPageForm.title,
+        pages: mulitPageForm.pages,
+        activePageId: mulitPageForm.pages.keys().next().value!, // guaranteed to have at least one page
+        activeFormElement: null,
+        pageSettings: mulitPageForm.pageSettings,
+      },
       pageSettings: mulitPageForm.pageSettings,
       setActivePageId: (pageId: string) => {
         set((state) => {
@@ -61,7 +68,7 @@ export function MultiPageFormProvider({
       },
       setActiveFormElement: (
         id: FormElement["id"],
-        type: "cta" | FormElement["type"]
+        type: "cta" | FormElement["type"],
       ) => {
         set({
           activeFormElement: {
@@ -96,6 +103,7 @@ export function MultiPageFormProvider({
           return {
             pages: newPages,
             activePageId: pageId,
+            isDirty: true, // mark as dirty
           };
         });
       },
@@ -140,7 +148,7 @@ export function MultiPageFormProvider({
           /** don't delete the last page */
           if (state.pages.size === 1) return state;
           const postDeletePages = cloneMapAnd(state.pages, (pages) =>
-            pages.delete(pageId)
+            pages.delete(pageId),
           );
           const [lastEntryKey, lastEntryValue] = [...postDeletePages].pop()!;
 
@@ -175,12 +183,13 @@ export function MultiPageFormProvider({
             pages: updatedPages,
             /** default to first page */
             activePageId: updatedPages.keys().next().value,
+            isDirty: true, // mark as dirty
           };
         });
       },
       setPageHeader: <k extends keyof Page["header"]>(
         fieldName: k,
-        value: Page["header"][k]
+        value: Page["header"][k],
       ) => {
         set((state) => ({
           pages: updateMap(state.pages, get().activePageId, (page) => ({
@@ -190,6 +199,7 @@ export function MultiPageFormProvider({
               [fieldName]: value,
             },
           })),
+          isDirty: true, // mark as dirty
         }));
       },
 
@@ -202,7 +212,7 @@ export function MultiPageFormProvider({
               elements: arrayMove(
                 page.body.elements,
                 sourceIndex,
-                destinationIndex
+                destinationIndex,
               ),
               // orderedElementIds: arrayMove(
               //   page.body.orderedElementIds,
@@ -211,6 +221,7 @@ export function MultiPageFormProvider({
               // ),
             },
           })),
+          isDirty: true, // mark as dirty
         }));
       },
       addPageElement: (type: ComponentVariants) => {
@@ -224,6 +235,7 @@ export function MultiPageFormProvider({
             },
           })),
           activeFormElement: { id: newElement.id, type: newElement.type },
+          isDirty: true, // mark as dirty
         }));
       },
       deletePageElement: (elementId: string) => {
@@ -231,12 +243,12 @@ export function MultiPageFormProvider({
           const activePageElements = get().pages.get(get().activePageId)!.body
             .elements;
           const filteredPageElements = activePageElements.filter(
-            (item) => item.id !== elementId
+            (item) => item.id !== elementId,
           );
           console.log(
             "activePageElements.length > 0",
             activePageElements,
-            activePageElements.length
+            activePageElements.length,
           );
 
           return {
@@ -244,7 +256,7 @@ export function MultiPageFormProvider({
               ...page,
               body: {
                 elements: page.body.elements.filter(
-                  (item) => item.id !== elementId
+                  (item) => item.id !== elementId,
                 ),
                 // orderedElementIds: page.body.orderedElementIds.filter(
                 //   (item) => item !== elementId
@@ -259,12 +271,13 @@ export function MultiPageFormProvider({
                     type: filteredPageElements[0]!.type,
                   }
                 : null,
+            isDirty: true, // mark as dirty
           };
         });
       },
       updatePageElementProperties: (
         elementId: string,
-        updatedFields: Partial<FieldProperties>
+        updatedFields: Partial<FieldProperties>,
       ) => {
         set((state) => ({
           pages: updateMap(state.pages, get().activePageId, (page) => ({
@@ -331,6 +344,7 @@ export function MultiPageFormProvider({
               }),
             },
           })),
+          isDirty: true, // mark as dirty
         }));
       },
       updatePageAction: (updatedField: Partial<Page["action"]["cta"]>) => {
@@ -345,21 +359,24 @@ export function MultiPageFormProvider({
               },
             },
           })),
+          isDirty: true, // mark as dirty
         }));
       },
       updatePageSettings: (
-        updatedField: Partial<MultiPageForm["pageSettings"]>
+        updatedField: Partial<MultiPageForm["pageSettings"]>,
       ) => {
         set((state) => ({
           pageSettings: {
             ...state.pageSettings,
             ...updatedField,
           },
+          isDirty: true, // mark as dirty
         }));
       },
       setTitle: (title: string) =>
         set({
           title,
+          isDirty: true, // mark as dirty
         }),
       // seedConfiguration: (formConfig: FormConfiguration) => {
       //   console.log("inside seedConfiguration", { formConfig });
@@ -375,7 +392,19 @@ export function MultiPageFormProvider({
       //     pageSettings: formConfig.settings,
       //   });
       // },
-    }))
+      markSaved: () => {
+        set((state) => ({
+          isDirty: false,
+          lastSavedForm: {
+            title: state.title,
+            pages: state.pages,
+            activePageId: state.activePageId,
+            activeFormElement: state.activeFormElement,
+            pageSettings: state.pageSettings,
+          },
+        }));
+      },
+    })),
   );
   return (
     <MultiPageFormProviderContext.Provider value={store}>
@@ -385,13 +414,13 @@ export function MultiPageFormProvider({
 }
 
 export function useMultiPageFormStore<T>(
-  selector: (state: MultiPageForm) => T
+  selector: (state: MultiPageForm) => T,
 ) {
   const store = useContext(MultiPageFormProviderContext);
-  console.log({store})
+  console.log({ store });
   if (!store) {
     throw new Error(
-      "useMultiPageFormStore must be used within a MultiPageFormProvider"
+      "useMultiPageFormStore must be used within a MultiPageFormProvider",
     );
   }
 
