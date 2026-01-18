@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import { cn, createFirstPageScreenShot } from "@/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
-import { Eye, Pencil, Circle, Save } from "lucide-react";
+import { Eye, Circle, Save } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -18,8 +18,16 @@ import {
 } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef } from "react";
-import { emptyPage, NEW_FORM_ID } from "@/lib/constants";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { NEW_FORM_ID } from "@/lib/constants";
 import InlineEdit from "@/components/custom/InlineEdit";
 // import { useMultiPageFormStore } from "@/store/form-builder.store";
 import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
@@ -36,6 +44,8 @@ import {
 import { toast } from "sonner";
 import { MultiPageFormProvider } from "@/context/MultiPageFormProvider";
 import { FormConfiguration } from "@/types/form.types";
+import Show from "@/components/utils/Show";
+import FormPreview from "@/pages/FormPreview";
 const FormOverview = lazy(() => import("@/components/FormOverview"));
 const FormResponses = lazy(() => import("@/components/FormResponses"));
 
@@ -47,7 +57,6 @@ const searchSchema = z.object({
 type DispatchAction =
   | { type: "saveForm" }
   | { type: "previewForm" }
-  | { type: "seedMultiPageFormStore" }
   | { type: "updateForm" };
 
 export const Route = createFileRoute("/_protected/forms/$formId/")({
@@ -120,6 +129,9 @@ function FormDashboardContent({
   // mutations
   const { mutate: saveForm, isPending: isSavingForm } = useSaveForm();
   const { mutate: updateForm, isPending: isUpdatingForm } = useUpdateForm();
+
+  // states
+  const [preview, setPreview] = useState(false);
 
   // store states
   const formTitle = useMultiPageFormStore((s) => s.title);
@@ -233,7 +245,7 @@ function FormDashboardContent({
           }
           break;
         case "previewForm":
-        case "seedMultiPageFormStore":
+          setPreview(true);
           break;
       }
     },
@@ -249,77 +261,83 @@ function FormDashboardContent({
     ],
   );
 
+  const handlePreviewExit = useCallback(() => {
+    setPreview(false);
+  }, []);
+
   return (
-    <Tabs
-      value={tab}
-      onValueChange={(value) => {
-        navigate({
-          search: (prev: any) => ({
-            ...prev,
-            tab: value as
-              | "overview"
-              | "responses"
-              | "build"
-              | "share"
-              | "settings",
-          }),
-        });
-      }}
-      className="h-screen bg-gray-50/50 text-foreground flex flex-col font-sans">
-      {/* Top Navigation / Header */}
-      <DashboardHeader
-        formId={formId}
-        dispatch={dispatch}
-        isFormUpdating={isSavingForm || isUpdatingForm}
-      />
+    <Show when={!preview} fallback={<FormPreview goBack={handlePreviewExit} />}>
+      <Tabs
+        value={tab}
+        onValueChange={(value) => {
+          navigate({
+            search: (prev: any) => ({
+              ...prev,
+              tab: value as
+                | "overview"
+                | "responses"
+                | "build"
+                | "share"
+                | "settings",
+            }),
+          });
+        }}
+        className="h-screen bg-gray-50/50 text-foreground flex flex-col font-sans">
+        {/* Top Navigation / Header */}
+        <DashboardHeader
+          formId={formId}
+          dispatch={dispatch}
+          isFormUpdating={isSavingForm || isUpdatingForm}
+        />
 
-      <main className="w-full h-[91%] flex-1 mx-auto space-y-6 ">
-        <TabsContent value="overview" className="space-y-6 mt-0">
-          {/* KPI / Stats Section */}
-          <Suspense fallback={<div>form overview page Loading...</div>}>
-            <FormOverview />
-          </Suspense>
+        <main className="w-full h-[91%] flex-1 mx-auto space-y-6 ">
+          <TabsContent value="overview" className="space-y-6 mt-0">
+            {/* KPI / Stats Section */}
+            <Suspense fallback={<div>form overview page Loading...</div>}>
+              <FormOverview />
+            </Suspense>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              {/* Main Performance Chart */}
-              <PerformanceTrendChart />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                {/* Main Performance Chart */}
+                <PerformanceTrendChart />
 
-              {/* Drop-off Analysis */}
-              {/* <DropoffAnalysis /> */}
+                {/* Drop-off Analysis */}
+                {/* <DropoffAnalysis /> */}
+              </div>
+
+              <div className="lg:col-span-1 space-y-6">
+                {/* Sidebar Components */}
+                <FormHealth />
+                <Insights />
+                {/* <Suggestions /> */}
+              </div>
             </div>
+          </TabsContent>
 
-            <div className="lg:col-span-1 space-y-6">
-              {/* Sidebar Components */}
-              <FormHealth />
-              <Insights />
-              {/* <Suggestions /> */}
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="responses" className="mt-0">
-          <Suspense fallback={<div> form responses page Loading...</div>}>
-            <FormResponses />
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="build" className="mt-0 h-full">
-          <Suspense fallback={<div> form-builder page Loading...</div>}>
-            {isLoading ? (
-              <div>playground loading...</div>
-            ) : (
-              <FormPlayground formRef={formRef} />
-            )}
-          </Suspense>
-        </TabsContent>
-        <TabsContent value="share" className="mt-0">
-          share
-        </TabsContent>
-        <TabsContent value="settings" className="mt-0">
-          settings
-        </TabsContent>
-      </main>
-    </Tabs>
+          <TabsContent value="responses" className="mt-0">
+            <Suspense fallback={<div> form responses page Loading...</div>}>
+              <FormResponses />
+            </Suspense>
+          </TabsContent>
+          <TabsContent value="build" className="mt-0 h-full">
+            <Suspense fallback={<div> form-builder page Loading...</div>}>
+              {isLoading ? (
+                <div>playground loading...</div>
+              ) : (
+                <FormPlayground formRef={formRef} />
+              )}
+            </Suspense>
+          </TabsContent>
+          <TabsContent value="share" className="mt-0">
+            share
+          </TabsContent>
+          <TabsContent value="settings" className="mt-0">
+            settings
+          </TabsContent>
+        </main>
+      </Tabs>
+    </Show>
   );
 }
 
@@ -432,7 +450,11 @@ function DashboardHeader({
         </div>
 
         <div className="flex items-center gap-2 ">
-          <Button variant="ghost" size="sm" disabled={isEmptyForm}>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={isEmptyForm}
+            onClick={() => dispatch({ type: "previewForm" })}>
             <Eye />
             {/* TODO - add logic to enable preview only if atleast one page and one element exists */}
             Preview

@@ -1,5 +1,5 @@
 {
-  "id": "a36abae2-8d89-4225-8406-7fb2ad36a664",
+  "id": "13db5f34-2a81-44cf-ae1a-fb76348af094",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -28,17 +28,17 @@
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "varchar",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2026-01-17T08:26:23.019Z'"
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
-          "type": "varchar",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'2026-01-17T08:26:23.019Z'"
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -71,7 +71,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "title": {
           "name": "title",
@@ -124,17 +125,17 @@
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "varchar",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2026-01-17T08:26:23.018Z'"
+          "default": "now()"
         },
         "updatedAt": {
           "name": "updatedAt",
-          "type": "varchar",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
-          "default": "'2026-01-17T08:26:23.018Z'"
+          "default": "now()"
         }
       },
       "indexes": {},
