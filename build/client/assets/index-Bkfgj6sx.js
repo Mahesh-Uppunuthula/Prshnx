@@ -1,1 +1,0 @@
-import{c as t,j as e}from"./main-BKbmypsO.js";import{F as m}from"./FormNotFound-D-OUVY4V.js";import"./proxy-BIPfN8LO.js";function p(){const r=t.c(1);let o;return r[0]===Symbol.for("react.memo_cache_sentinel")?(o=e.jsx(m,{}),r[0]=o):o=r[0],o}export{p as errorComponent};

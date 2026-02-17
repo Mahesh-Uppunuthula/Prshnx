@@ -2,7 +2,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import devServer from "@hono/vite-dev-server";
-import adapter from "@hono/vite-dev-server/bun";
+import adapter from "@hono/vite-dev-server/node";
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
@@ -35,6 +35,7 @@ export default defineConfig({
   },
   server: {
     port: Number(process.env.PORT) || 3000,
+    allowedHosts: ["unprecocious-educationally-evon.ngrok-free.dev"],
   },
   build: {
     outDir: "build/client",

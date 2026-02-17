@@ -1,6 +1,7 @@
+import "dotenv/config";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
-import { serveStatic } from "hono/bun";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { ErrorResponse } from "./types/error";
 import apiRoute from "./routes/api";
 
@@ -42,7 +43,7 @@ app.use(
   "/widget.js",
   serveStatic({
     path: "./build/client/widget.js",
-  })
+  }),
 );
 app.use("*", serveStatic({ root: "./build/client" }));
 app.get("*", serveStatic({ path: "./build/client/index.html" }));
