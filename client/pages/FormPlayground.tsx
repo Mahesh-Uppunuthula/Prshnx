@@ -207,13 +207,13 @@ function FormPlayground({ formRef }: FormPlaygroundProps) {
         onDragEnd={handleDragEnd}
         onDragStart={handleDragStart}
         sensors={sensors}>
-        <section className="h-full max-h-full overflow-auto col-span-1 border rounded px-1 py-2">
+        <section className="h-full max-h-full overflow-auto col-span-1 border border-t-0 rounded px-1 py-2">
           <ElementsPanel
             column={Columns.staticColumn}
             items={builtInStaticFormElements}
           />
         </section>
-        <section className="h-full max-h-full col-span-3 overflow-auto border-t">
+        <section className="h-full max-h-full col-span-3 overflow-auto">
           <Playground
             formRef={formRef}
             items={elements}

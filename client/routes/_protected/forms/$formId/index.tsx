@@ -283,7 +283,7 @@ function FormDashboardContent({
             }),
           });
         }}
-        className="h-screen bg-gray-50/50 text-foreground flex flex-col font-sans">
+        className="h-screen gap-0 bg-gray-50/50 text-foreground flex flex-col font-sans">
         {/* Top Navigation / Header */}
         <DashboardHeader
           formId={formId}
@@ -318,7 +318,6 @@ function FormDashboardContent({
               </div>
             </div>
           </TabsContent>
-
           <TabsContent value="responses" className="mt-0">
             <Suspense fallback={<div> form responses page Loading...</div>}>
               <FormResponses />
