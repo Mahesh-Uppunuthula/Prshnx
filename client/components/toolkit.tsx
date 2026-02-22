@@ -928,7 +928,7 @@ function Toolkit() {
   };
 
   return (
-    <div className="w-full h-full px-2 py-2 border rounded">
+    <div className="w-full h-full px-2 py-2 border border-t-0 rounded">
       {/* container */}
       <div className="w-full flex flex-col justify-start gap-2 ">
         <div className="w-full text-lg font-semibold">
@@ -950,7 +950,7 @@ export default memo(Toolkit);
 
 function EmptyPage() {
   return (
-    <div className="w-full h-full flex justify-center place-items-center italic px-2 py-2 border rounded">
+    <div className="w-full h-full flex justify-center place-items-center italic px-2 py-2 border border-t-0 rounded">
       select any form element
     </div>
   );
