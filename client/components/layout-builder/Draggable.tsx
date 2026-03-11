@@ -1,14 +1,14 @@
-import { NodeType } from "@/routes/_protected/test_layout";
+import { NodeAlign } from "@/store/layout-builder.store";
 import { useDraggable } from "@dnd-kit/react";
 
 type DraggableProps = {
   id: string;
-  type: NodeType;
+  align: NodeAlign;
 };
-function Draggable({ id, type }: DraggableProps) {
+function Draggable({ id, align }: DraggableProps) {
   const { ref, isDragging } = useDraggable({
     id,
-    data: { type },
+    data: { align },
   });
   return (
     <div ref={ref} className={isDragging ? "opacity-50" : "opacity-100"}>

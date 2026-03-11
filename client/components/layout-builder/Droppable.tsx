@@ -1,17 +1,17 @@
 import { cn } from "@/lib/utils";
-import { NodeType } from "@/routes/_protected/test_layout";
+import { NodeAlign } from "@/store/layout-builder.store";
 import { useDroppable } from "@dnd-kit/react";
 
 type DroppableProps = {
   id: string;
-  type: NodeType;
+  align: NodeAlign;
 };
-function Droppable({ id, type, ...props }: DroppableProps) {
+function Droppable({ id, align, ...props }: DroppableProps) {
   console.log({ props });
   const { ref, droppable, isDropTarget } = useDroppable({
     id: id,
     data: {
-      type: type,
+      align: align,
     },
   });
   console.log({ droppable, isDropTarget });
@@ -22,8 +22,7 @@ function Droppable({ id, type, ...props }: DroppableProps) {
       className={cn("p-2", {
         "bg-green-200": isDropTarget,
         "bg-gray-200": !isDropTarget,
-      })}
-    ></div>
+      })}></div>
   );
 }
 

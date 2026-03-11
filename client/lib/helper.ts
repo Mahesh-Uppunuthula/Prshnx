@@ -10,6 +10,7 @@ import {
   type MultiPageForm,
 } from "@/store/form-builder.store";
 import { FormConfiguration } from "@/types/form.types";
+import { BuilderNode, ContainerNode, FieldNode } from "@/types/new-form-builder.types";
 
 export function createFormElement(type: ComponentVariants): FormElement {
   const id = `${type}_${nanoid().slice(0, 5)}`;
@@ -221,4 +222,16 @@ export function toMultiPageForm(
     activeFormElement: null,
     pageSettings: multiFormConfiguration.settings,
   };
+}
+
+export function assertContainerNode(
+  node: BuilderNode | undefined | null,
+): asserts node is ContainerNode {
+  if (!node) throw new Error("Node not found");
+}
+
+export function assertFieldNode(
+  node: BuilderNode | undefined | null,
+): asserts node is FieldNode {
+  if (!node) throw new Error("Node not found");
 }

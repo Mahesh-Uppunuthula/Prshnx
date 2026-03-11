@@ -1,77 +1,55 @@
 import Node from "@/components/layout-builder/Node";
 import ActionBar from "@/components/layout-builder/action-bar";
-import { cn } from "@/lib/utils";
+import type { ActionBarDispatcher } from "@/components/layout-builder/action-bar";
 import { createFileRoute } from "@tanstack/react-router";
-import { Structure } from "../../store/layout-builder.store";
+import { layoutBuilderStore } from "../../store/layout-builder.store";
+import { useShallow } from "zustand/react/shallow";
 export const Route = createFileRoute("/_protected/test_layout")({
   component: TestLayout,
 });
 
-const data: Structure = {
-  id: "root",
-  type: "column",
-  children: [
-    {
-      id: "col1",
-      type: "column",
-      children: [
-        {
-          id: "field1",
-          type: "field",
-        },
-        {
-          id: "field2",
-          type: "field",
-        },
-      ],
-    },
-    {
-      id: "col2",
-      type: "column",
-    },
-  ],
-};
-
-type Action = {
-  type: "split_horizontal" | "split_vertical";
-  payload: {parentId: string}
-}  | {
-  type: "delete";
-  payload: { id: string };
-};
-
-export type ActionBarDispatcher = (action: Action) => void; 
-
 function TestLayout() {
-  
-  function dispatchActionBarActions(action: Action){
-    switch(action.type){
-      case "split_horizontal": 
-        console.log("split horizontally", action.payload);
-      break;
+  const nodeStructure = layoutBuilderStore(useShallow((s) => s.structure));
+  const selectedNode = layoutBuilderStore(useShallow((s) => s.selectedNode));
+  const splitSection = layoutBuilderStore(useShallow((s) => s.splitSection));
+
+  const dispatchActionBarActions: ActionBarDispatcher = (action) => {
+    const { type, payload } = action;
+    switch (type) {
+      case "split_horizontal":
+        console.log("split_horizontal", payload);
+        splitSection(payload.id, "horizontal");
+        return;
       case "split_vertical":
-        console.log("split vertically", action.payload);
-      break;
+        console.log("split_vertical", payload);
+        splitSection(payload.id, "vertical");
+        return;
       case "delete":
-        console.log("delete", action.payload);
-      break;
+        console.log("delete", payload);
+        return;
     }
-  }
+  };
 
   return (
-    <div className="">
-      {data.id} - {data.type}
-      <div
+    <div className="bg-[#f5f5f5]/50 h-screen">
+      {/* <div
         className={cn("p-4 border rounded", {
-          "flex gap-2": data.type === "row",
-          "flex-col gap-2": data.type === "column",
-        })}
-      >
+          "flex gap-2": data.align === "horizontal",
+          "flex-col gap-2": data.align === "vertical",
+        })}>
         {data.children?.map((child) => (
           <Node key={child.id} {...child} />
         ))}
-      </div>
-      <ActionBar dispatch={dispatchActionBarActions} />
+      </div> */}
+      <Node {...nodeStructure} />
+      {selectedNode &&
+        (selectedNode.align === "vertical" ||
+          selectedNode.align === "horizontal") && (
+          <ActionBar
+            dispatch={dispatchActionBarActions}
+            selectedNode={selectedNode}
+          />
+        )}
     </div>
   );
 }
