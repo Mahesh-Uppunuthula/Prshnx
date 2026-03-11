@@ -180,8 +180,12 @@ function RouteComponent() {
 
     // 🔥 1. From Palette → Create new field
     if (activeData?.from === "palette") {
-      if (overNode?.type === "container") {
+      if (overNode.type === "container") {
+        // Dropped directly on the container's empty area
         addField(over.id as string, activeData.fieldType, activeData.label);
+      } else if (overNode.type === "field" && overNode.parentId) {
+        // Dropped on top of an existing field — add to its parent container instead
+        addField(overNode.parentId, activeData.fieldType, activeData.label);
       }
       return;
     }
@@ -261,7 +265,7 @@ function SortableWrapper({
 
   return (
     <div
-      className="flex-1"
+      className="w-full"
       ref={setNodeRef}
       style={style}
       {...attributes}
@@ -298,13 +302,12 @@ function ContainerNode({ id }: { id: string }) {
     <fieldset
       ref={setNodeRef}
       className={cn("w-full h-full border border-[#ccc]", {
-        "border-2 border-dashed border-indigo-400":
-          activeNode?.id === id,
+        "border-2 border-dashed border-indigo-400": activeNode?.id === id,
       })}
       style={{
         display: "flex",
         flexDirection: node.direction,
-        gap: 12,
+        gap: 8,
         padding: 12,
         // minHeight: ,
       }}>
@@ -314,7 +317,8 @@ function ContainerNode({ id }: { id: string }) {
           {
             "bg-indigo-200 text-indigo-600 font-medium px-2 rounded-xs":
               activeNode?.id === id,
-        })}
+          },
+        )}
         onClick={handleContainerClick}>
         {node.id}
       </legend>
@@ -442,6 +446,7 @@ function ActionPanel() {
           </Button>
           <Button
             variant={"outline"}
+            disabled={activeNode.id === "root"}
             onClick={() => deleteNode(activeNode.id)}>
             <LuTrash /> Delete
           </Button>
