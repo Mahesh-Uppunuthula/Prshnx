@@ -2,6 +2,27 @@ import { create } from "zustand";
 import { nanoid } from "nanoid";
 import { BuilderNode, BuilderState } from "@/types/new-form-builder.types";
 
+
+/**
+ * {
+ *   rootId: string;
+ *   nodes: Record<string, BuilderNode>;
+ *   pages: Record<string, Page>;
+ * }
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+export type Page = {
+  id: string;
+  name: string;
+  // layout: BuilderState;
+  // action: PageAction;
+}
+
 type ActiveNode = Pick<BuilderNode, "id" | "type" | "parentId">;
 type State = {
   past: BuilderState[];
@@ -20,6 +41,7 @@ type Actions = {
   ) => void;
   moveNode: (nodeId: string, newParentId: string, overId?: string) => void;
   deleteNode: (nodeId: string) => void;
+  // emptyContainer: (nodeId: string) => void;
   wrapNodes: (nodeIds: string[], direction: "row" | "column") => void;
   commit: (newPresent: BuilderState) => void;
   undo: () => void;
@@ -68,7 +90,7 @@ const removeFromParent = (
   }
 };
 
-export const useBuilderStore = create<Store>((set, get) => ({
+export const useNewBuilderStore = create<Store>((set, get) => ({
   past: [],
   present: initialState,
   future: [],
@@ -140,7 +162,7 @@ export const useBuilderStore = create<Store>((set, get) => ({
     }
 
     get().commit(newState);
-    set({ activeNode: { id: newId, type: "container", parentId } });
+    // set({ activeNode: { id: newId, type: "container", parentId } });
   },
 
   changeContainerDirection: (nodeId, direction) => {
@@ -220,6 +242,21 @@ export const useBuilderStore = create<Store>((set, get) => ({
     deleteSubtree(nodeId);
     get().commit(newState);
   },
+
+  // emptyContainer: (nodeId) => {
+  //   const { present } = get();
+  //   const node = present.nodes[nodeId];
+  //   if (!node || node.type !== "container") return;
+
+  //   const newState = structuredClone(present);
+  //   const targetNode = newState.nodes[nodeId];
+
+  //   if (targetNode && targetNode.type === "container") {
+  //     targetNode.children = [];
+  //   }
+
+  //   get().commit(newState);
+  // },
 
   // ✅ Wrap Multiple Nodes
   wrapNodes: (nodeIds, direction) => {

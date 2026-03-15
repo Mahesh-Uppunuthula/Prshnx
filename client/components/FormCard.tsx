@@ -38,7 +38,7 @@ export default function FormCard({ form }: FormCardProps) {
   const { mutate: deleteForm, isPending: deletingForm } = useDeleteForm();
   const navigate = useNavigate();
   const lastEdited = useMemo(() => {
-    return toHumanReadableFormat(form.updatedAt, {addAgo: true});
+    return toHumanReadableFormat(form.updatedAt, { addAgo: true });
   }, [form.updatedAt]);
 
   const openFormOverviewPage = useCallback(() => {

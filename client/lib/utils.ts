@@ -98,7 +98,7 @@ export function toHumanReadableFormat(
   const unitLabel = unit.replace(/s$/, ""); // singular form
 
   const label = `${rounded} ${unitLabel}${rounded !== 1 ? "s" : ""}`;
-  if(addAgo) {
+  if (addAgo) {
     return `${label} ago`;
   }
   return label;

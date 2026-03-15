@@ -20,6 +20,7 @@ import { MouseEvent, useState } from "react";
 import {
   LuFoldHorizontal,
   LuFoldVertical,
+  LuPaintbrush,
   LuSquareDashed,
   LuTrash,
 } from "react-icons/lu";
@@ -32,21 +33,21 @@ export const Route = createFileRoute("/new_layout")({
   component: RouteComponent,
 });
 
-type Node =
-  | {
-      id: string;
-      type: "container";
-      direction: "row" | "column";
-      parentId: string | null;
-      children: string[];
-    }
-  | {
-      id: string;
-      type: "field";
-      fieldType: string;
-      label: string;
-      parentId: string;
-    };
+// type Node =
+//   | {
+//       id: string;
+//       type: "container";
+//       direction: "row" | "column";
+//       parentId: string | null;
+//       children: string[];
+//     }
+//   | {
+//       id: string;
+//       type: "field";
+//       fieldType: string;
+//       label: string;
+//       parentId: string;
+//     };
 // export const initialState: {
 //   rootId: string;
 //   nodes: Record<string, Node>;
@@ -282,9 +283,16 @@ function ContainerNode({ id }: { id: string }) {
   // assertion
   assertContainerNode(node);
 
+  // const [isDragging, setIsDragging] = useState(false);
+  // useDndMonitor({
+  //   onDragStart: () => setIsDragging(true),
+  //   onDragEnd: () => setIsDragging(false),
+  //   onDragCancel: () => setIsDragging(false),
+  // });
+
   // useDroppable registers this container as a drop target for fields.
   // We do NOT use useSortable here — containers are not draggable.
-  const { setNodeRef } = useDroppable({ id });
+  const { setNodeRef, isOver } = useDroppable({ id });
 
   const strategy =
     node.direction === "row"
@@ -301,32 +309,38 @@ function ContainerNode({ id }: { id: string }) {
   return (
     <fieldset
       ref={setNodeRef}
-      className={cn("w-full h-full border border-[#ccc]", {
-        "border-2 border-dashed border-indigo-400": activeNode?.id === id,
-      })}
+      className={cn(
+        "w-full h-full max-h-[500px] border-2 border-slate-400/30 rounded overflow-auto",
+        {
+          "border-dashed border-indigo-400": activeNode?.id === id,
+          "border-dashed border-emerald-400": isOver,
+        },
+      )}
       style={{
         display: "flex",
         flexDirection: node.direction,
         gap: 8,
-        padding: 12,
-        // minHeight: ,
+        padding: 15,
       }}>
       <legend
         className={cn(
-          "text-xs text-slate-500 cursor-pointer select-none px-1",
+          "text-xs text-slate-500 cursor-pointer select-none px-2",
           {
-            "bg-indigo-200 text-indigo-600 font-medium px-2 rounded-xs":
+            "bg-indigo-200 text-indigo-600 font-medium rounded-xs":
               activeNode?.id === id,
+            "bg-emerald-200 text-emerald-600 font-medium rounded-xs": isOver,
           },
         )}
         onClick={handleContainerClick}>
         {node.id}
       </legend>
-      <SortableContext items={node.children} strategy={strategy}>
-        {node.children.map((childId) => (
-          <RenderNode key={childId} id={childId} />
-        ))}
-      </SortableContext>
+      {
+        <SortableContext items={node.children} strategy={strategy}>
+          {node.children.map((childId) => (
+            <RenderNode key={childId} id={childId} />
+          ))}
+        </SortableContext>
+      }
     </fieldset>
   );
 }
@@ -444,11 +458,14 @@ function ActionPanel() {
             onClick={() => changeContainerDirection(activeNode.id, "column")}>
             <LuFoldVertical /> Align Vertical
           </Button>
+          <Button variant={"outline"} onClick={() => deleteNode(activeNode.id)}>
+            <LuPaintbrush /> Clear All Fields
+          </Button>
           <Button
             variant={"outline"}
             disabled={activeNode.id === "root"}
             onClick={() => deleteNode(activeNode.id)}>
-            <LuTrash /> Delete
+            <LuTrash /> Delete Container
           </Button>
         </ButtonGroup>
       </div>
