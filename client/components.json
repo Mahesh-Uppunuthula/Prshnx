@@ -17,5 +17,8 @@
     "ui": "@/components/ui",
     "lib": "@/libs",
     "hooks": "@/hooks"
-  }
+  },
+  "menuColor": "default",
+  "menuAccent": "subtle",
+  "registries": {}
 }
