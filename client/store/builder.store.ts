@@ -72,7 +72,7 @@
 //   },
 // };
 
-import { createDefaultPage, generatePageId } from "@/lib/helper";
+import { createDefaultPage, generateComponentId } from "@/lib/helper";
 import { ContainerNode, Node, Page } from "@/types/builder.types";
 import { createStore } from "zustand";
 
@@ -163,22 +163,34 @@ import { createStore } from "zustand";
 //   page2: {};
 // };
 
-export type ActivePage = Pick<Page, "id" | "label"> | null;
-export type ActiveNode = Pick<Node, "id" | "label" | "type"> | null;
+export type ActivePage = Pick<Page, "id"> | null;
+export type ActiveNode = Pick<Node, "id" | "type"> | null;
 
 export type BuilderState = {
   pagesOrder: Page["id"][];
   pages: Record<Page["id"], Page>;
-  activeNode: ActiveNode;
-  activePage: ActivePage;
+  active: {
+    node: ActiveNode;
+    page: ActivePage;
+  };
+};
+
+export type Active = {
+  page: ActivePage;
+  node: ActiveNode;
 };
 
 export type BuilderActions = {
   // page actions
   addPage: (pageLabel: Page["label"]) => void;
   deletePage: (pageId: Page["id"]) => void;
+  addContainer: (pageId: Page["id"], parentId: Node["id"]) => void;
+  deleteNode: (pageId: Page["id"], nodeId: Node["id"]) => void;
 
+  setActive: (active: Active) => void;
   setActivePage: (activePage: ActivePage) => void;
+  // setActiveNode: (activeNode: ActiveNode) => void;
+  // setActivePage: (activePage: ActivePage) => void;
 
   // // layout actions
   // addContainer: (
@@ -197,14 +209,6 @@ export type BuilderActions = {
 export type InitialBuilderState = Pick<BuilderState, "pages" | "pagesOrder">;
 export type BuilderStore = BuilderState & BuilderActions;
 
-const defaultRootNode: ContainerNode = {
-  id: "root",
-  type: "container",
-  label: "main",
-  orientation: "vertical",
-  children: [],
-};
-
 const defaultPage = createDefaultPage("Introduction");
 const defaultInitialBuilderState: InitialBuilderState = {
   pages: { [defaultPage.id]: defaultPage },
@@ -214,14 +218,19 @@ const defaultInitialBuilderState: InitialBuilderState = {
 export function createBuilderStore(
   initialBuilderState = defaultInitialBuilderState,
 ) {
-  const store = createStore<BuilderStore>((set, get) => ({
-    activeNode: null,
+  const store = createStore<BuilderStore>((set) => ({
+    active: {
+      node: {
+        id: defaultPage.rootId,
+        type: defaultPage.nodes[defaultPage.rootId]!.type,
+      },
+      page: {
+        id: defaultPage.id,
+      },
+    },
     pages: initialBuilderState.pages,
     pagesOrder: initialBuilderState.pagesOrder,
-    activePage: {
-      id: defaultPage.id,
-      label: defaultPage.label,
-    },
+    // core actions
     addPage: (pageLabel) => {
       const page = createDefaultPage(pageLabel);
       set((state) => ({
@@ -230,9 +239,14 @@ export function createBuilderStore(
           [page.id]: page,
         },
         pagesOrder: [...state.pagesOrder, page.id],
-        activePage: {
-          id: page.id,
-          label: page.label,
+        active: {
+          page: {
+            id: page.id,
+          },
+          node: {
+            id: page.rootId,
+            type: page.nodes[page.rootId]!.type,
+          },
         },
       }));
     },
@@ -246,17 +260,113 @@ export function createBuilderStore(
         return {
           pages: newPages,
           pagesOrder: newPagesOrder,
-          activePage: state.activePage?.id === pageId ? null : state.activePage,
+          active: {
+            page: state.active.page?.id === pageId ? null : state.active.page,
+            node: null,
+          },
         };
       });
     },
-    setActivePage: (activePage) => {
-      set({
-        activePage,
+    addContainer: (pageId, parentId) => {
+      set((state) => {
+        const page = state.pages[pageId];
+        if (!page) return state;
+        const newPage = structuredClone(page);
+        const newContainer: ContainerNode = {
+          id: generateComponentId("container"),
+          type: "container",
+          label: "container",
+          orientation: "vertical",
+          children: [],
+        };
+        const parentNode = newPage.layout[parentId];
+        if (!parentNode) return state;
+        parentNode.children.push(newContainer.id);
+        newPage.layout[newContainer.id] = {
+          parentId,
+          children: [],
+        };
+        newPage.nodes[newContainer.id] = newContainer;
+        return {
+          pages: {
+            ...state.pages,
+            [pageId]: newPage,
+          },
+        };
       });
     },
+    deleteNode: (pageId, nodeId) => {
+      set((state) => {
+        const page = state.pages[pageId];
+        if (!page) return state;
+
+        const newPage = structuredClone(page);
+        const containerNode = newPage.layout[nodeId];
+        if (!containerNode) return state;
+
+        const parentNode = newPage.layout[containerNode.parentId!];
+
+        if (!parentNode) return state;
+        // Remove from parent
+        parentNode.children = parentNode.children.filter((id) => id !== nodeId);
+
+        // delete subtree
+        deleteSubtree(nodeId, newPage);
+
+        return {
+          pages: {
+            ...state.pages,
+            [pageId]: newPage,
+          },
+          active: {
+            ...state.active,
+            node: state.active.node?.id === nodeId ? null : state.active.node,
+          },
+        };
+      });
+    },
+    // side actions
+    setActive: (active) => {
+      set((state) => ({
+        active: {
+          ...state.active,
+          ...active,
+        },
+      }));
+    },
+    setActivePage: (activePage) => {
+      set((state) => {
+        const page = activePage ? state.pages[activePage.id] : null;
+        return {
+          active: {
+            page: activePage,
+            node: activePage
+              ? {
+                  id: page!.rootId,
+                  type: page!.nodes[page!.rootId]!.type,
+                }
+              : null,
+          },
+        };
+      });
+    },
+    // setActiveNode: (activeNode) => {
+    //   set({
+    //     activeNode,
+    //   });
+    // },
   }));
 
   return store;
 }
 
+const deleteSubtree = (id: string, page: Page) => {
+  const nodeLayout = page.layout[id];
+  if (!nodeLayout) return;
+  const nodeDetails = page.nodes[id];
+  if (nodeDetails?.type === "container") {
+    const children = [...nodeLayout.children];
+    children.forEach((childId) => deleteSubtree(childId, page));
+  }
+  delete page.layout[id];
+};

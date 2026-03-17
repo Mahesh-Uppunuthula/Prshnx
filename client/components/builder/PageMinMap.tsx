@@ -54,11 +54,11 @@ export default function PagesMinMap() {
   const [isOver, setIsOver] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const pages = useBuilderStore((s) => s.pages);
-  const activePage = useBuilderStore((s) => s.activePage);
+  const active = useBuilderStore((s) => s.active);
   const setActivePage = useBuilderStore((s) => s.setActivePage);
 
   function navigateToPage(nextActivePage: NonNullable<ActivePage>) {
-    if (activePage?.id === nextActivePage.id) return;
+    if (active.page?.id === nextActivePage.id) return;
     setActivePage(nextActivePage);
     const element = document.getElementById(nextActivePage.id);
     element?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -74,7 +74,7 @@ export default function PagesMinMap() {
               <div
                 key={`pages_min_map:${page.id}`}
                 className={cn("w-full border border-slate-200 rounded", {
-                  "border-slate-600": page.id === activePage?.id,
+                  "border-slate-600": page.id === active.page?.id,
                 })}
               />
             ))}
@@ -91,16 +91,14 @@ export default function PagesMinMap() {
           {Object.values(pages).map((page) => (
             <div
               key={`pages_min_map:${page.id}`}
-              onClick={() =>
-                navigateToPage({ id: page.id, label: page.label })
-              }>
+              onClick={() => navigateToPage({ id: page.id })}>
               <div
                 title={page.label}
                 className={cn(
                   "w-full max-w-full whitespace-nowrap text-xs cursor-pointer text-slate-400 hover:bg-muted px-1 py-[0.15rem] rounded text-ellipsis overflow-hidden",
                   {
-                    "text-indigo-600 font-medium": page.id === activePage?.id,
-                    "hover:text-slate-800": "page.id" !== activePage?.id,
+                    "text-indigo-600 font-medium": page.id === active.page?.id,
+                    "hover:text-slate-800": "page.id" !== active.page?.id,
                   },
                 )}>
                 {page.label}

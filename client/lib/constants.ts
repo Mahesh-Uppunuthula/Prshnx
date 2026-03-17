@@ -8,6 +8,8 @@ import type {
   StaticFormElements,
 } from "@/types/form-builder.types";
 import { generatePageId } from "./helper";
+import { FieldTypes } from "@/types/builder.types";
+import { From } from "@/components/builder/Layout";
 
 export const builtInStaticFormElements: StaticFormElements = {
   text: {
@@ -130,3 +132,62 @@ export const emptyPage: Page = {
     // orderedElementIds: [],
   },
 };
+
+export type PaletteFieldCategory = "text" | "date&time" | "choice";
+
+export type PaletteElement = {
+  id: string;
+  type: FieldTypes;
+  label: string;
+  category: PaletteFieldCategory;
+  from: From;
+};
+
+export const paletteElements: PaletteElement[] = [
+  {
+    id: "palette:single-line-input",
+    type: "single-line-input",
+    label: "Text Box",
+    category: "text",
+    from: "palette",
+  },
+  {
+    id: "palette:single-line-hidden-input",
+    type: "single-line-hidden-input",
+    label: "Password",
+    category: "text",
+    from: "palette",
+  },
+  {
+    id: "palette:multi-line-input",
+    type: "multi-line-input",
+    label: "Text Area",
+    category: "text",
+    from: "palette",
+  },
+  {
+    id: "palette:number-input",
+    type: "number-input",
+    label: "Number",
+    category: "text",
+    from: "palette",
+  },
+  // {
+  //   id: "palette:date-input",
+  //   type: "date-input",
+  //   label: "Date",
+  //   category: "date&time",
+  // },
+  // {
+  //   id: "palette:time-input",
+  //   type: "time-input",
+  //   label: "Time",
+  //   category: "date&time",
+  // },
+  // {
+  //   id: "palette:selection",
+  //   type: "selection",
+  //   label: "Selection",
+  //   category: "choice",
+  // },
+];

@@ -10,12 +10,17 @@ import {
   type MultiPageForm,
 } from "@/store/form-builder.store";
 import { FormConfiguration } from "@/types/form.types";
+// import {
+//   BuilderNode,
+//   ContainerNode,
+//   FieldNode,
+// } from "@/types/new-form-builder.types";
 import {
-  BuilderNode,
+  Page as BuilderPage,
   ContainerNode,
   FieldNode,
-} from "@/types/new-form-builder.types";
-import { Page as BuilderPage } from "@/types/builder.types";
+  Node,
+} from "@/types/builder.types";
 
 export function createFormElement(type: ComponentVariants): FormElement {
   const id = `${type}_${nanoid().slice(0, 5)}`;
@@ -229,24 +234,25 @@ export function toMultiPageForm(
   };
 }
 
-export function assertContainerNode(
-  node: BuilderNode | undefined | null,
-): asserts node is ContainerNode {
-  if (!node) throw new Error("Node not found");
-}
+// export function assertContainerNodeLegacy(
+//   node: BuilderNode | undefined | null,
+// ): asserts node is ContainerNode {
+//   if (!node) throw new Error("Node not found");
+// }
 
-export function assertFieldNode(
-  node: BuilderNode | undefined | null,
-): asserts node is FieldNode {
-  if (!node) throw new Error("Node not found");
-}
+// export function assertFieldNode(
+//   node: BuilderNode | undefined | null,
+// ): asserts node is FieldNode {
+//   if (!node) throw new Error("Node not found");
+// }
 
 export function createDefaultPage(pageLabel: BuilderPage["label"]) {
   const pageId = generatePageId();
+  const rootContainerId = generateComponentId("container");
   const page: BuilderPage = {
     id: pageId,
     label: pageLabel,
-    rootId: "root",
+    rootId: rootContainerId,
     layout: {
       root: {
         parentId: null,
@@ -254,8 +260,8 @@ export function createDefaultPage(pageLabel: BuilderPage["label"]) {
       },
     },
     nodes: {
-      root: {
-        id: "root",
+      [rootContainerId]: {
+        id: rootContainerId,
         label: "root",
         type: "container",
         orientation: "vertical",
@@ -264,4 +270,27 @@ export function createDefaultPage(pageLabel: BuilderPage["label"]) {
     },
   };
   return page;
+}
+
+export function generateComponentId(component: "page" | "container" | "field") {
+  switch (component) {
+    case "page":
+    case "container":
+    case "field":
+      return `${component}-${nanoid()}`;
+    default:
+      throw new Error("Invalid component type");
+  }
+}
+
+export function assertContainerNode(
+  node: Node | undefined | null,
+): asserts node is ContainerNode {
+  if (!node) throw new Error("Node not found");
+}
+
+export function assertFieldNode(
+  node: Node | undefined | null,
+): asserts node is FieldNode {
+  if (!node) throw new Error("Node not found");
 }
