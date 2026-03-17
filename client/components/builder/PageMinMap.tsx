@@ -3,6 +3,11 @@ import { ActivePage } from "@/store/builder.store";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useRef, useState } from "react";
+import { Page } from "@/types/builder.types";
+
+function getPageMinMapId(id: Page["id"]) {
+  return `pages_min_map:${id}`;
+}
 
 export default function PagesMinMap() {
   //   const dummyPages = [
@@ -61,6 +66,7 @@ export default function PagesMinMap() {
     if (active.page?.id === nextActivePage.id) return;
     setActivePage(nextActivePage);
     const element = document.getElementById(nextActivePage.id);
+    console.log({ element });
     element?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   return (
@@ -72,7 +78,7 @@ export default function PagesMinMap() {
           <div className="w-5 h-fit flex flex-col gap-3">
             {Object.values(pages).map((page) => (
               <div
-                key={`pages_min_map:${page.id}`}
+                key={getPageMinMapId(page.id)}
                 className={cn("w-full border border-slate-200 rounded", {
                   "border-slate-600": page.id === active.page?.id,
                 })}
@@ -90,7 +96,7 @@ export default function PagesMinMap() {
         <div className="h-fit flex flex-col gap-2  overflow-auto">
           {Object.values(pages).map((page) => (
             <div
-              key={`pages_min_map:${page.id}`}
+              key={getPageMinMapId(page.id)}
               onClick={() => navigateToPage({ id: page.id })}>
               <div
                 title={page.label}

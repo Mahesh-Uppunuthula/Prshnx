@@ -35,7 +35,8 @@ export function PageHeader({ page, idx }: PageHeaderProps) {
   const active = useBuilderStore((s) => s.active);
   const setActivePage = useBuilderStore((s) => s.setActivePage);
   return (
-    <span
+    <div
+      id={page.id}
       className={cn(
         "w-fit text-xs font-light text-slate-400 cursor-pointer px-2 py-1 hover:bg-muted rounded flex gap-2 place-items-center",
       )}
@@ -47,7 +48,7 @@ export function PageHeader({ page, idx }: PageHeaderProps) {
         })}>
         {page.label}
       </span>
-    </span>
+    </div>
   );
 }
 
