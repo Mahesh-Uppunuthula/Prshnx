@@ -186,6 +186,7 @@ export type BuilderActions = {
   deletePage: (pageId: Page["id"]) => void;
   addContainer: (pageId: Page["id"], parentId: Node["id"]) => void;
   deleteNode: (pageId: Page["id"], nodeId: Node["id"]) => void;
+  // addField: (pageId: Page["id"], parentId: Node["id"]) => void;
 
   setActive: (active: Active) => void;
   setActivePage: (activePage: ActivePage) => void;
@@ -268,14 +269,18 @@ export function createBuilderStore(
       });
     },
     addContainer: (pageId, parentId) => {
+      console.log("add container");
       set((state) => {
         const page = state.pages[pageId];
+        console.log("add container", { page });
         if (!page) return state;
         const newPage = structuredClone(page);
+
+        newPage["containerCount"]++;
         const newContainer: ContainerNode = {
           id: generateComponentId("container"),
           type: "container",
-          label: "container",
+          label: `Container ${newPage["containerCount"]}`,
           orientation: "vertical",
           children: [],
         };
@@ -287,6 +292,7 @@ export function createBuilderStore(
           children: [],
         };
         newPage.nodes[newContainer.id] = newContainer;
+        console.log({ newPage });
         return {
           pages: {
             ...state.pages,

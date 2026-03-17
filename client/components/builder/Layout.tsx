@@ -8,6 +8,8 @@ import ElementsPanel from "./ElementsPanel";
 import PagesMinMap from "./PageMinMap";
 import Playground from "./Playground";
 import { useState } from "react";
+import { Node, Page } from "@/types/builder.types";
+import { useBuilderStore } from "@/hooks/use-builder-store";
 
 export type DraggingComponent = {
   label: string;
@@ -22,9 +24,20 @@ export type DraggingComponent = {
     }
 );
 
+export type DroppableComponent = {
+  to: "playground";
+  componentType: "container";
+  pageId: Page["id"];
+  nodeId: Node["id"];
+};
+
 export type From = DraggingComponent["from"];
 
 export default function BuilderBodyLayout() {
+  //builder store
+  // const addField = useBuilderStore((s) => s.addField);
+  const addContainer = useBuilderStore((s) => s.addContainer);
+
   const [draggingComponent, setDraggingComponent] =
     useState<DraggingComponent | null>(null);
 
@@ -41,9 +54,22 @@ export default function BuilderBodyLayout() {
   }
 
   function handleDragEnd(e: DragEndEvent) {
-    const { over } = e;
-    if (over) {
-      console.log({ over });
+    const { over, active } = e;
+    console.log({ active, over });
+
+    if (!active || !over) return;
+
+    // to will always be playground
+    const activeData = active.data.current as DraggingComponent;
+    const droppableData = over.data.current as DroppableComponent;
+    const to = droppableData.to;
+    const from = activeData.from;
+
+    console.log({ to, from }, droppableData);
+
+    if (from === "palette") {
+      console.log("palette");
+      addContainer(droppableData.pageId, droppableData.nodeId);
     }
     setDraggingComponent(null);
   }

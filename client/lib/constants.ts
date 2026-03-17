@@ -133,7 +133,7 @@ export const emptyPage: Page = {
   },
 };
 
-export type PaletteFieldCategory = "text" | "date&time" | "choice";
+export type PaletteFieldCategory = "text" | "date&time" | "choice" | "layout";
 
 export type PaletteElement = {
   id: string;
@@ -170,6 +170,13 @@ export const paletteElements: PaletteElement[] = [
     type: "number-input",
     label: "Number",
     category: "text",
+    from: "palette",
+  },
+  {
+    id: "palette:container",
+    type: "container",
+    label: "Container",
+    category: "layout",
     from: "palette",
   },
   // {

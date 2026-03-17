@@ -10,6 +10,7 @@ import { MouseEvent } from "react";
 import { cn } from "@/lib/utils";
 import RenderNode from "./RenderNode";
 import { Node, Page } from "@/types/builder.types";
+import { DroppableComponent } from "./Layout";
 
 type ContainerNodeProps = {
   pageId: Page["id"];
@@ -37,7 +38,15 @@ export default function ContainerNode({ pageId, nodeId }: ContainerNodeProps) {
 
   // useDroppable registers this container as a drop target for fields.
   // We do NOT use useSortable here — containers are not draggable.
-  const { setNodeRef, isOver } = useDroppable({ id: nodeId });
+  const { setNodeRef, isOver } = useDroppable({
+    id: nodeId,
+    data: {
+      to: "playground",
+      componentType: "container",
+      pageId,
+      nodeId,
+    } satisfies DroppableComponent,
+  });
 
   const strategy =
     node.orientation === "horizontal"
@@ -69,7 +78,7 @@ export default function ContainerNode({ pageId, nodeId }: ContainerNodeProps) {
       }}>
       <legend
         className={cn(
-          "text-xs text-slate-500 cursor-pointer select-none px-2 rounded-xs",
+          "text-[0.6rem] text-slate-500 cursor-pointer select-none px-2 rounded-xs",
           {
             "bg-indigo-200 text-indigo-600 font-medium":
               active.node?.id === nodeId,

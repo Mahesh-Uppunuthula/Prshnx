@@ -249,6 +249,8 @@ export function toMultiPageForm(
 export function createDefaultPage(pageLabel: BuilderPage["label"]) {
   const pageId = generatePageId();
   const rootContainerId = generateComponentId("container");
+  const containerCount = 1;
+  const fieldCount = 0;
   const page: BuilderPage = {
     id: pageId,
     label: pageLabel,
@@ -262,12 +264,14 @@ export function createDefaultPage(pageLabel: BuilderPage["label"]) {
     nodes: {
       [rootContainerId]: {
         id: rootContainerId,
-        label: "root",
+        label: `Container ${containerCount}`,
         type: "container",
         orientation: "vertical",
         children: [],
       },
     },
+    containerCount,
+    fieldCount,
   };
   return page;
 }

@@ -34,11 +34,19 @@ export type NumberInputProperties = BaseFieldProperties & {
   max: number;
 };
 
+// non interactable fields
+export type ContainerProperties = {
+  type: "container";
+  id: string;
+  label: string;
+};
+
 export type Fields =
   | SingleLineInputProperties
   | SingleLineHiddenInputProperties
   | MultiLineInputProperties
-  | NumberInputProperties;
+  | NumberInputProperties
+  | ContainerProperties;
 
 export type FieldTypes = Fields["type"];
 
@@ -64,6 +72,8 @@ export type Page = {
   rootId: Node["id"];
   layout: Record<Node["id"], Layout>;
   nodes: Record<Node["id"], Node>;
+  containerCount: number;
+  fieldCount: number;
 };
 
 export type PageLayout = Pick<Page, "layout" | "nodes">;
