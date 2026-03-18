@@ -37,18 +37,19 @@ export default function CreatePageModal({
           <DialogTitle>Create Page</DialogTitle>
           <DialogDescription>Enter the name of the new page.</DialogDescription>
         </DialogHeader>
-        <div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit(pageLabelRef.current?.value ?? "New Page");
+          }}>
           <Input ref={pageLabelRef} placeholder="Example: Contact Page" />
-        </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button
-            onClick={() => onSubmit(pageLabelRef.current?.value ?? "New Page")}>
-            Create Page
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button type="submit">Create Page</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
