@@ -198,3 +198,14 @@ export const paletteElements: PaletteElement[] = [
   //   category: "choice",
   // },
 ];
+
+type PaletteKind = "field" | "container";
+type PaletteFieldsMap = { [K in FieldTypes]: PaletteKind };
+
+export const ALL_PALETTE_FIELDS_MAP: PaletteFieldsMap = {
+  container: "container",
+  "single-line-input": "field",
+  "single-line-hidden-input": "field",
+  "multi-line-input": "field",
+  "number-input": "field",
+};

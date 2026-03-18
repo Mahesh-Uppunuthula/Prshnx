@@ -19,6 +19,8 @@ import {
   Page as BuilderPage,
   ContainerNode,
   FieldNode,
+  InputFields,
+  InputFieldTypes,
   Node,
 } from "@/types/builder.types";
 
@@ -297,4 +299,67 @@ export function assertFieldNode(
   node: Node | undefined | null,
 ): asserts node is FieldNode {
   if (!node) throw new Error("Node not found");
+}
+
+export function createDefaultField(
+  fieldType: InputFieldTypes,
+  fieldCount: number,
+): InputFields {
+  const fieldId = generateComponentId("field");
+  switch (fieldType) {
+    case "single-line-input": {
+      return {
+        id: fieldId,
+        label: `Field ${fieldCount}`,
+        type: "single-line-input",
+        description: "",
+        required: false,
+        disabled: false,
+        placeholder: "Enter text",
+        minLength: 1,
+        maxLength: 256,
+      };
+    }
+    case "single-line-hidden-input": {
+      return {
+        id: fieldId,
+        label: `Field ${fieldCount}`,
+        type: "single-line-hidden-input",
+        description: "",
+        required: false,
+        disabled: false,
+        placeholder: "Enter text",
+        minLength: 1,
+        maxLength: 256,
+      };
+    }
+    case "number-input": {
+      return {
+        id: fieldId,
+        label: `Field ${fieldCount}`,
+        type: "number-input",
+        description: "",
+        required: false,
+        disabled: false,
+        placeholder: "Enter number",
+        min: 0,
+        max: 100,
+      };
+    }
+    case "multi-line-input": {
+      return {
+        id: fieldId,
+        label: `Field ${fieldCount}`,
+        type: "multi-line-input",
+        description: "",
+        required: false,
+        disabled: false,
+        placeholder: "Enter text",
+        minLength: 1,
+        maxLength: 256,
+      };
+    }
+    default:
+      throw new Error("Invalid field type");
+  }
 }

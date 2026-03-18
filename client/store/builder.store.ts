@@ -72,8 +72,17 @@
 //   },
 // };
 
-import { createDefaultPage, generateComponentId } from "@/lib/helper";
-import { ContainerNode, Node, Page } from "@/types/builder.types";
+import {
+  createDefaultField,
+  createDefaultPage,
+  generateComponentId,
+} from "@/lib/helper";
+import {
+  ContainerNode,
+  InputFieldTypes,
+  Node,
+  Page,
+} from "@/types/builder.types";
 import { createStore } from "zustand";
 
 // const pages = {};
@@ -185,6 +194,11 @@ export type BuilderActions = {
   addPage: (pageLabel: Page["label"]) => void;
   deletePage: (pageId: Page["id"]) => void;
   addContainer: (pageId: Page["id"], parentId: Node["id"]) => void;
+  addField: (
+    pageId: Page["id"],
+    containerId: Node["id"],
+    fieldType: InputFieldTypes,
+  ) => void;
   deleteNode: (pageId: Page["id"], nodeId: Node["id"]) => void;
   // addField: (pageId: Page["id"], parentId: Node["id"]) => void;
 
@@ -300,6 +314,42 @@ export function createBuilderStore(
         }
         newPage.nodes[newContainer.id] = newContainer;
         console.log({ newPage });
+        return {
+          pages: {
+            ...state.pages,
+            [pageId]: newPage,
+          },
+        };
+      });
+    },
+    addField: (pageId, containerId, fieldType) => {
+      console.log("add field");
+      set((state) => {
+        const page = state.pages[pageId];
+        if (!page) return state;
+        const newPage = structuredClone(page);
+        const containerLayout = newPage.layout[containerId];
+        if (!containerLayout) return state;
+        newPage["fieldCount"]++;
+        const newField = createDefaultField(fieldType, newPage["fieldCount"]);
+
+        // 1. Add field to layout (needed for deleteNode traversal)
+        newPage.layout[newField.id] = {
+          parentId: containerId,
+          children: [],
+        };
+
+        // 2. Add field id to the layout's children list
+        containerLayout.children.push(newField.id);
+
+        // 3. Add field id to the ContainerNode's node.children — this is what ContainerNode renders
+        const containerNode = newPage.nodes[containerId] as ContainerNode;
+        if (containerNode?.type === "container") {
+          containerNode.children.push(newField.id);
+        }
+
+        // 4. Add the field node itself
+        newPage.nodes[newField.id] = newField;
         return {
           pages: {
             ...state.pages,

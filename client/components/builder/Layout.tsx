@@ -8,21 +8,28 @@ import ElementsPanel from "./ElementsPanel";
 import PagesMinMap from "./PageMinMap";
 import Playground from "./Playground";
 import { useState } from "react";
-import { Node, Page } from "@/types/builder.types";
+import { InputFieldTypes, Node, Page } from "@/types/builder.types";
 import { useBuilderStore } from "@/hooks/use-builder-store";
+import { ALL_PALETTE_FIELDS_MAP } from "@/lib/constants";
 
 export type DraggingComponent = {
-  label: string;
-} & (
-  | {
-      from: "palette";
-      componentType: "field";
-    }
-  | {
-      from: "playground";
-      componentType: "field";
-    }
-);
+  id: Node["id"];
+  label: Node["label"];
+  elementType: Node["type"];
+  from: "palette" | "playground";
+};
+// export type DraggingComponent = {
+//   label: string;
+// } & (
+//   | {
+//       from: "palette";
+//       componentType: "field" | "container";
+//     }
+//   | {
+//       from: "playground";
+//       componentType: "field";
+//     }
+// );
 
 export type DroppableComponent = {
   to: "playground";
@@ -35,7 +42,7 @@ export type From = DraggingComponent["from"];
 
 export default function BuilderBodyLayout() {
   //builder store
-  // const addField = useBuilderStore((s) => s.addField);
+  const addField = useBuilderStore((s) => s.addField);
   const addContainer = useBuilderStore((s) => s.addContainer);
 
   const [draggingComponent, setDraggingComponent] =
@@ -43,14 +50,9 @@ export default function BuilderBodyLayout() {
 
   function handleDragStart(e: DragStartEvent) {
     const { active } = e;
-    console.log({ active });
     const data = active.data.current as DraggingComponent;
     console.log({ data });
-    setDraggingComponent({
-      label: data.label,
-      from: data.from,
-      componentType: data.componentType,
-    });
+    setDraggingComponent(data);
   }
 
   function handleDragEnd(e: DragEndEvent) {
@@ -67,9 +69,19 @@ export default function BuilderBodyLayout() {
 
     console.log({ to, from }, droppableData);
 
-    if (from === "palette") {
+    if (from === "palette" && activeData.elementType === "container") {
       console.log("palette");
       addContainer(droppableData.pageId, droppableData.nodeId);
+    } else if (
+      from === "palette" &&
+      ALL_PALETTE_FIELDS_MAP[activeData.elementType] === "field"
+    ) {
+      console.log("add field");
+      addField(
+        droppableData.pageId,
+        droppableData.nodeId,
+        activeData.elementType as InputFieldTypes,
+      );
     }
     setDraggingComponent(null);
   }

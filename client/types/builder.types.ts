@@ -49,6 +49,8 @@ export type Fields =
   | ContainerProperties;
 
 export type FieldTypes = Fields["type"];
+export type InputFields = Exclude<Fields, ContainerProperties>;
+export type InputFieldTypes = InputFields["type"];
 
 export type ContainerNode = {
   id: string;

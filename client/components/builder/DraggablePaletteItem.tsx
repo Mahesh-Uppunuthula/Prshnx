@@ -8,6 +8,7 @@ import {
   LuTrash2,
 } from "react-icons/lu";
 import { Bs123 } from "react-icons/bs";
+import { DraggingComponent } from "./Layout";
 
 type DraggablePaletteItemProps = {
   paletteElement: PaletteElement;
@@ -18,8 +19,11 @@ export function DraggablePaletteItem({
   const { setNodeRef, attributes, listeners, isDragging } = useDraggable({
     id: paletteElement.id,
     data: {
-      ...paletteElement,
-    },
+      id: paletteElement.id,
+      from: paletteElement.from,
+      elementType: paletteElement.type,
+      label: paletteElement.label,
+    } satisfies DraggingComponent,
   });
   return (
     <div
