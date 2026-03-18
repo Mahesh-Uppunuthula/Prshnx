@@ -284,13 +284,20 @@ export function createBuilderStore(
           orientation: "vertical",
           children: [],
         };
-        const parentNode = newPage.layout[parentId];
-        if (!parentNode) return state;
-        parentNode.children.push(newContainer.id);
+        const parentLayout = newPage.layout[parentId];
+        if (!parentLayout) return state;
+
+        // Update layout tree
+        parentLayout.children.push(newContainer.id);
         newPage.layout[newContainer.id] = {
           parentId,
           children: [],
         };
+        // update parent node children
+        const parentContainerNode = newPage.nodes[parentId] as ContainerNode;
+        if (parentContainerNode && parentContainerNode.type === "container") {
+          parentContainerNode.children.push(newContainer.id);
+        }
         newPage.nodes[newContainer.id] = newContainer;
         console.log({ newPage });
         return {

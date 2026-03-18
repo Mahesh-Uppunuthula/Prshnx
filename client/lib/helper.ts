@@ -256,7 +256,7 @@ export function createDefaultPage(pageLabel: BuilderPage["label"]) {
     label: pageLabel,
     rootId: rootContainerId,
     layout: {
-      root: {
+      [rootContainerId]: {
         parentId: null,
         children: [],
       },
