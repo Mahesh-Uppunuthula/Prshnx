@@ -3,6 +3,10 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 import ElementsPanel from "./ElementsPanel";
 import PagesMinMap from "./PageMinMap";
@@ -48,6 +52,15 @@ export default function BuilderBodyLayout() {
   const [draggingComponent, setDraggingComponent] =
     useState<DraggingComponent | null>(null);
 
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
+    }),
+  );
+
   function handleDragStart(e: DragStartEvent) {
     const { active } = e;
     const data = active.data.current as DraggingComponent;
@@ -87,7 +100,7 @@ export default function BuilderBodyLayout() {
   }
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="w-full h-[92%] flex">
         <div className="w-[18%]">
           <ElementsPanel />

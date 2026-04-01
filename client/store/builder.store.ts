@@ -364,16 +364,29 @@ export function createBuilderStore(
         if (!page) return state;
 
         const newPage = structuredClone(page);
-        const containerNode = newPage.layout[nodeId];
-        if (!containerNode) return state;
+        const layoutNode = newPage.layout[nodeId];
+        const node = newPage.nodes[nodeId];
 
-        const parentNode = newPage.layout[containerNode.parentId!];
+        if (!node || !layoutNode) return state;
 
-        if (!parentNode) return state;
-        // Remove from parent
-        parentNode.children = parentNode.children.filter((id) => id !== nodeId);
+        // Get the actual parent layout entry (not the node itself)
+        const parentLayoutNode = newPage.layout[layoutNode.parentId!];
+        if (!parentLayoutNode) return state;
 
-        // delete subtree
+        // Remove nodeId from parent's children in layout
+        parentLayoutNode.children = parentLayoutNode.children.filter(
+          (id) => id !== nodeId,
+        );
+
+        // Also remove from parent ContainerNode's node.children (used for rendering)
+        const parentNode = newPage.nodes[layoutNode.parentId!];
+        if (parentNode?.type === "container") {
+          (parentNode as ContainerNode).children = (
+            parentNode as ContainerNode
+          ).children.filter((id) => id !== nodeId);
+        }
+
+        // Recursively delete this node and its entire subtree
         deleteSubtree(nodeId, newPage);
 
         return {
@@ -426,10 +439,10 @@ export function createBuilderStore(
 const deleteSubtree = (id: string, page: Page) => {
   const nodeLayout = page.layout[id];
   if (!nodeLayout) return;
-  const nodeDetails = page.nodes[id];
-  if (nodeDetails?.type === "container") {
-    const children = [...nodeLayout.children];
-    children.forEach((childId) => deleteSubtree(childId, page));
-  }
+  // Recursively delete all children first
+  const children = [...nodeLayout.children];
+  children.forEach((childId) => deleteSubtree(childId, page));
+  // Delete from both layout and nodes maps
   delete page.layout[id];
+  delete page.nodes[id];
 };

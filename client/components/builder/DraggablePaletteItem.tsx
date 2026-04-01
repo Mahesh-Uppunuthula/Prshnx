@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   LuRectangleEllipsis,
   LuRectangleHorizontal,
+  LuSquareDashed,
   LuTextQuote,
   LuTrash2,
 } from "react-icons/lu";
@@ -51,6 +52,7 @@ function RenderPaletteItem({ paletteElement }: RenderPaletteItemProps) {
     case "multi-line-input":
     case "number-input":
     case "single-line-hidden-input":
+    case "container":
       return (
         <div className="w-full h-fit text-sm flex gap-2 place-items-center">
           <span>
@@ -64,7 +66,7 @@ function RenderPaletteItem({ paletteElement }: RenderPaletteItemProps) {
   }
 }
 
-const Icon = ({ type }: { type: PaletteElement["type"] }) => {
+export const Icon = ({ type }: { type: PaletteElement["type"] }) => {
   switch (type) {
     case "single-line-input":
       return <LuRectangleHorizontal size={19} strokeWidth={1} />;
@@ -74,6 +76,8 @@ const Icon = ({ type }: { type: PaletteElement["type"] }) => {
       return <LuTextQuote size={19} strokeWidth={1} />;
     case "number-input":
       return <Bs123 size={19} />;
+    case "container":
+      return <LuSquareDashed size={19} strokeWidth={1} />;
     // case "date-input":
     //   return <BsCalendar2Date size={19} />;
     // case "time-input":
