@@ -194,6 +194,12 @@ export type BuilderActions = {
   addPage: (pageLabel: Page["label"]) => void;
   deletePage: (pageId: Page["id"]) => void;
   addContainer: (pageId: Page["id"], parentId: Node["id"]) => void;
+  updateContainer: (
+    pageId: Page["id"],
+    containerId: Node["id"],
+    updates: Partial<Pick<ContainerNode, "label" | "orientation">>,
+  ) => void;
+  // emptyContainer: (pageId: Page["id"], containerId: Node["id"]) => void;
   addField: (
     pageId: Page["id"],
     containerId: Node["id"],
@@ -322,6 +328,49 @@ export function createBuilderStore(
         };
       });
     },
+    updateContainer: (pageId, containerId, updates) => {
+      set((state) => {
+        const page = state.pages[pageId];
+        if (!page) return state;
+
+        const newPage = structuredClone(page);
+        const containerNode = newPage.nodes[containerId] as ContainerNode;
+
+        if (!containerNode || containerNode.type !== "container") return state;
+
+        containerNode.label = updates.label ?? containerNode.label;
+        containerNode.orientation =
+          updates.orientation ?? containerNode.orientation;
+        return {
+          pages: {
+            ...state.pages,
+            [pageId]: newPage,
+          },
+        };
+      });
+    },
+    // emptyContainer: (pageId, containerId) => {
+    //   set((state) => {
+    //     const page = state.pages[pageId];
+    //     if (!page) return state;
+
+    //     const newPage = structuredClone(page);
+    //     const layoutNode = newPage.layout[containerId];
+    //     const node = newPage.nodes[containerId];
+
+    //     if (!node || !layoutNode || node.type !== "container") return state;
+
+    //     // Recursively delete this node and its entire subtree
+    //     deleteSubtree(containerId, newPage);
+
+    //     return {
+    //       pages: {
+    //         ...state.pages,
+    //         [pageId]: newPage,
+    //       },
+    //     };
+    //   });
+    // },
     addField: (pageId, containerId, fieldType) => {
       console.log("add field");
       set((state) => {

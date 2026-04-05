@@ -1,13 +1,14 @@
 import { useBuilderStore } from "@/hooks/use-builder-store";
 import { ButtonGroup } from "../ui/button-group";
 import { Button } from "../ui/button";
-import { LuTrash } from "react-icons/lu";
+import { LuFoldHorizontal, LuFoldVertical, LuTrash } from "react-icons/lu";
 import { Node } from "@/types/builder.types";
 import { Icon } from "./DraggablePaletteItem";
 
 export default function QuickActionBar() {
   const activeEntity = useBuilderStore((s) => s.active);
   const deleteNode = useBuilderStore((s) => s.deleteNode);
+  const updateContainer = useBuilderStore((s) => s.updateContainer);
 
   const activePage = activeEntity.page;
   const activeNode = activeEntity.node;
@@ -21,38 +22,70 @@ export default function QuickActionBar() {
       !activeNode?.id,
     );
     if (!activePage || !activePage.id || !activeNode || !activeNode.id) return;
+
     if (action === "delete") {
       deleteNode(activePage.id, activeNode.id);
       return;
     }
   };
 
-  if (!activeNode || !activeNode.id || !activeNode.type) return;
+  if (
+    !activePage ||
+    !activePage.id ||
+    !activeNode ||
+    !activeNode.id ||
+    !activeNode.type
+  )
+    return;
 
-  return (
-    <div className="w-fit h-fit p-2 rounded flex gap-2 place-items-center">
-      <ButtonGroup className="shadow-xl">
-        <NodeHighlight type={activeNode.type} />
-        {/* <Button
+  if (activeNode.type === "container") {
+    return (
+      <div className="w-fit h-fit p-2 rounded flex gap-2 place-items-center">
+        <ButtonGroup className="shadow-xl">
+          <NodeHighlight type={activeNode.type} />
+          {/* <Button
           variant={"outline"}
           onClick={() => addContainer(activeNode.id, "column")}
         >
           <LuSquareDashed /> Add Container
         </Button> */}
-        {/* <Button
+          <Button
             variant={"outline"}
-            onClick={() => changeContainerDirection(activeNode.id, "row")}>
-            <LuFoldHorizontal /> Align Horizontal
+            onClick={() =>
+              updateContainer(activePage.id, activeNode.id, {
+                orientation: "horizontal",
+              })
+            }>
+            <LuFoldHorizontal /> Horizontal
           </Button>
           <Button
             variant={"outline"}
-            onClick={() => changeContainerDirection(activeNode.id, "column")}>
-            <LuFoldVertical /> Align Vertical
+            onClick={() =>
+              updateContainer(activePage.id, activeNode.id, {
+                orientation: "vertical",
+              })
+            }>
+            <LuFoldVertical /> Vertical
           </Button>
-          <Button variant={"outline"} onClick={() => deleteNode(activeNode.id)}>
-            <LuPaintbrush /> Clear All Fields
+          {/* <Button variant={"outline"} onClick={() => emptyContainer(activePage.id, activeNode.id)}>
+            <LuPaintbrush /> Clear
+          </Button> */}
+
+          <Button
+            variant={"outline"}
+            onClick={handleAction("delete")}
+            // disabled={areActionsDisabled || isDeleteDisabled}
+          >
+            <LuTrash /> Delete
           </Button>
-          */}
+        </ButtonGroup>
+      </div>
+    );
+  }
+  return (
+    <div className="w-fit h-fit p-2 rounded flex gap-2 place-items-center">
+      <ButtonGroup className="shadow-xl">
+        <NodeHighlight type={activeNode.type} />
         <Button
           variant={"outline"}
           onClick={handleAction("delete")}

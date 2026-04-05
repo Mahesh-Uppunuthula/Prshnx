@@ -54,10 +54,10 @@ export default function BuilderBodyLayout() {
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { delay: 200, tolerance: 5 },
+      activationConstraint: { delay: 50, tolerance: 5 },
     }),
     useSensor(TouchSensor, {
-      activationConstraint: { delay: 200, tolerance: 5 },
+      activationConstraint: { delay: 50, tolerance: 5 },
     }),
   );
 
