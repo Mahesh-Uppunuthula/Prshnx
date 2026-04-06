@@ -3,7 +3,7 @@ import { ActivePage } from "@/store/builder.store";
 import { cn } from "@/lib/utils";
 import { scrollToPage } from "@/lib/helper";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Page } from "@/types/builder.types";
 
 function getPageMinMapId(id: Page["id"]) {
@@ -60,6 +60,7 @@ export default function PagesMinMap() {
   const [isOver, setIsOver] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const pages = useBuilderStore((s) => s.pages);
+  const pagesOrder = useBuilderStore((s) => s.pagesOrder);
   const active = useBuilderStore((s) => s.active);
   const setActivePage = useBuilderStore((s) => s.setActivePage);
 
@@ -68,6 +69,15 @@ export default function PagesMinMap() {
     setActivePage(nextActivePage);
     scrollToPage(nextActivePage.id);
   }
+  const sortedPages: Page[] = useMemo(() => {
+    const _sortedPages: Page[] = [];
+    pagesOrder.forEach((pageId: Page["id"]) => {
+      if (pages[pageId]) {
+        _sortedPages.push(pages[pageId]);
+      }
+    });
+    return _sortedPages;
+  }, [pagesOrder, pages]);
   return (
     <Popover open={isOver}>
       <PopoverTrigger
@@ -93,7 +103,7 @@ export default function PagesMinMap() {
         sideOffset={-20}
         onMouseLeave={() => setIsOver(false)}>
         <div className="h-fit flex flex-col gap-2  overflow-auto">
-          {Object.values(pages).map((page) => (
+          {sortedPages.map((page) => (
             <div
               key={getPageMinMapId(page.id)}
               onClick={() => navigateToPage({ id: page.id })}>
