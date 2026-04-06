@@ -191,7 +191,7 @@ export type Active = {
 
 export type BuilderActions = {
   // page actions
-  addPage: (pageLabel: Page["label"]) => void;
+  addPage: (pageLabel: Page["label"], position?: number) => Page["id"];
   deletePage: (pageId: Page["id"]) => void;
   addContainer: (pageId: Page["id"], parentId: Node["id"]) => void;
   updateContainer: (
@@ -252,24 +252,34 @@ export function createBuilderStore(
     pages: initialBuilderState.pages,
     pagesOrder: initialBuilderState.pagesOrder,
     // core actions
-    addPage: (pageLabel) => {
+    addPage: (pageLabel, position) => {
       const page = createDefaultPage(pageLabel);
-      set((state) => ({
-        pages: {
-          ...state.pages,
-          [page.id]: page,
-        },
-        pagesOrder: [...state.pagesOrder, page.id],
-        active: {
-          page: {
-            id: page.id,
+      set((state) => {
+        const updatedPagesOrder = structuredClone(state.pagesOrder);
+        if (position) {
+          updatedPagesOrder.splice(position, 0, page.id);
+        } else {
+          updatedPagesOrder.push(page.id);
+        }
+        return {
+
+          pages: {
+            ...state.pages,
+            [page.id]: page,
           },
-          node: {
-            id: page.rootId,
-            type: page.nodes[page.rootId]!.type,
+          pagesOrder: updatedPagesOrder,
+          active: {
+            page: {
+              id: page.id,
+            },
+            node: {
+              id: page.rootId,
+              type: page.nodes[page.rootId]!.type,
+            },
           },
-        },
-      }));
+        };
+      });
+      return page.id;
     },
     deletePage: (pageId) => {
       set((state) => {

@@ -18,24 +18,35 @@ type CreatePageModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (pageLabel: Page["label"]) => void;
+  trigger?: React.ReactNode;
+  title?: string;
+  description?: string;
+  buttonText?: string;
 };
 export default function CreatePageModal({
   open,
   onOpenChange,
   onSubmit,
+  trigger,
+  title = "Create Page",
+  description = "Enter the name of the new page.",
+  buttonText = "Create",
 }: CreatePageModalProps) {
   const pageLabelRef = useRef<HTMLInputElement>(null);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button size={"sm"} variant={"outline"}>
-          <LuPlus /> Page
-        </Button>
-      </DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+      {!trigger && (
+        <DialogTrigger asChild>
+          <Button size={"sm"} variant={"outline"}>
+            <LuPlus /> Page
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Page</DialogTitle>
-          <DialogDescription>Enter the name of the new page.</DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -43,11 +54,11 @@ export default function CreatePageModal({
             onSubmit(pageLabelRef.current?.value ?? "New Page");
           }}>
           <Input ref={pageLabelRef} placeholder="Example: Contact Page" />
-          <DialogFooter>
+          <DialogFooter className="mt-4">
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Create Page</Button>
+            <Button type="submit">{buttonText}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

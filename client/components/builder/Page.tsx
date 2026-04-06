@@ -4,6 +4,9 @@ import { cn } from "@/lib/utils";
 import { useBuilderStore } from "@/hooks/use-builder-store";
 import { Page as PageType } from "@/types/builder.types";
 import RenderNode from "./RenderNode";
+import { useState } from "react";
+import CreatePageModal from "./CreatePageModal";
+import { scrollToPage } from "@/lib/helper";
 
 export default function Page({ children }: { children: React.ReactNode }) {
   return <div className="group min-h-full">{children}</div>;
@@ -52,15 +55,37 @@ export function PageHeader({ page, idx }: PageHeaderProps) {
   );
 }
 
-export function PageFooter() {
+type PageFooterProps = {
+  idx: number;
+};
+export function PageFooter({ idx }: PageFooterProps) {
+  const addPage = useBuilderStore((s) => s.addPage);
+  const [open, setOpen] = useState(false);
+
+  const handleSubmit = (label: string) => {
+    console.log({ label, idx });
+    const pageId = addPage(label, idx + 1);
+    setOpen(false);
+    scrollToPage(pageId);
+  };
+
   return (
     <div className="invisible group-hover:visible">
-      <Button
-        variant={"ghost"}
-        size={"xs"}
-        className="w-fit cursor-pointer text-xs text-slate-400 flex gap-2 items-center px-2 py-1 mt-1 rounded hover:bg-muted">
-        <LuPlus /> Insert Page
-      </Button>
+      <CreatePageModal
+        open={open}
+        onOpenChange={setOpen}
+        onSubmit={handleSubmit}
+        title="Insert Page"
+        buttonText="Insert"
+        trigger={
+          <Button
+            variant={"ghost"}
+            size={"xs"}
+            className="w-fit cursor-pointer text-xs text-slate-400 flex gap-2 items-center px-2 py-1 mt-1 rounded hover:bg-muted">
+            <LuPlus /> Insert Page
+          </Button>
+        }
+      />
     </div>
   );
 }

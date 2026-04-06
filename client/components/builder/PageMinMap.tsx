@@ -1,6 +1,7 @@
 import { useBuilderStore } from "@/hooks/use-builder-store";
 import { ActivePage } from "@/store/builder.store";
 import { cn } from "@/lib/utils";
+import { scrollToPage } from "@/lib/helper";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useRef, useState } from "react";
 import { Page } from "@/types/builder.types";
@@ -65,9 +66,7 @@ export default function PagesMinMap() {
   function navigateToPage(nextActivePage: NonNullable<ActivePage>) {
     if (active.page?.id === nextActivePage.id) return;
     setActivePage(nextActivePage);
-    const element = document.getElementById(nextActivePage.id);
-    console.log({ element });
-    element?.scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollToPage(nextActivePage.id);
   }
   return (
     <Popover open={isOver}>

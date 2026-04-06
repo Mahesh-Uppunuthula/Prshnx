@@ -15,6 +15,7 @@ import { useState } from "react";
 import { InputFieldTypes, Node, Page } from "@/types/builder.types";
 import { useBuilderStore } from "@/hooks/use-builder-store";
 import { ALL_PALETTE_FIELDS_MAP } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 export type DraggingComponent = {
   id: Node["id"];
@@ -49,6 +50,7 @@ export default function BuilderBodyLayout() {
   const addField = useBuilderStore((s) => s.addField);
   const addContainer = useBuilderStore((s) => s.addContainer);
 
+  const [isElementsPanelOpen, setIsElementsPanelOpen] = useState(true);
   const [draggingComponent, setDraggingComponent] =
     useState<DraggingComponent | null>(null);
 
@@ -100,13 +102,27 @@ export default function BuilderBodyLayout() {
   }
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}>
       <div className="w-full h-[92%] flex">
-        <div className="w-[18%]">
-          <ElementsPanel />
+        <div
+          className={cn(
+            "p-2 border border-r-0 rounded-l transition-all duration-300",
+            isElementsPanelOpen ? "w-[18%]" : "w-12 bg-[#cccccc20] flex flex-col items-center hover:bg-muted",
+          )}>
+          <ElementsPanel
+            isOpen={isElementsPanelOpen}
+            setIsOpen={setIsElementsPanelOpen}
+          />
         </div>
-        <div className="w-[82%] relative  flex justify-between">
-          <div className="w-[95%]">
+        <div
+          className={cn(
+            " relative flex justify-between",
+            isElementsPanelOpen ? "w-[82%]" : "w-[calc(100%-3rem)]",
+          )}>
+          <div className="w-[95%] border rounded rounded-l-none">
             <Playground />
           </div>
 

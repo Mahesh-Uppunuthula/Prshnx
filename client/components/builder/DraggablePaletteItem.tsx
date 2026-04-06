@@ -32,10 +32,11 @@ export function DraggablePaletteItem({
       {...attributes}
       {...listeners}
       className={cn(
-        `p-2 text-foreground bg-muted border rounded-md cursor-grab active:cursor-grabbing`,
+        `p-2 text-foreground bg-white border rounded cursor-grab active:cursor-grabbing`,
         `hover:shadow`,
         {
-          "opacity-60": isDragging,
+          // "opacity-60": isDragging,
+          "opacity-60 border-gray-600 border-dashed": isDragging,
         },
       )}>
       <RenderPaletteItem paletteElement={paletteElement} />

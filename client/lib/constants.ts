@@ -145,6 +145,13 @@ export type PaletteElement = {
 
 export const paletteElements: PaletteElement[] = [
   {
+    id: "palette:container",
+    type: "container",
+    label: "Container",
+    category: "layout",
+    from: "palette",
+  },
+  {
     id: "palette:single-line-input",
     type: "single-line-input",
     label: "Text Box",
@@ -170,13 +177,6 @@ export const paletteElements: PaletteElement[] = [
     type: "number-input",
     label: "Number",
     category: "text",
-    from: "palette",
-  },
-  {
-    id: "palette:container",
-    type: "container",
-    label: "Container",
-    category: "layout",
     from: "palette",
   },
   // {
