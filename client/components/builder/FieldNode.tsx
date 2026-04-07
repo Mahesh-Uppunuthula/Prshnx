@@ -103,6 +103,7 @@ function FieldOptions({ pageId, nodeId }: FieldOptionsProps) {
     descriptionToggle: !!node.description?.length,
     placeholderToggle: !!node.placeholder?.length,
   });
+
   const handleToggle =
     (key: "required" | "descriptionToggle" | "placeholderToggle") =>
     (checked: boolean) => {
@@ -122,11 +123,6 @@ function FieldOptions({ pageId, nodeId }: FieldOptionsProps) {
           updateField(pageId, nodeId, { required: checked });
       }
     };
-  const handleTextChange =
-    (key: "description" | "placeholder") => (value: string) => {
-      // setOptionsState((prev) => ({ ...prev, [key]: event.target.value }));
-      updateField(pageId, nodeId, { [key]: value });
-    };
 
   function renderFieldSpecificOptions() {
     switch (node?.type) {
@@ -136,7 +132,109 @@ function FieldOptions({ pageId, nodeId }: FieldOptionsProps) {
             <OptionalInput
               label="Placeholder"
               value={!!node.placeholder ? node.placeholder : ""}
-              onChange={handleTextChange("placeholder")}
+              onChange={(value) =>
+                updateField(pageId, nodeId, { placeholder: value })
+              }
+            />
+            <NumberInput
+              label="Min Length"
+              value={node.minLength}
+              min={1}
+              max={256}
+              onChange={(value) =>
+                updateField(pageId, nodeId, { minLength: value })
+              }
+            />
+            <NumberInput
+              label="Max Length"
+              value={node.maxLength}
+              min={1}
+              max={256}
+              onChange={(value) =>
+                updateField(pageId, nodeId, { maxLength: value })
+              }
+            />
+          </>
+        );
+      case "single-line-hidden-input":
+        return (
+          <>
+            <OptionalInput
+              label="Placeholder"
+              value={!!node.placeholder ? node.placeholder : ""}
+              onChange={(value) =>
+                updateField(pageId, nodeId, { placeholder: value })
+              }
+            />
+            <NumberInput
+              label="Min Length"
+              value={node.minLength}
+              min={1}
+              max={256}
+              onChange={(value) =>
+                updateField(pageId, nodeId, { minLength: value })
+              }
+            />
+            <NumberInput
+              label="Max Length"
+              value={node.maxLength}
+              min={1}
+              max={256}
+              onChange={(value) =>
+                updateField(pageId, nodeId, { maxLength: value })
+              }
+            />
+          </>
+        );
+      case "multi-line-input":
+        return (
+          <>
+            <OptionalInput
+              label="Placeholder"
+              value={!!node.placeholder ? node.placeholder : ""}
+              onChange={(value) =>
+                updateField(pageId, nodeId, { placeholder: value })
+              }
+            />
+            <NumberInput
+              label="Min Length"
+              value={node.minLength}
+              min={1}
+              max={256}
+              onChange={(value) =>
+                updateField(pageId, nodeId, { minLength: value })
+              }
+            />
+            <NumberInput
+              label="Max Length"
+              value={node.maxLength}
+              min={1}
+              max={1024}
+              onChange={(value) =>
+                updateField(pageId, nodeId, { maxLength: value })
+              }
+            />
+          </>
+        );
+      case "number-input":
+        return (
+          <>
+            <OptionalInput
+              label="Placeholder"
+              value={!!node.placeholder ? node.placeholder : ""}
+              onChange={(value) =>
+                updateField(pageId, nodeId, { placeholder: value })
+              }
+            />
+            <NumberInput
+              label="Min"
+              value={node.min}
+              onChange={(value) => updateField(pageId, nodeId, { min: value })}
+            />
+            <NumberInput
+              label="Max"
+              value={node.max}
+              onChange={(value) => updateField(pageId, nodeId, { max: value })}
             />
           </>
         );
@@ -160,39 +258,23 @@ function FieldOptions({ pageId, nodeId }: FieldOptionsProps) {
           align="end"
           className="w-fit min-w-72 flex flex-col gap-1">
           {/* Required */}
-          <div className="flex justify-between place-items-center gap-2 mb-2">
-            <span className="text-sm">Required</span>
-            <ToggleSwitch
-              size="sm"
-              checked={node.required}
-              onCheckedChange={handleToggle("required")}
-            />
-          </div>
+          <ToggleSwitchOption
+            label="Required"
+            checked={node.required}
+            onCheckedChange={handleToggle("required")}
+          />
           {/* Description */}
-          {/* <div>
-            <div className="flex justify-between place-items-center gap-2 mb-2">
-              <span className="text-sm">Description</span>
-              <ToggleSwitch
-                size="sm"
-                checked={optionsState.descriptionToggle}
-                onCheckedChange={handleToggle("descriptionToggle")}
-              />
-            </div>
-            {optionsState.descriptionToggle && (
-              <Input
-                placeholder="Enter description"
-                value={node.description}
-                onChange={handleTextChange("description")}
-              />
-            )}
-          </div> */}
           <OptionalInput
             label="Description"
             value={!!node.description ? node.description : ""}
-            onChange={handleTextChange("description")}
+            onChange={(value) =>
+              updateField(pageId, nodeId, { description: value })
+            }
           />
           {/* Field Specific Options */}
-          {renderFieldSpecificOptions()}
+          <div className="flex flex-col gap-2">
+            {renderFieldSpecificOptions()}
+          </div>
         </PopoverContent>
       </Popover>
       <Button
@@ -226,6 +308,53 @@ function OptionalInput({ label, value, onChange }: OptionalInputProps) {
           onChange={(e) => onChange(e.target.value)}
         />
       )}
+    </div>
+  );
+}
+
+type NumberInputProps = {
+  label: string;
+  value: number;
+  min?: number;
+  max?: number;
+  onChange: (value: number) => void;
+};
+function NumberInput({ label, value, min, max, onChange }: NumberInputProps) {
+  return (
+    <div>
+      <div className="flex justify-between place-items-center gap-2 mb-1">
+        <span className="text-sm">{label}</span>
+      </div>
+      <Input
+        type="number"
+        min={min}
+        max={max}
+        placeholder={`Enter ${label}`}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+      />
+    </div>
+  );
+}
+
+type ToggleSwitchOptionProps = {
+  label: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+};
+function ToggleSwitchOption({
+  label,
+  checked,
+  onCheckedChange,
+}: ToggleSwitchOptionProps) {
+  return (
+    <div className="flex justify-between place-items-center gap-2 mb-2">
+      <span className="text-sm">{label}</span>
+      <ToggleSwitch
+        size="sm"
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+      />
     </div>
   );
 }
