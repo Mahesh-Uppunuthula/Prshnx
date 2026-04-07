@@ -79,9 +79,13 @@ import {
 } from "@/lib/helper";
 import {
   ContainerNode,
+  FieldNode,
   InputFieldTypes,
+  MultiLineInputProperties,
   Node,
+  NumberInputProperties,
   Page,
+  SingleLineInputProperties,
 } from "@/types/builder.types";
 import { createStore } from "zustand";
 
@@ -204,6 +208,11 @@ export type BuilderActions = {
     pageId: Page["id"],
     containerId: Node["id"],
     fieldType: InputFieldTypes,
+  ) => void;
+  updateField: (
+    pageId: Page["id"],
+    nodeId: Node["id"],
+    updates: Partial<FieldNode>,
   ) => void;
   deleteNode: (pageId: Page["id"], nodeId: Node["id"]) => void;
   // addField: (pageId: Page["id"], parentId: Node["id"]) => void;
@@ -409,6 +418,57 @@ export function createBuilderStore(
 
         // 4. Add the field node itself
         newPage.nodes[newField.id] = newField;
+        return {
+          pages: {
+            ...state.pages,
+            [pageId]: newPage,
+          },
+        };
+      });
+    },
+    updateField: (pageId, nodeId, updates) => {
+      set((state) => {
+        const page = state.pages[pageId];
+        if (!page) return state;
+        const newPage = structuredClone(page);
+        const node = newPage.nodes[nodeId];
+        if (!node) return state;
+        let updatedNode = node as FieldNode;
+        switch (node.type) {
+          case "single-line-input":
+            {
+              updatedNode = {
+                ...node,
+                ...(updates as Partial<SingleLineInputProperties>),
+              };
+            }
+            break;
+          case "single-line-hidden-input":
+            {
+              updatedNode = {
+                ...node,
+                ...(updates as Partial<SingleLineInputProperties>),
+              };
+            }
+            break;
+          case "multi-line-input":
+            {
+              updatedNode = {
+                ...node,
+                ...(updates as Partial<MultiLineInputProperties>),
+              };
+            }
+            break;
+          case "number-input":
+            {
+              updatedNode = {
+                ...node,
+                ...(updates as Partial<NumberInputProperties>),
+              };
+            }
+            break;
+        }
+        newPage.nodes[nodeId] = updatedNode;
         return {
           pages: {
             ...state.pages,

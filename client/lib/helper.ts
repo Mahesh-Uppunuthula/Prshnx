@@ -301,6 +301,12 @@ export function assertFieldNode(
   if (!node) throw new Error("Node not found");
 }
 
+export function assertInputFieldNode(
+  node: Node | undefined | null,
+): asserts node is InputFields {
+  if (!node) throw new Error("Node not found");
+}
+
 export function createDefaultField(
   fieldType: InputFieldTypes,
   fieldCount: number,
@@ -315,7 +321,7 @@ export function createDefaultField(
         description: "",
         required: false,
         disabled: false,
-        placeholder: "Enter text",
+        placeholder: "",
         minLength: 1,
         maxLength: 256,
       };
@@ -328,7 +334,7 @@ export function createDefaultField(
         description: "",
         required: false,
         disabled: false,
-        placeholder: "Enter text",
+        placeholder: "",
         minLength: 1,
         maxLength: 256,
       };
@@ -341,7 +347,7 @@ export function createDefaultField(
         description: "",
         required: false,
         disabled: false,
-        placeholder: "Enter number",
+        placeholder: "",
         min: 0,
         max: 100,
       };
@@ -354,7 +360,7 @@ export function createDefaultField(
         description: "",
         required: false,
         disabled: false,
-        placeholder: "Enter text",
+        placeholder: "",
         minLength: 1,
         maxLength: 256,
       };
