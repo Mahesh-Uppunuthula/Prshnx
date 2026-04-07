@@ -92,6 +92,7 @@ export default function QuickActionBar() {
           // disabled={areActionsDisabled || isDeleteDisabled}
         >
           <LuTrash />
+          Delete
         </Button>
       </ButtonGroup>
     </div>

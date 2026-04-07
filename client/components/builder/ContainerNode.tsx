@@ -18,8 +18,8 @@ type ContainerNodeProps = {
 };
 export default function ContainerNode({ pageId, nodeId }: ContainerNodeProps) {
   const active = useBuilderStore((s) => s.active);
-  const activeNode = active.node;
-  console.log({ activeNode });
+  // const activeNode = active.node;
+  // console.log({ activeNode });
   const setActive = useBuilderStore((s) => s.setActive);
   const page = useBuilderStore((s) => s.pages[pageId]);
   const node = page?.nodes[nodeId];
@@ -53,7 +53,7 @@ export default function ContainerNode({ pageId, nodeId }: ContainerNodeProps) {
       ? horizontalListSortingStrategy
       : verticalListSortingStrategy;
 
-  function handleContainerClick(event: MouseEvent<HTMLLegendElement>) {
+  function handleContainerClick(event: MouseEvent<HTMLFieldSetElement>) {
     console.log("clicked on container");
     event.stopPropagation();
     if (!node) return;
@@ -62,6 +62,7 @@ export default function ContainerNode({ pageId, nodeId }: ContainerNodeProps) {
 
   return (
     <fieldset
+      onClick={handleContainerClick}
       ref={setNodeRef}
       className={cn(
         "w-full h-full border-2 border-slate-400/30 rounded-xs overflow-auto",
@@ -84,8 +85,7 @@ export default function ContainerNode({ pageId, nodeId }: ContainerNodeProps) {
               active.node?.id === nodeId,
             "bg-emerald-200 text-emerald-600 font-medium": isOver,
           },
-        )}
-        onClick={handleContainerClick}>
+        )}>
         {node.label}
       </legend>
       {

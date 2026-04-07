@@ -3,8 +3,7 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
-  MouseSensor,
-  TouchSensor,
+  PointerSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -55,11 +54,8 @@ export default function BuilderBodyLayout() {
     useState<DraggingComponent | null>(null);
 
   const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: { delay: 50, tolerance: 5 },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 50, tolerance: 5 },
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 10 },
     }),
   );
 
