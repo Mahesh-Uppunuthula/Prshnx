@@ -18,9 +18,11 @@ import { cn } from "@/lib/utils";
 
 export type DraggingComponent = {
   id: Node["id"];
-  label: Node["label"];
-  elementType: Node["type"];
+  label?: Node["label"];
+  elementType?: Node["type"];
   from: "palette" | "playground";
+  nodeId?: Node["id"];
+  pageId?: Page["id"];
 };
 // export type DraggingComponent = {
 //   label: string;
@@ -48,6 +50,7 @@ export default function BuilderBodyLayout() {
   //builder store
   const addField = useBuilderStore((s) => s.addField);
   const addContainer = useBuilderStore((s) => s.addContainer);
+  const moveNode = useBuilderStore((s) => s.moveNode);
 
   const [isElementsPanelOpen, setIsElementsPanelOpen] = useState(true);
   const [draggingComponent, setDraggingComponent] =
@@ -85,6 +88,7 @@ export default function BuilderBodyLayout() {
       addContainer(droppableData.pageId, droppableData.nodeId);
     } else if (
       from === "palette" &&
+      activeData.elementType &&
       ALL_PALETTE_FIELDS_MAP[activeData.elementType] === "field"
     ) {
       console.log("add field");
@@ -93,6 +97,14 @@ export default function BuilderBodyLayout() {
         droppableData.nodeId,
         activeData.elementType as InputFieldTypes,
       );
+    } else if (from === "playground") {
+      console.log("playground move");
+      // over.id can be a container or another field
+      // we need to resolve the pageId
+      const pageId = activeData.pageId;
+      if (pageId) {
+        moveNode(pageId, active.id as string, over.id as string);
+      }
     }
     setDraggingComponent(null);
   }
@@ -132,14 +144,18 @@ export default function BuilderBodyLayout() {
       </div>
 
       <DragOverlay>
-        {draggingComponent?.from === "palette" && (
+        {draggingComponent && (
           <div
             style={{
               padding: 10,
               background: "white",
               border: "1px solid #ccc",
+              borderRadius: "4px",
+              boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
             }}>
-            {draggingComponent.label}
+            {draggingComponent.from === "palette" 
+              ? draggingComponent.label 
+              : "Moving Field"}
           </div>
         )}
       </DragOverlay>

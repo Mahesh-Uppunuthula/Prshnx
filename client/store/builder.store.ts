@@ -215,6 +215,7 @@ export type BuilderActions = {
     updates: Partial<FieldNode>,
   ) => void;
   deleteNode: (pageId: Page["id"], nodeId: Node["id"]) => void;
+  moveNode: (pageId: Page["id"], activeId: string, overId: string) => void;
   // addField: (pageId: Page["id"], parentId: Node["id"]) => void;
 
   setActive: (active: Active) => void;
@@ -516,6 +517,65 @@ export function createBuilderStore(
           active: {
             ...state.active,
             node: state.active.node?.id === nodeId ? null : state.active.node,
+          },
+        };
+      });
+    },
+    moveNode: (pageId, activeId, overId) => {
+      set((state) => {
+        const page = state.pages[pageId];
+        if (!page) return state;
+
+        const newPage = structuredClone(page);
+        const activeLayout = newPage.layout[activeId];
+        const overLayout = newPage.layout[overId];
+
+        if (!activeLayout || !overLayout) return state;
+
+        const oldParentId = activeLayout.parentId;
+        const oldParentLayout = newPage.layout[oldParentId!];
+        const oldParentNode = newPage.nodes[oldParentId!] as ContainerNode;
+
+        // Determine target container and index
+        let newParentId: string;
+        let newIndex: number;
+
+        const overNode = newPage.nodes[overId];
+        if (overNode?.type === "container") {
+          newParentId = overId;
+          newIndex = (overNode as ContainerNode).children.length;
+        } else {
+          newParentId = overLayout.parentId!;
+          const newParentNode = newPage.nodes[newParentId] as ContainerNode;
+          newIndex = newParentNode.children.indexOf(overId);
+        }
+
+        // 1. Remove from old parent
+        if (oldParentLayout) {
+          oldParentLayout.children = oldParentLayout.children.filter(
+            (id) => id !== activeId,
+          );
+        }
+        if (oldParentNode) {
+          oldParentNode.children = oldParentNode.children.filter(
+            (id) => id !== activeId,
+          );
+        }
+
+        // 2. Insert into new parent
+        const newParentLayout = newPage.layout[newParentId];
+        const newParentNode = newPage.nodes[newParentId] as ContainerNode;
+
+        if (newParentLayout && newParentNode) {
+          newParentLayout.children.splice(newIndex, 0, activeId);
+          newParentNode.children.splice(newIndex, 0, activeId);
+          activeLayout.parentId = newParentId;
+        }
+
+        return {
+          pages: {
+            ...state.pages,
+            [pageId]: newPage,
           },
         };
       });

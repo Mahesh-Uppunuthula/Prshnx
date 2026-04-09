@@ -20,7 +20,7 @@ export default function RenderNode({ pageId, nodeId }: RenderNodeProps) {
   }
 
   return (
-    <SortableWrapper id={nodeId}>
+    <SortableWrapper id={nodeId} pageId={pageId}>
       <FieldNode pageId={pageId} nodeId={nodeId} />
     </SortableWrapper>
   );
