@@ -4,6 +4,8 @@ import { Button } from "../ui/button";
 import { LuFoldHorizontal, LuFoldVertical, LuTrash } from "react-icons/lu";
 import { Node } from "@/types/builder.types";
 import { Icon } from "./DraggablePaletteItem";
+import { cn } from "@/lib/utils";
+import { assertContainerNode } from "@/lib/helper";
 
 export default function QuickActionBar() {
   const activeEntity = useBuilderStore((s) => s.active);
@@ -12,6 +14,12 @@ export default function QuickActionBar() {
 
   const activePage = activeEntity.page;
   const activeNode = activeEntity.node;
+
+  const node = useBuilderStore((s) =>
+    activePage?.id && activeNode?.id
+      ? s.pages[activePage.id]?.nodes[activeNode.id]
+      : null,
+  );
 
   const handleAction = (action: "delete") => () => {
     console.log(
@@ -39,6 +47,8 @@ export default function QuickActionBar() {
     return;
 
   if (activeNode.type === "container") {
+    if (!node) return;
+    assertContainerNode(node);
     return (
       <div className="w-fit h-fit p-2 rounded flex gap-2 place-items-center">
         <ButtonGroup className="shadow-xl">
@@ -51,21 +61,38 @@ export default function QuickActionBar() {
         </Button> */}
           <Button
             variant={"outline"}
+            className={cn({
+              "bg-indigo-50 text-indigo-900":
+                node?.orientation === "horizontal",
+            })}
             onClick={() =>
               updateContainer(activePage.id, activeNode.id, {
                 orientation: "horizontal",
               })
             }>
-            <LuFoldHorizontal /> Horizontal
+            <LuFoldHorizontal
+              className={cn({
+                "text-indigo-900": node?.orientation === "horizontal",
+              })}
+            />
+            Horizontal
           </Button>
           <Button
             variant={"outline"}
+            className={cn({
+              "bg-indigo-50 text-indigo-900": node?.orientation === "vertical",
+            })}
             onClick={() =>
               updateContainer(activePage.id, activeNode.id, {
                 orientation: "vertical",
               })
             }>
-            <LuFoldVertical /> Vertical
+            <LuFoldVertical
+              className={cn({
+                "text-indigo-900": node?.orientation === "vertical",
+              })}
+            />{" "}
+            Vertical
           </Button>
           {/* <Button variant={"outline"} onClick={() => emptyContainer(activePage.id, activeNode.id)}>
             <LuPaintbrush /> Clear

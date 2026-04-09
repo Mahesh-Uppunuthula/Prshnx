@@ -2,7 +2,7 @@ import { useBuilderStore } from "@/hooks/use-builder-store";
 import { assertInputFieldNode } from "@/lib/helper";
 import { cn } from "@/lib/utils";
 import { Node, Page } from "@/types/builder.types";
-import { ChangeEvent, MouseEvent, useState } from "react";
+import { MouseEvent, useState } from "react";
 import InlineEdit from "../custom/InlineEdit";
 import { LuAsterisk, LuSettings, LuTrash2 } from "react-icons/lu";
 import { Button } from "../ui/button";
