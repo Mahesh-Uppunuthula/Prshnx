@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import { cn, createFirstPageScreenShot } from "@/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
-import { Eye, Circle, Save } from "lucide-react";
+import { LuEye, LuCircle, LuSave } from "react-icons/lu";
 import {
   Tooltip,
   TooltipContent,
@@ -46,6 +46,7 @@ import { MultiPageFormProvider } from "@/context/MultiPageFormProvider";
 import { FormConfiguration } from "@/types/form.types";
 import Show from "@/components/utils/Show";
 import FormPreview from "@/pages/FormPreview";
+import Builder from "@/pages/builder";
 const FormOverview = lazy(() => import("@/components/FormOverview"));
 const FormResponses = lazy(() => import("@/components/FormResponses"));
 
@@ -323,12 +324,13 @@ function FormDashboardContent({
               <FormResponses />
             </Suspense>
           </TabsContent>
-          <TabsContent value="build" className="mt-0 h-full">
+          <TabsContent value="build" className="m-0 h-full">
             <Suspense fallback={<div> form-builder page Loading...</div>}>
               {isLoading ? (
                 <div>playground loading...</div>
               ) : (
-                <FormPlayground formRef={formRef} />
+                // <FormPlayground formRef={formRef} />
+                <Builder />
               )}
             </Suspense>
           </TabsContent>
@@ -362,7 +364,7 @@ function DashboardHeader({ formId, dispatch, state }: DashboardHeaderProps) {
   const isPublished = !!formConfig?.isPublished;
   // const a = useMultiPageFormStore((s) => s.isPublished);
   return (
-    <header className="h-[9%] sticky top-0 z-10 border-b bg-background px-6 py-3">
+    <header className="h-[9%] flex justify-center place-items-center sticky top-0 z-10 border-b bg-background px-6 py-3">
       <div className="flex items-center justify-between mx-auto w-full relative">
         <div className="flex items-center gap-4">
           {/* <Button
@@ -388,7 +390,7 @@ function DashboardHeader({ formId, dispatch, state }: DashboardHeaderProps) {
                   {/* Form {formId.slice(0, 8)}... */}
                   <Tooltip>
                     <TooltipTrigger>
-                      <Circle
+                      <LuCircle
                         className={cn(
                           "h-2 w-2 rounded-full font-mono tabular-nums",
                           {
@@ -455,7 +457,7 @@ function DashboardHeader({ formId, dispatch, state }: DashboardHeaderProps) {
             size="sm"
             disabled={isEmptyForm}
             onClick={() => dispatch({ type: "previewForm" })}>
-            <Eye />
+            <LuEye />
             {/* TODO - add logic to enable preview only if atleast one page and one element exists */}
             Preview
           </Button>
@@ -469,7 +471,7 @@ function DashboardHeader({ formId, dispatch, state }: DashboardHeaderProps) {
               }
               variant={state.isSyncDisabled ? "outline" : "default"}
               disabled={state.isSyncDisabled}>
-              <Save />
+              <LuSave />
               {state.isSyncing ? "Saving..." : "Save"}
             </Button>
           )}

@@ -114,11 +114,13 @@ export default function BuilderBodyLayout() {
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}>
-      <div className="w-full h-[92%] flex">
+      <div className="w-full h-full flex">
         <div
           className={cn(
-            "p-2 border border-r-0 rounded-l transition-all duration-300",
-            isElementsPanelOpen ? "w-[18%]" : "w-12 bg-[#cccccc20] flex flex-col items-center hover:bg-muted",
+            "p-2 transition-all duration-300",
+            isElementsPanelOpen
+              ? "w-[18%]"
+              : "w-12 bg-[#cccccc20] flex flex-col items-center hover:bg-muted",
           )}>
           <ElementsPanel
             isOpen={isElementsPanelOpen}
@@ -127,15 +129,15 @@ export default function BuilderBodyLayout() {
         </div>
         <div
           className={cn(
-            " relative flex justify-between",
+            "relative flex justify-between",
             isElementsPanelOpen ? "w-[82%]" : "w-[calc(100%-3rem)]",
           )}>
-          <div className="w-[95%] border rounded rounded-l-none">
+          <div className="w-[96%] border-x rounded rounded-l-none">
             <Playground />
           </div>
 
           {/* Pages Min Map */}
-          <div className="w-[5%] flex justify-center place-items-start">
+          <div className="w-[4%] flex justify-center place-items-start">
             <div className="translate-y-20">
               <PagesMinMap />
             </div>
@@ -153,8 +155,8 @@ export default function BuilderBodyLayout() {
               borderRadius: "4px",
               boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
             }}>
-            {draggingComponent.from === "palette" 
-              ? draggingComponent.label 
+            {draggingComponent.from === "palette"
+              ? draggingComponent.label
               : "Moving Field"}
           </div>
         )}
