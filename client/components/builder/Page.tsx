@@ -1,4 +1,4 @@
-import { LuPlus } from "react-icons/lu";
+import { LuPlus, LuTrash } from "react-icons/lu";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { useBuilderStore } from "@/hooks/use-builder-store";
@@ -7,6 +7,7 @@ import RenderNode from "./RenderNode";
 import { useState } from "react";
 import CreatePageModal from "./CreatePageModal";
 import { scrollToPage } from "@/lib/helper";
+import ConfirmDialog from "@/components/custom/ConfirmDialog";
 
 export default function Page({ children }: { children: React.ReactNode }) {
   return <div className="group min-h-full">{children}</div>;
@@ -56,10 +57,13 @@ export function PageHeader({ page, idx }: PageHeaderProps) {
 }
 
 type PageFooterProps = {
+  page: PageType;
   idx: number;
 };
-export function PageFooter({ idx }: PageFooterProps) {
+export function PageFooter({ page, idx }: PageFooterProps) {
   const addPage = useBuilderStore((s) => s.addPage);
+  const deletePage = useBuilderStore((s) => s.deletePage);
+  const pagesOrder = useBuilderStore((s) => s.pagesOrder);
   const [open, setOpen] = useState(false);
 
   const handleSubmit = (label: string) => {
@@ -69,8 +73,10 @@ export function PageFooter({ idx }: PageFooterProps) {
     scrollToPage(pageId);
   };
 
+  const isDeleteDisabled = pagesOrder.length <= 1;
+
   return (
-    <div className="invisible group-hover:visible">
+    <div className="invisible group-hover:visible flex items-center gap-1">
       <CreatePageModal
         open={open}
         onOpenChange={setOpen}
@@ -83,6 +89,22 @@ export function PageFooter({ idx }: PageFooterProps) {
             size={"xs"}
             className="w-fit cursor-pointer text-xs text-slate-400 flex gap-2 items-center px-2 py-1 mt-1 rounded hover:bg-muted">
             <LuPlus /> Insert Page
+          </Button>
+        }
+      />
+      <ConfirmDialog
+        title="Delete page?"
+        description={`"${page.label}" and all its fields will be permanently removed. This cannot be undone.`}
+        actionText="Delete"
+        actionVariant="destructive"
+        onAction={() => deletePage(page.id)}
+        trigger={
+          <Button
+            variant="ghost"
+            size="xs"
+            disabled={isDeleteDisabled}
+            className="w-fit cursor-pointer text-xs text-slate-400 flex gap-2 items-center px-2 py-1 mt-1 rounded hover:bg-red-50 hover:text-red-500">
+            <LuTrash /> Delete Page
           </Button>
         }
       />

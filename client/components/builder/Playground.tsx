@@ -21,7 +21,7 @@ export default function Playground() {
         <Page key={page.id}>
           <PageHeader page={page} idx={idx} />
           <PageContent page={page} />
-          <PageFooter idx={idx} />
+          <PageFooter page={page} idx={idx} />
         </Page>
       ))}
     </section>
