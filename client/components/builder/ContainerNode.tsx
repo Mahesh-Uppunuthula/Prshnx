@@ -65,10 +65,11 @@ export default function ContainerNode({ pageId, nodeId }: ContainerNodeProps) {
       onClick={handleContainerClick}
       ref={setNodeRef}
       className={cn(
-        "w-full h-full border-2 border-slate-400/30 rounded-xs overflow-auto",
+        "w-full h-full border-2 border-slate-400/30 rounded-xs",
         {
           "border-indigo-400": active.node?.id === nodeId,
           "border-emerald-400": isOver,
+          "overflow-auto": page?.rootId === nodeId,
         },
       )}
       style={{

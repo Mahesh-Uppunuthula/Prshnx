@@ -87,7 +87,7 @@ export function PageFooter({ page, idx }: PageFooterProps) {
           <Button
             variant={"ghost"}
             size={"xs"}
-            className="w-fit cursor-pointer text-xs text-slate-400 flex gap-2 items-center px-2 py-1 mt-1 rounded hover:bg-muted">
+            className="w-fit cursor-pointer text-xs text-slate-600 flex gap-2 items-center px-2 py-1 mt-1 rounded hover:bg-muted">
             <LuPlus /> Insert Page
           </Button>
         }
@@ -103,7 +103,7 @@ export function PageFooter({ page, idx }: PageFooterProps) {
             variant="ghost"
             size="xs"
             disabled={isDeleteDisabled}
-            className="w-fit cursor-pointer text-xs text-slate-400 flex gap-2 items-center px-2 py-1 mt-1 rounded hover:bg-red-50 hover:text-red-500">
+            className="w-fit cursor-pointer text-xs text-slate-600 flex gap-2 items-center px-2 py-1 mt-1 rounded hover:bg-red-50 hover:text-red-500">
             <LuTrash /> Delete Page
           </Button>
         }
