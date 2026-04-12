@@ -23,6 +23,7 @@ import {
   InputFieldTypes,
   Node,
 } from "@/types/builder.types";
+import { BuilderState } from "@/store/builder.store";
 
 export function createFormElement(type: ComponentVariants): FormElement {
   const id = `${type}_${nanoid().slice(0, 5)}`;
@@ -377,4 +378,17 @@ export function scrollToPage(id: string) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, 100);
+}
+
+export function isBuilderEmpty(pages: BuilderState["pages"]) {
+  return !Object.values(pages).some((page) => {
+    const rootNode = page.nodes[page.rootId];
+    const hasContent =
+      rootNode &&
+      "children" in rootNode &&
+      Array.isArray(rootNode.children) &&
+      rootNode.children.length > 0;
+
+    return hasContent;
+  });
 }

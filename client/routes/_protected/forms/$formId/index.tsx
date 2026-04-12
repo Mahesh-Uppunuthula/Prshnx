@@ -30,23 +30,33 @@ import {
 import { NEW_FORM_ID } from "@/lib/constants";
 import InlineEdit from "@/components/custom/InlineEdit";
 // import { useMultiPageFormStore } from "@/store/form-builder.store";
-import { useMultiPageFormStore } from "@/context/MultiPageFormProvider";
+import {
+  MultiPageFormProvider,
+  useMultiPageFormStore,
+} from "@/context/MultiPageFormProvider";
 import { FormHealth } from "@/components/FormHealth";
 import { Insights } from "@/components/FormInsights";
 import { PerformanceTrendChart } from "@/components/FormPerformanceTrendChart";
-import FormPlayground from "@/pages/FormPlayground";
-import { isFormEmpty, toStructuredPages } from "@/lib/helper";
+// import FormPlayground from "@/pages/FormPlayground";
+import {
+  isBuilderEmpty,
+  // isFormEmpty,
+  toStructuredPages,
+} from "@/lib/helper";
 import {
   useFormConfigurationById,
   useSaveForm,
   useUpdateForm,
 } from "@/hooks/use-forms";
 import { toast } from "sonner";
-import { MultiPageFormProvider } from "@/context/MultiPageFormProvider";
+// import { MultiPageFormProvider } from "@/context/MultiPageFormProvider";
 import { FormConfiguration } from "@/types/form.types";
 import Show from "@/components/utils/Show";
 import FormPreview from "@/pages/FormPreview";
 import Builder from "@/pages/builder";
+import { useBuilderStore } from "@/hooks/use-builder-store";
+import { BuilderProvider } from "@/context/BuilderProvider";
+import { InitialBuilderState } from "@/store/builder.store";
 const FormOverview = lazy(() => import("@/components/FormOverview"));
 const FormResponses = lazy(() => import("@/components/FormResponses"));
 
@@ -74,16 +84,16 @@ function FormDashboard() {
   // queries
   const { data: formConfig, isLoading } = useFormConfigurationById(formId);
 
-  const initialForm: FormConfiguration | undefined = useMemo(() => {
+  const initialBuilderState: InitialBuilderState | undefined = useMemo(() => {
     if (!formConfig) {
       console.log("multipageformprovider", "formConfig not found");
       return undefined;
     }
     console.log("multipageformprovider", { formConfig });
-    const res = {
+    const res: InitialBuilderState = {
       title: formConfig.title,
-      pages: formConfig.configuration.pages,
-      settings: formConfig.configuration.settings,
+      pages: formConfig.pages,
+      pagesOrder: formConfig.pagesOrder,
     };
 
     console.log("multipageformprovider", { res });
@@ -106,9 +116,11 @@ function FormDashboard() {
   }
 
   return (
-    <MultiPageFormProvider initialForm={initialForm}>
-      <FormDashboardContent formId={formId} isLoading={isLoading} />
-    </MultiPageFormProvider>
+    <BuilderProvider initialBuilderState={initialBuilderState}>
+      <MultiPageFormProvider initialForm={undefined}>
+        <FormDashboardContent formId={formId} isLoading={isLoading} />
+      </MultiPageFormProvider>
+    </BuilderProvider>
   );
 }
 
@@ -356,10 +368,16 @@ type DashboardHeaderProps = {
 };
 function DashboardHeader({ formId, dispatch, state }: DashboardHeaderProps) {
   const newForm = formId === NEW_FORM_ID;
-  const title = useMultiPageFormStore((s) => s.title);
-  const setTitle = useMultiPageFormStore((s) => s.setTitle);
-  const pages = useMultiPageFormStore((s) => s.pages);
-  const isEmptyForm = useMemo(() => isFormEmpty(pages), [pages]);
+  const title = useBuilderStore((s) => s.title);
+  const setTitle = useBuilderStore((s) => s.setTitle);
+  const pages = useBuilderStore((s) => s.pages);
+  const isEmptyForm = useMemo(() => isBuilderEmpty(pages), [pages]);
+
+  // isSyncDisabled from the parent is based on the old store's isDirty (which is
+  // never updated by the new BuilderStore). Override it: only block while a
+  // mutation is in flight; show/enable the button based on builder content.
+  const isSyncDisabled = state.isSyncing;
+
   const { data: formConfig } = useFormConfigurationById(formId);
   const isPublished = !!formConfig?.isPublished;
   // const a = useMultiPageFormStore((s) => s.isPublished);
@@ -469,8 +487,8 @@ function DashboardHeader({ formId, dispatch, state }: DashboardHeaderProps) {
                   type: newForm ? "saveForm" : "updateForm",
                 })
               }
-              variant={state.isSyncDisabled ? "outline" : "default"}
-              disabled={state.isSyncDisabled}>
+              variant={isSyncDisabled ? "outline" : "default"}
+              disabled={isSyncDisabled}>
               <LuSave />
               {state.isSyncing ? "Saving..." : "Save"}
             </Button>

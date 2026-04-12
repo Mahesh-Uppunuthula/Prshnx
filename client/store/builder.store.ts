@@ -1,3 +1,181 @@
+// latest obj
+// const _x = {
+//   active: {
+//     page: {
+//       id: "page-FkHiP8z25tvmGbkDYKozH",
+//     },
+//     node: {
+//       id: "field-ZIumVdrPyZE4WTRw-AXYY",
+//       type: "single-line-hidden-input",
+//     },
+//   },
+//   pages: {
+//     "page-spXeIjo1Pr6iNLsD_o3e-": {
+//       id: "page-spXeIjo1Pr6iNLsD_o3e-",
+//       label: "Introduction",
+//       rootId: "container-dHsdp82ubyPj2IPrQsLA7",
+//       layout: {
+//         "container-dHsdp82ubyPj2IPrQsLA7": {
+//           parentId: null,
+//           children: [
+//             "container-lp6oqjukfLnyJmz02NWiM",
+//             "container-2AkB5-1YEkHNbYNb51x4l",
+//           ],
+//         },
+//         "container-lp6oqjukfLnyJmz02NWiM": {
+//           parentId: "container-dHsdp82ubyPj2IPrQsLA7",
+//           children: [],
+//         },
+//         "field-g1e2EN29UmnsamQ9woL8q": {
+//           parentId: "container-2AkB5-1YEkHNbYNb51x4l",
+//           children: [],
+//         },
+//         "container-2AkB5-1YEkHNbYNb51x4l": {
+//           parentId: "container-dHsdp82ubyPj2IPrQsLA7",
+//           children: [
+//             "field-g1e2EN29UmnsamQ9woL8q",
+//             "field-1hVPYGVJPvppf2YjX4Uul",
+//             "field-JqclbQohUMn1HNvg521zs",
+//           ],
+//         },
+//         "field-1hVPYGVJPvppf2YjX4Uul": {
+//           parentId: "container-2AkB5-1YEkHNbYNb51x4l",
+//           children: [],
+//         },
+//         "field-JqclbQohUMn1HNvg521zs": {
+//           parentId: "container-2AkB5-1YEkHNbYNb51x4l",
+//           children: [],
+//         },
+//       },
+//       nodes: {
+//         "container-dHsdp82ubyPj2IPrQsLA7": {
+//           id: "container-dHsdp82ubyPj2IPrQsLA7",
+//           label: "Container 1",
+//           type: "container",
+//           orientation: "horizontal",
+//           children: [
+//             "container-lp6oqjukfLnyJmz02NWiM",
+//             "container-2AkB5-1YEkHNbYNb51x4l",
+//           ],
+//         },
+//         "container-lp6oqjukfLnyJmz02NWiM": {
+//           id: "container-lp6oqjukfLnyJmz02NWiM",
+//           type: "container",
+//           label: "Container 2",
+//           orientation: "vertical",
+//           children: [],
+//         },
+//         "field-g1e2EN29UmnsamQ9woL8q": {
+//           id: "field-g1e2EN29UmnsamQ9woL8q",
+//           label: "Field 1",
+//           type: "single-line-input",
+//           description: "asdfghjk",
+//           required: true,
+//           disabled: false,
+//           placeholder: "asdfghjkl",
+//           minLength: 1,
+//           maxLength: 256,
+//         },
+//         "container-2AkB5-1YEkHNbYNb51x4l": {
+//           id: "container-2AkB5-1YEkHNbYNb51x4l",
+//           type: "container",
+//           label: "Container 3",
+//           orientation: "vertical",
+//           children: [
+//             "field-g1e2EN29UmnsamQ9woL8q",
+//             "field-1hVPYGVJPvppf2YjX4Uul",
+//             "field-JqclbQohUMn1HNvg521zs",
+//           ],
+//         },
+//         "field-1hVPYGVJPvppf2YjX4Uul": {
+//           id: "field-1hVPYGVJPvppf2YjX4Uul",
+//           label: "Field 3",
+//           type: "multi-line-input",
+//           description: "",
+//           required: false,
+//           disabled: false,
+//           placeholder: "",
+//           minLength: 1,
+//           maxLength: 256,
+//         },
+//         "field-JqclbQohUMn1HNvg521zs": {
+//           id: "field-JqclbQohUMn1HNvg521zs",
+//           label: "Field 4",
+//           type: "single-line-hidden-input",
+//           description: "",
+//           required: false,
+//           disabled: false,
+//           placeholder: "",
+//           minLength: 1,
+//           maxLength: 256,
+//         },
+//       },
+//       containerCount: 3,
+//       fieldCount: 4,
+//     },
+//     "page-FkHiP8z25tvmGbkDYKozH": {
+//       id: "page-FkHiP8z25tvmGbkDYKozH",
+//       label: "page-2",
+//       rootId: "container-wfsyLDwc41W0FYbS6c6S6",
+//       layout: {
+//         "container-wfsyLDwc41W0FYbS6c6S6": {
+//           parentId: null,
+//           children: [
+//             "field-uL7s7Mi71Kdv4ifbrO320",
+//             "field-Zvzy2L_mz9dO5HxbdP4sb",
+//           ],
+//         },
+//         "field-uL7s7Mi71Kdv4ifbrO320": {
+//           parentId: "container-wfsyLDwc41W0FYbS6c6S6",
+//           children: [],
+//         },
+//         "field-Zvzy2L_mz9dO5HxbdP4sb": {
+//           parentId: "container-wfsyLDwc41W0FYbS6c6S6",
+//           children: [],
+//         },
+//       },
+//       nodes: {
+//         "container-wfsyLDwc41W0FYbS6c6S6": {
+//           id: "container-wfsyLDwc41W0FYbS6c6S6",
+//           label: "Container 1",
+//           type: "container",
+//           orientation: "vertical",
+//           children: [
+//             "field-uL7s7Mi71Kdv4ifbrO320",
+//             "field-Zvzy2L_mz9dO5HxbdP4sb",
+//           ],
+//         },
+//         "field-uL7s7Mi71Kdv4ifbrO320": {
+//           id: "field-uL7s7Mi71Kdv4ifbrO320",
+//           label: "Field 1",
+//           type: "single-line-input",
+//           description: "",
+//           required: false,
+//           disabled: false,
+//           placeholder: "",
+//           minLength: 1,
+//           maxLength: 256,
+//         },
+//         "field-Zvzy2L_mz9dO5HxbdP4sb": {
+//           id: "field-Zvzy2L_mz9dO5HxbdP4sb",
+//           label: "Field 3",
+//           type: "multi-line-input",
+//           description: "",
+//           required: false,
+//           disabled: false,
+//           placeholder: "",
+//           minLength: 1,
+//           maxLength: 256,
+//         },
+//       },
+//       containerCount: 1,
+//       fieldCount: 3,
+//     },
+//   },
+//   pagesOrder: ["page-spXeIjo1Pr6iNLsD_o3e-", "page-FkHiP8z25tvmGbkDYKozH"],
+// };
+
+// prototype obj
 // const x = {
 //   rootId: "root",
 //   layout: {
@@ -180,6 +358,7 @@ export type ActivePage = Pick<Page, "id"> | null;
 export type ActiveNode = Pick<Node, "id" | "type"> | null;
 
 export type BuilderState = {
+  title: string;
   pagesOrder: Page["id"][];
   pages: Record<Page["id"], Page>;
   active: {
@@ -194,6 +373,8 @@ export type Active = {
 };
 
 export type BuilderActions = {
+  setTitle: (title: BuilderState["title"]) => void;
+
   // page actions
   addPage: (pageLabel: Page["label"], position?: number) => Page["id"];
   deletePage: (pageId: Page["id"]) => void;
@@ -237,11 +418,12 @@ export type BuilderActions = {
   // // extended functionality
   // setActiveNode: (nodeId: Node["id"]) => void;
 };
-export type InitialBuilderState = Pick<BuilderState, "pages" | "pagesOrder">;
+export type InitialBuilderState = Omit<BuilderState, "active">;
 export type BuilderStore = BuilderState & BuilderActions;
 
 const defaultPage = createDefaultPage("Introduction");
 const defaultInitialBuilderState: InitialBuilderState = {
+  title: "Untitled Form",
   pages: { [defaultPage.id]: defaultPage },
   pagesOrder: [defaultPage.id],
 };
@@ -249,7 +431,8 @@ const defaultInitialBuilderState: InitialBuilderState = {
 export function createBuilderStore(
   initialBuilderState = defaultInitialBuilderState,
 ) {
-  const store = createStore<BuilderStore>((set) => ({
+  const store = createStore<BuilderStore>((set, get) => ({
+    title: initialBuilderState.title,
     active: {
       node: {
         id: defaultPage.rootId,
@@ -262,8 +445,12 @@ export function createBuilderStore(
     pages: initialBuilderState.pages,
     pagesOrder: initialBuilderState.pagesOrder,
     // core actions
+    setTitle: (title) => {
+      set({ title });
+    },
     addPage: (pageLabel, position) => {
       const page = createDefaultPage(pageLabel);
+      console.log({ state: get() });
       set((state) => {
         const updatedPagesOrder = structuredClone(state.pagesOrder);
         if (position) {
@@ -272,7 +459,6 @@ export function createBuilderStore(
           updatedPagesOrder.push(page.id);
         }
         return {
-
           pages: {
             ...state.pages,
             [page.id]: page,

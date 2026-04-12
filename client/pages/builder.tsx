@@ -1,14 +1,9 @@
 import BuilderBodyLayout from "@/components/builder/Layout";
 // import NavigationBar from "@/components/builder/NavigationBar";
 import QuickActionBar from "@/components/builder/QuickActionsBar";
-import { BuilderProvider } from "@/context/BuilderProvider";
 
 export default function Builder() {
-  return (
-    <BuilderProvider initialBuilderState={undefined}>
-      <BuilderLayout />
-    </BuilderProvider>
-  );
+  return <BuilderLayout />;
 }
 
 function BuilderLayout() {
