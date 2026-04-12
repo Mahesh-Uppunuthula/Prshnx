@@ -1,11 +1,18 @@
 import { useBuilderStore } from "@/hooks/use-builder-store";
 import { ButtonGroup } from "../ui/button-group";
 import { Button } from "../ui/button";
-import { LuFoldHorizontal, LuFoldVertical, LuTrash } from "react-icons/lu";
+import {
+  LuFoldHorizontal,
+  LuFoldVertical,
+  LuSettings,
+  LuTrash,
+} from "react-icons/lu";
 import { Node } from "@/types/builder.types";
 import { Icon } from "./DraggablePaletteItem";
 import { cn } from "@/lib/utils";
 import { assertContainerNode } from "@/lib/helper";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { ToggleSwitchOption } from "./CommonOptions";
 
 export default function QuickActionBar() {
   const activeEntity = useBuilderStore((s) => s.active);
@@ -19,6 +26,12 @@ export default function QuickActionBar() {
     activePage?.id && activeNode?.id
       ? s.pages[activePage.id]?.nodes[activeNode.id]
       : null,
+  );
+
+  const isRoot = useBuilderStore((s) =>
+    activePage?.id && node?.id
+      ? s.pages[activePage.id]?.rootId === node.id
+      : false,
   );
 
   const handleAction = (action: "delete") => () => {
@@ -97,6 +110,25 @@ export default function QuickActionBar() {
           {/* <Button variant={"outline"} onClick={() => emptyContainer(activePage.id, activeNode.id)}>
             <LuPaintbrush /> Clear
           </Button> */}
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant={"outline"}>
+                <LuSettings /> Settings
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="center" className="w-48 p-3 flex flex-col">
+              <ToggleSwitchOption
+                label="Scrollable"
+                checked={node.isScrollable ?? isRoot}
+                onCheckedChange={(checked) =>
+                  updateContainer(activePage.id, activeNode.id, {
+                    isScrollable: checked,
+                  })
+                }
+              />
+            </PopoverContent>
+          </Popover>
 
           <Button
             variant={"outline"}

@@ -271,6 +271,7 @@ export function createDefaultPage(pageLabel: BuilderPage["label"]) {
         type: "container",
         orientation: "vertical",
         children: [],
+        isScrollable: true,
       },
     },
     containerCount,

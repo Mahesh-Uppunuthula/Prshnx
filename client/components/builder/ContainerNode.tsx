@@ -69,7 +69,7 @@ export default function ContainerNode({ pageId, nodeId }: ContainerNodeProps) {
         {
           "border-indigo-400": active.node?.id === nodeId,
           "border-emerald-400": isOver,
-          "overflow-auto": page?.rootId === nodeId,
+          "overflow-auto": node.isScrollable ?? (page?.rootId === nodeId),
         },
       )}
       style={{

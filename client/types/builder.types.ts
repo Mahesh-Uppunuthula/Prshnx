@@ -39,6 +39,7 @@ export type ContainerProperties = {
   type: "container";
   id: string;
   label: string;
+  isScrollable?: boolean;
 };
 
 export type Fields =
@@ -58,6 +59,7 @@ export type ContainerNode = {
   type: "container";
   orientation: Orientation;
   children: string[];
+  isScrollable?: boolean;
 };
 
 export type FieldNode = Fields;

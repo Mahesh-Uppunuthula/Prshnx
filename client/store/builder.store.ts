@@ -382,7 +382,7 @@ export type BuilderActions = {
   updateContainer: (
     pageId: Page["id"],
     containerId: Node["id"],
-    updates: Partial<Pick<ContainerNode, "label" | "orientation">>,
+    updates: Partial<Pick<ContainerNode, "label" | "orientation" | "isScrollable">>,
   ) => void;
   // emptyContainer: (pageId: Page["id"], containerId: Node["id"]) => void;
   addField: (
@@ -509,6 +509,7 @@ export function createBuilderStore(
           label: `Container ${newPage["containerCount"]}`,
           orientation: "vertical",
           children: [],
+          isScrollable: false,
         };
         const parentLayout = newPage.layout[parentId];
         if (!parentLayout) return state;
@@ -547,6 +548,8 @@ export function createBuilderStore(
         containerNode.label = updates.label ?? containerNode.label;
         containerNode.orientation =
           updates.orientation ?? containerNode.orientation;
+        containerNode.isScrollable =
+          updates.isScrollable ?? containerNode.isScrollable;
         return {
           pages: {
             ...state.pages,
