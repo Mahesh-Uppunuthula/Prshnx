@@ -359,6 +359,7 @@ export type ActiveNode = Pick<Node, "id" | "type"> | null;
 
 export type BuilderState = {
   title: string;
+  version: number;
   pagesOrder: Page["id"][];
   pages: Record<Page["id"], Page>;
   active: {
@@ -418,14 +419,24 @@ export type BuilderActions = {
   // // extended functionality
   // setActiveNode: (nodeId: Node["id"]) => void;
 };
-export type InitialBuilderState = Omit<BuilderState, "active">;
+export type InitialBuilderState = BuilderState;
 export type BuilderStore = BuilderState & BuilderActions;
 
 const defaultPage = createDefaultPage("Introduction");
 const defaultInitialBuilderState: InitialBuilderState = {
   title: "Untitled Form",
+  version: 1,
   pages: { [defaultPage.id]: defaultPage },
   pagesOrder: [defaultPage.id],
+  active: {
+    node: {
+      id: defaultPage.rootId,
+      type: defaultPage.nodes[defaultPage.rootId]!.type,
+    },
+    page: {
+      id: defaultPage.id,
+    },
+  },
 };
 
 export function createBuilderStore(
@@ -433,15 +444,8 @@ export function createBuilderStore(
 ) {
   const store = createStore<BuilderStore>((set, get) => ({
     title: initialBuilderState.title,
-    active: {
-      node: {
-        id: defaultPage.rootId,
-        type: defaultPage.nodes[defaultPage.rootId]!.type,
-      },
-      page: {
-        id: defaultPage.id,
-      },
-    },
+    version: initialBuilderState.version,
+    active: initialBuilderState.active,
     pages: initialBuilderState.pages,
     pagesOrder: initialBuilderState.pagesOrder,
     // core actions
