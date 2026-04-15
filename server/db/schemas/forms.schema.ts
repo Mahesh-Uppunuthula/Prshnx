@@ -1,14 +1,7 @@
-import {
-  boolean,
-  json,
-  pgTable,
-  uuid,
-  varchar,
-  timestamp,
-} from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+import { boolean, json, pgTable, varchar } from "drizzle-orm/pg-core";
+import { defaultPrimaryKey, defaultTimeStamps } from "../../lib/utils";
 export const forms = pgTable("forms", {
-  id: uuid().primaryKey().defaultRandom(),
+  ...defaultPrimaryKey(),
   title: varchar().notNull(),
   description: varchar(),
   ownerId: varchar({ length: 36 }).notNull(),
@@ -22,11 +15,7 @@ export const forms = pgTable("forms", {
     .notNull(),
   previewLink: varchar(),
   previewKey: varchar(),
-  createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
-  updatedAt: timestamp({ mode: "string" })
-    .defaultNow()
-    .$onUpdate(() => sql`now()`) // Use SQL function to get current timestamp
-    .notNull(),
+  ...defaultTimeStamps(),
 });
 
 export type UpdateForm = Pick<

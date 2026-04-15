@@ -1,17 +1,14 @@
-import { json, pgTable, uuid, timestamp } from "drizzle-orm/pg-core";
+import { json, pgTable, uuid } from "drizzle-orm/pg-core";
 import { forms } from "./forms.schema";
-import { sql } from "drizzle-orm";
+import { defaultPrimaryKey, defaultTimeStamps } from "../../lib/utils";
 
 export const formResponses = pgTable("form-responses", {
-  id: uuid(),
+  ...defaultPrimaryKey(),
   formId: uuid()
     .references(() => forms.id)
     .notNull(),
   response: json().notNull(),
-  createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
-  updatedAt: timestamp({ mode: "string" })
-    .defaultNow()
-    .$onUpdate(() => sql`now()`).notNull(),
+  ...defaultTimeStamps(),
 });
 
 // add association tables
