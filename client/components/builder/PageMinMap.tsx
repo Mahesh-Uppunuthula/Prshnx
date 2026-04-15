@@ -88,7 +88,7 @@ export default function PagesMinMap() {
             {Object.values(pages).map((page) => (
               <div
                 key={getPageMinMapId(page.id)}
-                className={cn("w-full border border-slate-200 rounded", {
+                className={cn("w-full border-[1.5px] border-slate-200 rounded", {
                   "border-slate-600": page.id === active.page?.id,
                 })}
               />
@@ -97,12 +97,12 @@ export default function PagesMinMap() {
         </div>
       </PopoverTrigger>
       <PopoverContent
-        className={cn("w-52 max-h-80 p-4")}
+        className={cn("max-w-80 max-h-80 p-4")}
         side="left"
         align="center"
         sideOffset={-20}
         onMouseLeave={() => setIsOver(false)}>
-        <div className="h-fit flex flex-col gap-2  overflow-auto">
+        <div className="max-h-72 flex flex-col gap-2  overflow-y-auto">
           {sortedPages.map((page) => (
             <div
               key={getPageMinMapId(page.id)}
