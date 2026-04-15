@@ -1,7 +1,9 @@
 import { and, eq, exists, getTableColumns, sql } from "drizzle-orm";
 import { db } from "../db";
 import {
+  CreateFormType,
   forms,
+  InsertFormType,
   UpdateForm,
   type CreateForm,
   type SelectForm,
@@ -9,7 +11,7 @@ import {
 import { generateImageId, generatePublicLink } from "../lib/utils";
 import { R2Service } from "./r2.service";
 import { ErrorResponse } from "../types/error";
-import { v4 as uuidv4 } from "uuid";
+import { v7 as uuidv7 } from "uuid";
 import { UserType } from "@kinde-oss/kinde-typescript-sdk";
 
 const r2Service = new R2Service();
@@ -66,52 +68,41 @@ export class FormService {
   }
   async createForm({
     ownerId,
-    formConfiguration,
-    formPreviewFile,
+    formData,
   }: {
     ownerId: string;
-    formConfiguration: {
-      title: string;
-      description?: string;
-      settings: any;
-      pages: CreateForm["configuration"];
-    };
-    formPreviewFile: File | undefined;
+    formData: CreateFormType;
   }) {
-    const formPreviewImageId = uuidv4();
-    const formPreviewImageKey = generateImageId(
-      "form-previews",
-      formPreviewImageId,
-    );
+    // const formPreviewImageId = uuidv7();
+    // const formPreviewImageKey = generateImageId(
+    //   "form-previews",
+    //   formPreviewImageId,
+    // );
 
-    let previewLink: string | null = null;
-    if (formPreviewFile) {
-      previewLink = await r2Service.upload(
-        formPreviewFile!,
-        formPreviewImageKey,
-      );
-    }
+    // let previewLink: string | null = null;
+    // if (formPreviewFile) {
+    //   previewLink = await r2Service.upload(
+    //     formPreviewFile!,
+    //     formPreviewImageKey,
+    //   );
+    // }
 
-    const insertForm: CreateForm = {
-      title: formConfiguration.title,
-      description: formConfiguration.description,
-      configuration: {
-        settings: formConfiguration.settings,
-        pages: formConfiguration.pages,
-      },
-      isPublished: false,
+    const insertForm: InsertFormType = {
+      title: formData.title,
+      description: formData.description,
+      configuration: formData.configuration,
       publicLink: generatePublicLink(),
-      previewLink: previewLink,
-      previewKey: formPreviewImageKey,
       ownerId: ownerId,
+      status: "draft",
     };
 
-    const result = await db
+    console.log({ insertForm });
+    const [result] = await db
       .insert(forms)
       .values(insertForm)
       .returning({ insertionId: forms.id });
 
-    return result[0];
+    return result;
   }
   async updateForm({
     ownerId,
