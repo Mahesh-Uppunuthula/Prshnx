@@ -1,4 +1,5 @@
 import type { AppType } from "@server/app";
+import { CreateFormType } from "@server/db/schemas/forms.schema";
 import { hc } from "hono/client";
 
 const client = hc<AppType>("/");
@@ -8,20 +9,29 @@ export const formsApi = {
     if (!getAllFormsQuery.ok) throw new Error("Failed to fetch forms");
     return await getAllFormsQuery.json();
   },
-  createForm: async (form: FormData) => {
+  createForm: async (form: CreateFormType) => {
     console.log({ form });
-
-    // POST query has to be made via fetch to preserve form-preview URL
-    const saveFormQuery = await fetch("/api/protected/v1/forms", {
-      method: "POST",
-      body: form,
+    const createFormQuery = await client.api.protected.v1.forms.$post({
+      json: form,
     });
-
-    if (!saveFormQuery.ok) throw new Error("Failed to create form");
-
-    const createFormResponse = await saveFormQuery.json();
+    if (!createFormQuery.ok) throw new Error("Failed to create form");
+    const createFormResponse = await createFormQuery.json();
     return createFormResponse;
   },
+  // createForm: async (form: FormData) => {
+  //   console.log({ form });
+
+  //   // POST query has to be made via fetch to preserve form-preview URL
+  //   const saveFormQuery = await fetch("/api/protected/v1/forms", {
+  //     method: "POST",
+  //     body: form,
+  //   });
+
+  //   if (!saveFormQuery.ok) throw new Error("Failed to create form");
+
+  //   const createFormResponse = await saveFormQuery.json();
+  //   return createFormResponse;
+  // },
   updateForm: async ({ formId, form }: { formId: string; form: FormData }) => {
     const updateFormQuery = await fetch(`/api/protected/v1/forms/${formId}`, {
       method: "PUT",

@@ -1,6 +1,6 @@
 import { timestamp, uuid } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { v7 as uuidv7 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { ErrorResponse } from "../types/error";
 
 export function asyncHandler<T extends (...args: any) => Promise<any> | void>(
@@ -37,7 +37,7 @@ export function generateISOTimestamp() {
 }
 
 export function generatePublicLink() {
-  return uuidv7().slice(0, 8);
+  return uuidv4().slice(0, 8);
 }
 
 export function defaultPrimaryKey() {

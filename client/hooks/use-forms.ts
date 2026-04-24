@@ -66,5 +66,6 @@ export const useFormConfigurationById = (formId: string) => {
     queryKey: QUERY_KEYS.forms.getFormConfigurationById(formId),
     queryFn: () => formsApi.getFormConfigurationById(formId),
     enabled: !!formId && formId !== NEW_FORM_ID,
+    retry: 2
   });
 };

@@ -92,8 +92,13 @@ function FormDashboard() {
     console.log("multipageformprovider", { formConfig });
     const res: InitialBuilderState = {
       title: formConfig.title,
+      version: formConfig.version ?? 1,
       pages: formConfig.pages,
       pagesOrder: formConfig.pagesOrder,
+      active: {
+        node: null,
+        page: null,
+      },
     };
 
     console.log("multipageformprovider", { res });
@@ -147,8 +152,10 @@ function FormDashboardContent({
   const [preview, setPreview] = useState(false);
 
   // store states
-  const formTitle = useMultiPageFormStore((s) => s.title);
-  const pages = useMultiPageFormStore((s) => s.pages);
+  const formTitle = useBuilderStore((s) => s.title);
+  const pages = useBuilderStore((s) => s.pages);
+  const pagesOrder = useBuilderStore((s) => s.pagesOrder);
+  const version = useBuilderStore((s) => s.version);
   const pageSettings = useMultiPageFormStore((s) => s.pageSettings);
   const isDirty = useMultiPageFormStore((s) => s.isDirty);
   const markSaved = useMultiPageFormStore((s) => s.markSaved);
@@ -160,8 +167,8 @@ function FormDashboardContent({
 
   // computed states
   const tab = search.tab || "overview";
-  const firstPageId = pages.keys().next().value!;
-  const firstPageHasElements = pages.get(firstPageId)!.body.elements.length > 0;
+  // const firstPageId = pages.keys().next().value!;
+  // const firstPageHasElements = pages.get(firstPageId)!.body.elements.length > 0;
 
   // callbacks
   const dispatch = useCallback(
@@ -170,83 +177,48 @@ function FormDashboardContent({
         case "saveForm":
           {
             console.log("dispatch", "saveForm", formRef, formRef.current);
-            if (!formRef || !formRef.current) return;
+            // if (!formRef || !formRef.current) return;
 
-            // set first page for preview
-            setActivePageId(pages.keys().next().value!);
-            setActiveFormElement("dummy-id", "cta");
-
-            // create the form preview screenshot
-            const formPreviewResponse = firstPageHasElements
-              ? await createFirstPageScreenShot(formRef)
-              : null;
-
-            const formData = new FormData();
-            formData.append(
-              "form",
-              JSON.stringify(toStructuredPages(formTitle, pageSettings, pages)),
-            );
-            if (formPreviewResponse && formPreviewResponse.success)
-              formData.append(
-                "preview",
-                formPreviewResponse.data,
-                `${formTitle}_preview.png`,
-              );
-
-            saveForm(formData, {
-              onSuccess: (data) => {
-                markSaved();
-                toast.success("Form saved successfully", {
-                  closeButton: true,
-                });
-                navigate({
-                  to: `/forms/${data.insertionId}`,
-                  search: {
-                    tab: "overview",
-                  },
-                });
-              },
-              onError: (error) => {
-                toast.error(error.message);
-              },
-            });
-          }
-          break;
-        case "updateForm":
-          {
-            console.log("dispatch", "updateForm", formRef, formRef.current);
-            if (!formRef || !formRef.current) return;
-
-            // set first page for preview
-            setActivePageId(pages.keys().next().value!);
-            setActiveFormElement("dummy-id", "cta");
+            // // set first page for preview
+            // setActivePageId(pages.keys().next().value!);
+            // setActiveFormElement("dummy-id", "cta");
 
             // create the form preview screenshot
-            const formPreviewResponse = firstPageHasElements
-              ? await createFirstPageScreenShot(formRef)
-              : null;
+            // const formPreviewResponse = firstPageHasElements
+            //   ? await createFirstPageScreenShot(formRef)
+            //   : null;
 
-            const formData = new FormData();
-            formData.append(
-              "form",
-              JSON.stringify(toStructuredPages(formTitle, pageSettings, pages)),
-            );
-            if (formPreviewResponse && formPreviewResponse.success)
-              formData.append(
-                "preview",
-                formPreviewResponse.data,
-                `${formTitle}_preview.png`,
-              );
-            updateForm(
-              { formId, form: formData },
+            // const formData = new FormData();
+            // formData.append(
+            //   "form",
+            //   JSON.stringify(toStructuredPages(formTitle, pageSettings, pages)),
+            // );
+            // if (formPreviewResponse && formPreviewResponse.success)
+            //   formData.append(
+            //     "preview",
+            //     formPreviewResponse.data,
+            //     `${formTitle}_preview.png`,
+            //   );
+
+            saveForm(
               {
-                onSuccess: () => {
-                  markSaved();
-                  toast.success("Form updated successfully", {
+                title: formTitle,
+                description: "",
+                settings: pageSettings,
+                version: version,
+                configuration: {
+                  pages: pages,
+                  pagesOrder: pagesOrder,
+                },
+              },
+              {
+                onSuccess: (data) => {
+                  // markSaved(); TODO - add this to new builder store
+                  toast.success("Form saved successfully", {
                     closeButton: true,
                   });
                   navigate({
-                    to: `/forms/${formId}`,
+                    to: `/forms/${data.insertionId}`,
                     search: {
                       tab: "overview",
                     },
@@ -259,16 +231,63 @@ function FormDashboardContent({
             );
           }
           break;
-        case "previewForm":
-          setPreview(true);
-          break;
+        // case "updateForm":
+        //   {
+        //     console.log("dispatch", "updateForm", formRef, formRef.current);
+        //     if (!formRef || !formRef.current) return;
+
+        //     // set first page for preview
+        //     setActivePageId(pages.keys().next().value!);
+        //     setActiveFormElement("dummy-id", "cta");
+
+        //     // create the form preview screenshot
+        //     const formPreviewResponse = firstPageHasElements
+        //       ? await createFirstPageScreenShot(formRef)
+        //       : null;
+
+        //     const formData = new FormData();
+        //     formData.append(
+        //       "form",
+        //       JSON.stringify(toStructuredPages(formTitle, pageSettings, pages)),
+        //     );
+        //     if (formPreviewResponse && formPreviewResponse.success)
+        //       formData.append(
+        //         "preview",
+        //         formPreviewResponse.data,
+        //         `${formTitle}_preview.png`,
+        //       );
+        //     updateForm(
+        //       { formId, form: formData },
+        //       {
+        //         onSuccess: () => {
+        //           markSaved();
+        //           toast.success("Form updated successfully", {
+        //             closeButton: true,
+        //           });
+        //           navigate({
+        //             to: `/forms/${formId}`,
+        //             search: {
+        //               tab: "overview",
+        //             },
+        //           });
+        //         },
+        //         onError: (error) => {
+        //           toast.error(error.message);
+        //         },
+        //       },
+        //     );
+        //   }
+        //   break;
+        // case "previewForm":
+        //   setPreview(true);
+        //   break;
       }
     },
     [
       formTitle,
       pageSettings,
       pages,
-      firstPageHasElements,
+      // firstPageHasElements,
       setActivePageId,
       setActiveFormElement,
       saveForm,
