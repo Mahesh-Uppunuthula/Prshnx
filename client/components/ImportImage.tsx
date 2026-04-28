@@ -33,7 +33,7 @@ function ImportImage({ trigger, onImport }: ImportImageProps) {
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-w-full min-w-[50vw] h-[80vh] flex flex-col p-0">
-        <DialogHeader className="p-6 pb-2">
+        <DialogHeader className="p-6 pb-0">
           <DialogTitle>Import Images</DialogTitle>
           <DialogDescription>
             Choose where you want to import image from
@@ -46,7 +46,7 @@ function ImportImage({ trigger, onImport }: ImportImageProps) {
             setSelectedImage(null);
           }}
           className="w-full flex-1 flex flex-col overflow-hidden">
-          <div className="w-full px-6 py-4">
+          <div className="w-full px-6">
             <TabsList className="w-full bg-muted/50 p-1 h-auto rounded-xl gap-1">
               <TabsTrigger
                 value="upload"
