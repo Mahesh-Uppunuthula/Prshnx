@@ -5,6 +5,7 @@ import { LuAsterisk, LuSettings } from "react-icons/lu";
 import InlineEdit from "./InlineEdit";
 import { MouseEvent } from "react";
 import { cn } from "@/lib/utils";
+import ImportImage from "../ImportImage";
 
 type ChatBlockProps = {
   nodeId: string;
@@ -38,7 +39,7 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
   return (
     <div
       className={cn(
-        "w-full min-w-[100px] h-fit text-sm rounded-lg border-2 border-black/10 shadow-sm",
+        "w-full min-w-[100px] h-fit text-sm rounded border-2 border-black/10",
         active.node?.id === nodeId && active.page?.id === pageId
           ? "border-indigo-400"
           : "hover:border-muted-foreground/50 border-border",
@@ -46,11 +47,17 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
       onClick={handleOnClick}>
       {/* question and questioner */}
       <div className="w-full p-2 flex gap-3">
-        <img
-          className="rounded-full size-10"
-          src={questioner.avatar}
-          alt={questioner.name}
-        />
+        <div onPointerDown={(e) => e.stopPropagation()}>
+          <ImportImage
+            trigger={
+              <img
+                className="rounded-full size-10 cursor-pointer hover:opacity-80 transition-opacity"
+                src={questioner.avatar}
+                alt={questioner.name}
+              />
+            }
+          />
+        </div>
         <div className="w-full flex flex-col justify-start gap-0 bg-red-20">
           <div className="w-full flex justify-between bg-blue-20">
             <span className="w-fit font-medium flex gap-2 place-items-center">
@@ -72,11 +79,17 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
       <div className="w-full border-t" />
       {/* respondent and response */}
       <div className="w-full p-2 flex gap-3">
-        <img
-          className="rounded-full size-10"
-          src={respondent.avatar}
-          alt={respondent.name}
-        />
+        <div onPointerDown={(e) => e.stopPropagation()}>
+          <ImportImage
+            trigger={
+              <img
+                className="rounded-full size-10 cursor-pointer hover:opacity-80 transition-opacity"
+                src={respondent.avatar}
+                alt={respondent.name}
+              />
+            }
+          />
+        </div>
         <div className="w-full flex flex-col">
           <span className="w-fit font-medium ">{respondent.name}</span>
           {/* <span>{response.type}</span> */}
