@@ -1,7 +1,10 @@
 import { useBuilderStore } from "@/hooks/use-builder-store";
 import { FieldOptions } from "../builder/FieldNode";
 import { assertChatBlockNode } from "@/lib/helper";
-import { LuAsterisk } from "react-icons/lu";
+import { LuAsterisk, LuSettings } from "react-icons/lu";
+import InlineEdit from "./InlineEdit";
+import { MouseEvent } from "react";
+import { cn } from "@/lib/utils";
 
 type ChatBlockProps = {
   nodeId: string;
@@ -9,14 +12,38 @@ type ChatBlockProps = {
 };
 function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
   const page = useBuilderStore((s) => s.pages[pageId]);
+  const updateField = useBuilderStore((s) => s.updateField);
+  const active = useBuilderStore((s) => s.active);
+  const setActive = useBuilderStore((s) => s.setActive);
   const node = page?.nodes[nodeId];
   if (!node) return null;
 
   assertChatBlockNode(node);
 
+  const handleTextChange =
+    (type: "question") => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      if (type === "question") {
+        updateField(pageId, nodeId, { question: value });
+      }
+    };
+
+  function handleOnClick(event: MouseEvent<HTMLDivElement>) {
+    event.stopPropagation();
+    if (!node || !node.id || !node.type) return;
+    setActive({ page: { id: pageId }, node: { id: node.id, type: node.type } });
+  }
+
   const { questioner, respondent, question, response } = node;
   return (
-    <div className="w-full h-fit text-sm rounded-lg border border-black/10 shadow-sm">
+    <div
+      className={cn(
+        "w-full min-w-[100px] h-fit text-sm rounded-lg border-2 border-black/10 shadow-sm",
+        active.node?.id === nodeId && active.page?.id === pageId
+          ? "border-indigo-400"
+          : "hover:border-muted-foreground/50 border-border",
+      )}
+      onClick={handleOnClick}>
       {/* question and questioner */}
       <div className="w-full p-2 flex gap-3">
         <img
@@ -36,7 +63,10 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
             </span>
             <FieldOptions pageId={pageId} nodeId={nodeId} />
           </div>
-          <span>{question}</span>
+          <InlineEdit
+            value={question}
+            onChange={handleTextChange("question")}
+          />
         </div>
       </div>
       <div className="w-full border-t" />
@@ -53,7 +83,13 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
           <div className="mt-1">
             <div className="w-full min-h-[36px] bg-white border border-input rounded-md px-3 py-1 flex items-center shadow-sm">
               <span className="text-sm text-muted-foreground truncate">
-                {response.placeholder || "Enter text..."}
+                {response.placeholder || (
+                  <span className="flex place-items-center gap-2">
+                    Click on
+                    <LuSettings className="scale-90 text-primary" />
+                    to add <b>placeholder</b>
+                  </span>
+                )}
               </span>
             </div>
           </div>
