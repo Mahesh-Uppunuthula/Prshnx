@@ -234,11 +234,12 @@ function ChatBlockResponseFieldOptions({
           <OptionalInput
             label="Placeholder"
             value={response.placeholder || ""}
-            onChange={(value) =>
+            onChange={(value) => {
+              console.log("placeholder value ", { value });
               updateField(pageId, nodeId, {
                 response: { ...response, placeholder: value },
-              })
-            }
+              });
+            }}
           />
           <NumberInput
             label="Min Length"
@@ -271,7 +272,9 @@ function ChatBlockResponseFieldOptions({
             label="Placeholder"
             value={!!response.placeholder ? response.placeholder : ""}
             onChange={(value) =>
-              updateField(pageId, nodeId, { placeholder: value })
+              updateField(pageId, nodeId, {
+                response: { ...response, placeholder: value },
+              })
             }
           />
           <NumberInput
@@ -280,7 +283,9 @@ function ChatBlockResponseFieldOptions({
             min={1}
             max={256}
             onChange={(value) =>
-              updateField(pageId, nodeId, { minLength: value })
+              updateField(pageId, nodeId, {
+                response: { ...response, minLength: value },
+              })
             }
           />
           <NumberInput
@@ -289,7 +294,9 @@ function ChatBlockResponseFieldOptions({
             min={1}
             max={256}
             onChange={(value) =>
-              updateField(pageId, nodeId, { maxLength: value })
+              updateField(pageId, nodeId, {
+                response: { ...response, maxLength: value },
+              })
             }
           />
         </>
@@ -301,7 +308,9 @@ function ChatBlockResponseFieldOptions({
             label="Placeholder"
             value={!!response.placeholder ? response.placeholder : ""}
             onChange={(value) =>
-              updateField(pageId, nodeId, { placeholder: value })
+              updateField(pageId, nodeId, {
+                response: { ...response, placeholder: value },
+              })
             }
           />
           <NumberInput
@@ -310,7 +319,9 @@ function ChatBlockResponseFieldOptions({
             min={1}
             max={256}
             onChange={(value) =>
-              updateField(pageId, nodeId, { minLength: value })
+              updateField(pageId, nodeId, {
+                response: { ...response, minLength: value },
+              })
             }
           />
           <NumberInput
@@ -319,7 +330,9 @@ function ChatBlockResponseFieldOptions({
             min={1}
             max={1024}
             onChange={(value) =>
-              updateField(pageId, nodeId, { maxLength: value })
+              updateField(pageId, nodeId, {
+                response: { ...response, maxLength: value },
+              })
             }
           />
         </>
@@ -331,18 +344,28 @@ function ChatBlockResponseFieldOptions({
             label="Placeholder"
             value={!!response.placeholder ? response.placeholder : ""}
             onChange={(value) =>
-              updateField(pageId, nodeId, { placeholder: value })
+              updateField(pageId, nodeId, {
+                response: { ...response, placeholder: value },
+              })
             }
           />
           <NumberInput
             label="Min"
             value={response.min}
-            onChange={(value) => updateField(pageId, nodeId, { min: value })}
+            onChange={(value) =>
+              updateField(pageId, nodeId, {
+                response: { ...response, min: value },
+              })
+            }
           />
           <NumberInput
             label="Max"
             value={response.max}
-            onChange={(value) => updateField(pageId, nodeId, { max: value })}
+            onChange={(value) =>
+              updateField(pageId, nodeId, {
+                response: { ...response, max: value },
+              })
+            }
           />
         </>
       );

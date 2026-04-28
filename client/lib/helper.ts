@@ -389,7 +389,7 @@ export function createDefaultField(
           avatar: "https://avatar.vercel.sh/user",
         },
         question:
-          "How can I help you today? asdfsadfsdf sd sd fsdfsdafsadf sadfasd fsadfsdafdfasdf23 13wfds fwdf13 rfads fadsfasdfas fsadf asdfsaf sadfsad fsfsasf saf???",
+          "How can I help you today?",
         response: createDefaultField(
           "single-line-input",
           fieldCount,
