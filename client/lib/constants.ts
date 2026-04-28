@@ -133,7 +133,12 @@ export const emptyPage: Page = {
   },
 };
 
-export type PaletteFieldCategory = "text" | "date&time" | "choice" | "layout";
+export type PaletteFieldCategory =
+  | "text"
+  | "date&time"
+  | "choice"
+  | "layout"
+  | "chat";
 
 export type PaletteElement = {
   id: string;
@@ -179,6 +184,13 @@ export const paletteElements: PaletteElement[] = [
     category: "text",
     from: "palette",
   },
+  {
+    id: "palette:chat-block",
+    type: "chat-block",
+    label: "Chat Block",
+    category: "chat",
+    from: "palette",
+  },
   // {
   //   id: "palette:date-input",
   //   type: "date-input",
@@ -208,4 +220,5 @@ export const ALL_PALETTE_FIELDS_MAP: PaletteFieldsMap = {
   "single-line-hidden-input": "field",
   "multi-line-input": "field",
   "number-input": "field",
+  "chat-block": "field",
 };

@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 
 export type DraggingComponent = {
   id: Node["id"];
-  label?: Node["label"];
+  label?: string;
   elementType?: Node["type"];
   from: "palette" | "playground";
   nodeId?: Node["id"];

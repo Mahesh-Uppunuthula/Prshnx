@@ -1,20 +1,16 @@
 import { useBuilderStore } from "@/hooks/use-builder-store";
-import { assertInputFieldNode } from "@/lib/helper";
+import { assertChatBlockNode, assertInputFieldNode } from "@/lib/helper";
 import { cn } from "@/lib/utils";
 import { Node, Page } from "@/types/builder.types";
-import { MouseEvent, useState } from "react";
+import { MouseEvent } from "react";
 import InlineEdit from "../custom/InlineEdit";
 import { LuAsterisk, LuSettings, LuTrash2 } from "react-icons/lu";
 import { Button } from "../ui/button";
-import { ToggleSwitch } from "../ui/toggle-switch";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Input } from "../ui/input";
 
-import {
-  NumberInput,
-  OptionalInput,
-  ToggleSwitchOption,
-} from "./CommonOptions";
+import { ToggleSwitchOption } from "./CommonOptions";
+import ChatBlock from "../custom/ChatBlock";
+import { FieldSpecificOptions } from "./FieldSpecificOptions";
 
 type FieldNodeProps = {
   pageId: Page["id"];
@@ -37,7 +33,10 @@ export default function FieldNode({ pageId, nodeId }: FieldNodeProps) {
     if (!node || !node.id || !node.type) return;
     setActive({ page: { id: pageId }, node: { id: node.id, type: node.type } });
   }
-
+  if (node.type === "chat-block") {
+    assertChatBlockNode(node);
+    return <ChatBlock nodeId={nodeId} pageId={pageId} />;
+  }
   return (
     <div
       onClick={handleOnClick}
@@ -93,7 +92,7 @@ type FieldOptionsProps = {
   nodeId: Node["id"];
 };
 
-function FieldOptions({ pageId, nodeId }: FieldOptionsProps) {
+export function FieldOptions({ pageId, nodeId }: FieldOptionsProps) {
   const pages = useBuilderStore((s) => s.pages);
   const updateField = useBuilderStore((s) => s.updateField);
   const deleteNode = useBuilderStore((s) => s.deleteNode);
@@ -104,16 +103,10 @@ function FieldOptions({ pageId, nodeId }: FieldOptionsProps) {
   if (!node) return null;
   assertInputFieldNode(node);
 
-  const [optionsState, setOptionsState] = useState({
-    // required: false,
-    descriptionToggle: !!node.description?.length,
-    placeholderToggle: !!node.placeholder?.length,
-  });
-
   const handleToggle =
     (key: "required" | "descriptionToggle" | "placeholderToggle") =>
     (checked: boolean) => {
-      setOptionsState((prev) => ({ ...prev, [key]: checked }));
+      console.log({ pageId, nodeId }, "key ", key, " checked ", checked);
       switch (key) {
         case "descriptionToggle":
           if (!checked) {
@@ -130,125 +123,6 @@ function FieldOptions({ pageId, nodeId }: FieldOptionsProps) {
       }
     };
 
-  function renderFieldSpecificOptions() {
-    switch (node?.type) {
-      case "single-line-input":
-        return (
-          <>
-            <OptionalInput
-              label="Placeholder"
-              value={!!node.placeholder ? node.placeholder : ""}
-              onChange={(value) =>
-                updateField(pageId, nodeId, { placeholder: value })
-              }
-            />
-            <NumberInput
-              label="Min Length"
-              value={node.minLength}
-              min={1}
-              max={256}
-              onChange={(value) =>
-                updateField(pageId, nodeId, { minLength: value })
-              }
-            />
-            <NumberInput
-              label="Max Length"
-              value={node.maxLength}
-              min={1}
-              max={256}
-              onChange={(value) =>
-                updateField(pageId, nodeId, { maxLength: value })
-              }
-            />
-          </>
-        );
-      case "single-line-hidden-input":
-        return (
-          <>
-            <OptionalInput
-              label="Placeholder"
-              value={!!node.placeholder ? node.placeholder : ""}
-              onChange={(value) =>
-                updateField(pageId, nodeId, { placeholder: value })
-              }
-            />
-            <NumberInput
-              label="Min Length"
-              value={node.minLength}
-              min={1}
-              max={256}
-              onChange={(value) =>
-                updateField(pageId, nodeId, { minLength: value })
-              }
-            />
-            <NumberInput
-              label="Max Length"
-              value={node.maxLength}
-              min={1}
-              max={256}
-              onChange={(value) =>
-                updateField(pageId, nodeId, { maxLength: value })
-              }
-            />
-          </>
-        );
-      case "multi-line-input":
-        return (
-          <>
-            <OptionalInput
-              label="Placeholder"
-              value={!!node.placeholder ? node.placeholder : ""}
-              onChange={(value) =>
-                updateField(pageId, nodeId, { placeholder: value })
-              }
-            />
-            <NumberInput
-              label="Min Length"
-              value={node.minLength}
-              min={1}
-              max={256}
-              onChange={(value) =>
-                updateField(pageId, nodeId, { minLength: value })
-              }
-            />
-            <NumberInput
-              label="Max Length"
-              value={node.maxLength}
-              min={1}
-              max={1024}
-              onChange={(value) =>
-                updateField(pageId, nodeId, { maxLength: value })
-              }
-            />
-          </>
-        );
-      case "number-input":
-        return (
-          <>
-            <OptionalInput
-              label="Placeholder"
-              value={!!node.placeholder ? node.placeholder : ""}
-              onChange={(value) =>
-                updateField(pageId, nodeId, { placeholder: value })
-              }
-            />
-            <NumberInput
-              label="Min"
-              value={node.min}
-              onChange={(value) => updateField(pageId, nodeId, { min: value })}
-            />
-            <NumberInput
-              label="Max"
-              value={node.max}
-              onChange={(value) => updateField(pageId, nodeId, { max: value })}
-            />
-          </>
-        );
-
-      default:
-        return null;
-    }
-  }
   return (
     <div className="w-fit flex place-items-center">
       <Popover>
@@ -269,17 +143,9 @@ function FieldOptions({ pageId, nodeId }: FieldOptionsProps) {
             checked={node.required}
             onCheckedChange={handleToggle("required")}
           />
-          {/* Description */}
-          <OptionalInput
-            label="Description"
-            value={!!node.description ? node.description : ""}
-            onChange={(value) =>
-              updateField(pageId, nodeId, { description: value })
-            }
-          />
           {/* Field Specific Options */}
           <div className="flex flex-col gap-2">
-            {renderFieldSpecificOptions()}
+            <FieldSpecificOptions pageId={pageId} nodeId={nodeId} />
           </div>
         </PopoverContent>
       </Popover>

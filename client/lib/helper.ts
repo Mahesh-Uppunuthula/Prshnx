@@ -17,7 +17,9 @@ import { FormConfiguration } from "@/types/form.types";
 // } from "@/types/new-form-builder.types";
 import {
   Page as BuilderPage,
+  ChatBlockNode,
   ContainerNode,
+  ConventionalFields,
   FieldNode,
   InputFields,
   InputFieldTypes,
@@ -308,6 +310,11 @@ export function assertInputFieldNode(
 ): asserts node is InputFields {
   if (!node) throw new Error("Node not found");
 }
+export function assertChatBlockNode(
+  node: Node | undefined | null,
+): asserts node is ChatBlockNode {
+  if (!node) throw new Error("Node not found");
+}
 
 export function createDefaultField(
   fieldType: InputFieldTypes,
@@ -366,6 +373,48 @@ export function createDefaultField(
         minLength: 1,
         maxLength: 256,
       };
+    }
+    case "chat-block": {
+      return {
+        id: fieldId,
+        type: "chat-block",
+        required: false,
+        disabled: false,
+        questioner: {
+          name: "Jason",
+          avatar: "https://avatar.vercel.sh/assistant",
+        },
+        respondent: {
+          name: "Office Q&A assistant",
+          avatar: "https://avatar.vercel.sh/user",
+        },
+        question:
+          "How can I help you today? asdfsadfsdf sd sd fsdfsdafsadf sadfasd fsadfsdafdfasdf23 13wfds fwdf13 rfads fadsfasdfas fsadf asdfsaf sadfsad fsfsasf saf???",
+        response: createDefaultField(
+          "single-line-input",
+          fieldCount,
+        ) as ConventionalFields,
+      };
+    }
+    default:
+      throw new Error("Invalid field type");
+  }
+}
+
+export function convertToField(
+  node: ConventionalFields,
+  toType: ConventionalFields["type"],
+) {
+  if (node.type === toType) return node;
+  console.log("node.type", node.type, "to type", toType);
+  switch (node.type) {
+    case "single-line-input":
+    case "single-line-hidden-input":
+    case "number-input":
+    case "multi-line-input": {
+      const clonedNode = structuredClone(node);
+      const newNode = createDefaultField(toType, -1);
+      return { ...newNode, id: clonedNode.id, label: clonedNode.label };
     }
     default:
       throw new Error("Invalid field type");

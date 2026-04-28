@@ -34,6 +34,25 @@ export type NumberInputProperties = BaseFieldProperties & {
   max: number;
 };
 
+export type ChatBlockBaseFieldProperties = Pick<
+  BaseFieldProperties,
+  "id" | "required" | "disabled"
+>;
+export type ChatBlockProperties = ChatBlockBaseFieldProperties & {
+  type: "chat-block";
+  questioner: {
+    name: string;
+    avatar: string;
+  };
+  respondent: {
+    name: string;
+    avatar: string;
+  };
+  question: string;
+  response: ConventionalFields;
+};
+
+export type ChatBlockNode = ChatBlockProperties;
 // non interactable fields
 export type ContainerProperties = {
   type: "container";
@@ -47,9 +66,14 @@ export type Fields =
   | SingleLineHiddenInputProperties
   | MultiLineInputProperties
   | NumberInputProperties
+  | ChatBlockProperties
   | ContainerProperties;
 
 export type FieldTypes = Fields["type"];
+export type ConventionalFields = Exclude<
+  Fields,
+  ChatBlockProperties | ContainerProperties
+>;
 export type InputFields = Exclude<Fields, ContainerProperties>;
 export type InputFieldTypes = InputFields["type"];
 

@@ -251,12 +251,15 @@
 // };
 
 import {
+  convertToField,
   createDefaultField,
   createDefaultPage,
   generateComponentId,
 } from "@/lib/helper";
 import {
+  ChatBlockProperties,
   ContainerNode,
+  ConventionalFields,
   FieldNode,
   InputFieldTypes,
   MultiLineInputProperties,
@@ -383,7 +386,9 @@ export type BuilderActions = {
   updateContainer: (
     pageId: Page["id"],
     containerId: Node["id"],
-    updates: Partial<Pick<ContainerNode, "label" | "orientation" | "isScrollable">>,
+    updates: Partial<
+      Pick<ContainerNode, "label" | "orientation" | "isScrollable">
+    >,
   ) => void;
   // emptyContainer: (pageId: Page["id"], containerId: Node["id"]) => void;
   addField: (
@@ -399,6 +404,12 @@ export type BuilderActions = {
   deleteNode: (pageId: Page["id"], nodeId: Node["id"]) => void;
   moveNode: (pageId: Page["id"], activeId: string, overId: string) => void;
   // addField: (pageId: Page["id"], parentId: Node["id"]) => void;
+
+  convertToField: (
+    pageId: Page["id"],
+    nodeId: Node["id"],
+    fieldType: ConventionalFields["type"],
+  ) => void;
 
   setActive: (active: Active) => void;
   setActivePage: (activePage: ActivePage) => void;
@@ -661,6 +672,14 @@ export function createBuilderStore(
               };
             }
             break;
+          case "chat-block":
+            {
+              updatedNode = {
+                ...node,
+                ...(updates as Partial<ChatBlockProperties>),
+              };
+            }
+            break;
         }
         newPage.nodes[nodeId] = updatedNode;
         return {
@@ -763,6 +782,36 @@ export function createBuilderStore(
           newParentLayout.children.splice(newIndex, 0, activeId);
           newParentNode.children.splice(newIndex, 0, activeId);
           activeLayout.parentId = newParentId;
+        }
+
+        return {
+          pages: {
+            ...state.pages,
+            [pageId]: newPage,
+          },
+        };
+      });
+    },
+    convertToField: (pageId, nodeId, fieldType) => {
+      set((state) => {
+        const page = state.pages[pageId];
+        if (!page) return state;
+        const node = page.nodes[nodeId];
+        if (!node || node.type === "container") return state;
+
+        const newPage = structuredClone(page);
+
+        if (node.type === "chat-block") {
+          // For chat-block, update the nested `response` field
+          const newResponse = convertToField(node.response, fieldType);
+          newPage.nodes[nodeId] = {
+            ...newPage.nodes[nodeId],
+            response: newResponse,
+          } as typeof node;
+        } else {
+          // For regular fields, replace the node directly
+          const newNode = convertToField(node as ConventionalFields, fieldType);
+          newPage.nodes[newNode.id] = newNode;
         }
 
         return {

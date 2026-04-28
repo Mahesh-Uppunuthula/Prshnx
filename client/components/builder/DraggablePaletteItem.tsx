@@ -2,6 +2,8 @@ import { useDraggable } from "@dnd-kit/core";
 import { PaletteElement } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import {
+  LuBotMessageSquare,
+  LuMessagesSquare,
   LuRectangleEllipsis,
   LuRectangleHorizontal,
   LuSquareDashed,
@@ -53,6 +55,7 @@ function RenderPaletteItem({ paletteElement }: RenderPaletteItemProps) {
     case "multi-line-input":
     case "number-input":
     case "single-line-hidden-input":
+    case "chat-block":
     case "container":
       return (
         <div className="w-full h-fit text-sm flex gap-2 place-items-center">
@@ -77,6 +80,8 @@ export const Icon = ({ type }: { type: PaletteElement["type"] }) => {
       return <LuTextQuote size={19} strokeWidth={1} />;
     case "number-input":
       return <Bs123 size={19} />;
+    case "chat-block":
+      return <LuBotMessageSquare size={19} strokeWidth={1} />;
     case "container":
       return <LuSquareDashed size={19} strokeWidth={1} />;
     // case "date-input":
