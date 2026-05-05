@@ -26,6 +26,19 @@ export function ImageUpload({ onImageSelect }: ImageUploadProps) {
   const [uploadMethod, setUploadMethod] = useState<"new" | "existing">("new");
   const [selectedFolder, setSelectedFolder] = useState<string>("");
   const [customFolderName, setCustomFolderName] = useState<string>("");
+  const [isFolderSelectOpen, setIsFolderSelectOpen] = useState(false);
+
+  const [folders, setFolders] = useState<
+    Array<{
+      id: string;
+      label: string;
+    }>
+  >([
+    { id: "logos", label: "Company logos" },
+    { id: "backgrounds", label: "Background images" },
+    { id: "icons", label: "Icons" },
+    { id: "avatars", label: "Avatars" },
+  ]);
 
   const handleFile = useCallback(
     (file?: File) => {
@@ -91,6 +104,17 @@ export function ImageUpload({ onImageSelect }: ImageUploadProps) {
       setCustomFolderName("");
     }
   };
+
+  const handleFolderSelectOpenChange = (open: boolean) => {
+    setIsFolderSelectOpen(open);
+    if (open) setUploadMethod("existing");
+  };
+
+  const handleFolderSelectValueChange = (value: string) => {
+    setSelectedFolder(value);
+    setIsFolderSelectOpen(false);
+  };
+
   return (
     <div className="w-full h-full flex flex-col gap-6 place-items-start">
       <div className="grid grid-cols-2 gap-4 w-full">
@@ -104,7 +128,9 @@ export function ImageUpload({ onImageSelect }: ImageUploadProps) {
               : "border-border hover:border-muted-foreground/30",
           )}>
           <div className="flex justify-between items-center">
-            <span className="font-semibold text-sm px-1">Upload new image</span>
+            <span className="font-semibold text-sm px-1">
+              Create new folder
+            </span>
             <div
               className={cn(
                 "size-5 rounded-full border-2 flex items-center justify-center transition-colors",
@@ -151,19 +177,20 @@ export function ImageUpload({ onImageSelect }: ImageUploadProps) {
             </div>
           </div>
           <Select
+            open={isFolderSelectOpen}
+            onOpenChange={handleFolderSelectOpenChange}
             value={selectedFolder}
-            onValueChange={(e) => setSelectedFolder(e)}
-            disabled={uploadMethod !== "existing"}>
+            onValueChange={handleFolderSelectValueChange}
+            disabled={uploadMethod !== "existing" || folders.length === 0}>
             <SelectTrigger className="w-full h-10 text-sm">
-              <SelectValue placeholder="Select category" />
+              <SelectValue
+                placeholder={
+                  folders.length === 0 ? "No existing folders" : "Select folder"
+                }
+              />
             </SelectTrigger>
             <SelectContent>
-              {[
-                { id: "logos", label: "Company logos" },
-                { id: "backgrounds", label: "Background images" },
-                { id: "icons", label: "Icons" },
-                { id: "avatars", label: "Avatars" },
-              ].map((item) => (
+              {folders.map((item) => (
                 <SelectItem key={item.id} value={item.id}>
                   {item.label}
                 </SelectItem>

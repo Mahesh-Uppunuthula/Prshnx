@@ -30,7 +30,7 @@ function ImportImage({ trigger, onImport }: ImportImageProps) {
   }
 
   return (
-    <Dialog>
+    <Dialog modal={true}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-w-full min-w-[50vw] h-[80vh] flex flex-col p-0">
         <DialogHeader className="p-6 pb-0">
