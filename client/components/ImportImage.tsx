@@ -13,6 +13,7 @@ import { ReactNode, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Button } from "./ui/button";
 import { ImageUpload } from "./ImageUpload";
+import EmbedImageUrl from "./EmbedImageUrl";
 
 type ImportImageProps = {
   trigger: ReactNode;
@@ -78,7 +79,7 @@ function ImportImage({ trigger, onImport }: ImportImageProps) {
               Gallery Content
             </TabsContent>
             <TabsContent value="link" className="mt-0 h-full">
-              Link Content
+              <EmbedImageUrl onImageSelect={setSelectedImage} />
             </TabsContent>
             <TabsContent
               value="unsplash"
