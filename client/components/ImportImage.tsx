@@ -21,8 +21,9 @@ type ImportImageProps = {
 };
 
 function ImportImage({ trigger, onImport }: ImportImageProps) {
-  const [activeTab, setActiveTab] = useState("upload");
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+   const [activeTab, setActiveTab] = useState("upload");
+   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+   const [isUploadFolderValid, setIsUploadFolderValid] = useState(false);
 
   function handleUploadImage() {
     onImport?.(selectedImage!);
@@ -73,7 +74,10 @@ function ImportImage({ trigger, onImport }: ImportImageProps) {
           </div>
           <div className="flex-1 overflow-y-auto p-6 pt-0">
             <TabsContent value="upload" className="mt-0 h-full">
-              <ImageUpload onImageSelect={setSelectedImage} />
+              <ImageUpload
+                onImageSelect={setSelectedImage}
+                onFolderValidationChange={setIsUploadFolderValid}
+              />
             </TabsContent>
             <TabsContent value="gallery" className="mt-0 h-full">
               Gallery Content
@@ -97,7 +101,7 @@ function ImportImage({ trigger, onImport }: ImportImageProps) {
           {activeTab === "upload" ? (
             <Button
               className="rounded-lg px-6 bg-black hover:bg-black/90"
-              disabled={!selectedImage}
+              disabled={!selectedImage || !isUploadFolderValid}
               onClick={handleUploadImage}>
               Upload
             </Button>

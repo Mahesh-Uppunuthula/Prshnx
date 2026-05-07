@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LuTrash2, LuUpload } from "react-icons/lu";
@@ -13,9 +13,13 @@ import {
 
 type ImageUploadProps = {
   onImageSelect?: (image: string | null) => void;
+  onFolderValidationChange?: (isValid: boolean) => void;
 };
 
-export function ImageUpload({ onImageSelect }: ImageUploadProps) {
+export function ImageUpload({
+  onImageSelect,
+  onFolderValidationChange,
+}: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [draggingFileType, setDraggingFileType] = useState<string | undefined>(
@@ -95,6 +99,18 @@ export function ImageUpload({ onImageSelect }: ImageUploadProps) {
       isDragging && !!draggingFileType && !draggingFileType.startsWith("image/")
     );
   }, [isDragging, draggingFileType]);
+
+  const isFolderValid = useMemo(() => {
+    if (uploadMethod === "new") {
+      return customFolderName.trim().length > 0;
+    } else {
+      return selectedFolder.length > 0;
+    }
+  }, [uploadMethod, customFolderName, selectedFolder]);
+
+  useEffect(() => {
+    onFolderValidationChange?.(isFolderValid);
+  }, [isFolderValid, onFolderValidationChange]);
 
   const handleChangeMethod = (method: "new" | "existing") => () => {
     setUploadMethod(method);
