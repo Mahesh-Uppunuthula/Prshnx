@@ -11,13 +11,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "./ui/breadcrumb";
+import { GalleryImageState } from "./ImportImage";
 
 interface GalleryProps {
-  onSelect?: (imageUrl: string | null) => void;
-  selectedImageUrl?: string | null;
+  onChange?: (state: GalleryImageState) => void;
 }
 
-function Gallery({ onSelect, selectedImageUrl }: GalleryProps) {
+function Gallery({ onChange }: GalleryProps) {
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const { data: folders, isLoading: isFetchingFolders } = useUserAssetFolders();
 
@@ -54,11 +54,7 @@ function Gallery({ onSelect, selectedImageUrl }: GalleryProps) {
       </div>
 
       {selectedFolder ? (
-        <FolderImages
-          folderName={selectedFolder}
-          onSelect={onSelect}
-          selectedImageUrl={selectedImageUrl}
-        />
+        <FolderImages folderName={selectedFolder} onChange={onChange} />
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-1">
           {!folders || folders.length === 0 ? (

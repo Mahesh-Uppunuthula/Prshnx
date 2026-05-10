@@ -18,4 +18,15 @@ export const assetsApi = {
     if (!listFolderAssets.ok) throw new Error("Failed to fetch folder assets");
     return await listFolderAssets.json();
   },
+  uploadAsset: async (file: File, folder: string) => {
+    const response = await client.api.protected.v1.assets.upload.$post({
+      form: {
+        file,
+        folder,
+      },
+    });
+    if (!response.ok) throw new Error("Failed to upload asset");
+    const data = await response.json();
+    return data as { url: string; key: string; name: string };
+  },
 };

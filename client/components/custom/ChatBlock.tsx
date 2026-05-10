@@ -3,7 +3,7 @@ import { FieldOptions } from "../builder/FieldNode";
 import { assertChatBlockNode } from "@/lib/helper";
 import { LuAsterisk, LuSettings } from "react-icons/lu";
 import InlineEdit from "./InlineEdit";
-import { MouseEvent } from "react";
+import { MouseEvent, useState } from "react";
 import { cn } from "@/lib/utils";
 import ImportImage from "../ImportImage";
 
@@ -21,6 +21,12 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
 
   assertChatBlockNode(node);
 
+  // states
+  const [importImageOpen, setImportImageOpen] = useState<
+    "questioner" | "respondent" | null
+  >(null);
+
+  // callbacks
   const handleTextChange =
     (type: "question") => (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
@@ -36,6 +42,23 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
   }
 
   const { questioner, respondent, question, response } = node;
+
+  function handleAvatarChange(
+    fieldKey: "questioner" | "respondent",
+    url: string,
+  ) {
+    const target = fieldKey === "questioner" ? questioner : respondent;
+    console.log({ fieldKey, target, url });
+
+    updateField(pageId, nodeId, {
+      [fieldKey]: { ...target, avatar: url },
+    });
+  }
+
+  function closeImportImageModal() {
+    setImportImageOpen(null);
+  }
+
   return (
     <div
       className={cn(
@@ -49,6 +72,7 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
       <div className="w-full p-2 flex gap-3">
         <div onPointerDown={(e) => e.stopPropagation()}>
           <ImportImage
+            key={"questioner"}
             trigger={
               <img
                 className="rounded-full size-10 cursor-pointer hover:opacity-80 transition-opacity"
@@ -56,6 +80,12 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
                 alt={questioner.name}
               />
             }
+            onImport={(url) => handleAvatarChange("questioner", url)}
+            open={importImageOpen === "questioner"}
+            onOpenChange={(open) =>
+              setImportImageOpen(open ? "questioner" : null)
+            }
+            onClose={closeImportImageModal}
           />
         </div>
         <div className="w-full flex flex-col justify-start gap-0 bg-red-20">
@@ -81,6 +111,7 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
       <div className="w-full p-2 flex gap-3">
         <div onPointerDown={(e) => e.stopPropagation()}>
           <ImportImage
+            key={"respondent"}
             trigger={
               <img
                 className="rounded-full size-10 cursor-pointer hover:opacity-80 transition-opacity"
@@ -88,6 +119,12 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
                 alt={respondent.name}
               />
             }
+            onImport={(url) => handleAvatarChange("respondent", url)}
+            open={importImageOpen === "respondent"}
+            onOpenChange={(open) =>
+              setImportImageOpen(open ? "respondent" : null)
+            }
+            onClose={closeImportImageModal}
           />
         </div>
         <div className="w-full flex flex-col">

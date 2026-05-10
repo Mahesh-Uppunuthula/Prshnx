@@ -3,14 +3,15 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { X } from "lucide-react";
+import { EmbedImageUrlState } from "./ImportImage";
 
 const IMAGE_URL_REGEX = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/i;
 
 interface EmbedImageUrlProps {
-  onSelect?: (url: string | null) => void;
+  onChange?: (state: EmbedImageUrlState) => void;
 }
 
-function EmbedImageUrl({ onSelect }: EmbedImageUrlProps) {
+function EmbedImageUrl({ onChange }: EmbedImageUrlProps) {
   const [url, setUrl] = useState("");
 
   const isValidUrl = useMemo(() => {
@@ -21,18 +22,26 @@ function EmbedImageUrl({ onSelect }: EmbedImageUrlProps) {
   function handleOnChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newUrl = e.target.value;
     setUrl(newUrl);
-    onSelect?.(IMAGE_URL_REGEX.test(newUrl) ? newUrl : null);
+    onChange?.({
+      type: "embed",
+      valid: IMAGE_URL_REGEX.test(newUrl),
+      payload: { url: newUrl },
+    });
   }
 
   function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
     const newUrl = e.target.value;
     setUrl(newUrl);
-    onSelect?.(IMAGE_URL_REGEX.test(newUrl) ? newUrl : null);
+    onChange?.({
+      type: "embed",
+      valid: IMAGE_URL_REGEX.test(newUrl),
+      payload: { url: newUrl },
+    });
   }
 
   function handleClear() {
     setUrl("");
-    onSelect?.(null);
+    onChange?.({ type: "embed", valid: false, payload: { url: "" } });
   }
 
   return (
