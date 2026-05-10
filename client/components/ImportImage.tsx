@@ -12,8 +12,9 @@ import {
 import { ReactNode, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Button } from "./ui/button";
-import { ImageUpload } from "./ImageUpload";
+import ImageUpload from "./ImageUpload";
 import EmbedImageUrl from "./EmbedImageUrl";
+import Gallery from "./Gallery";
 
 type ImportImageProps = {
   trigger: ReactNode;
@@ -21,9 +22,9 @@ type ImportImageProps = {
 };
 
 function ImportImage({ trigger, onImport }: ImportImageProps) {
-   const [activeTab, setActiveTab] = useState("upload");
-   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-   const [isUploadFolderValid, setIsUploadFolderValid] = useState(false);
+  const [activeTab, setActiveTab] = useState("upload");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isUploadFolderValid, setIsUploadFolderValid] = useState(false);
 
   function handleUploadImage() {
     onImport?.(selectedImage!);
@@ -75,15 +76,18 @@ function ImportImage({ trigger, onImport }: ImportImageProps) {
           <div className="flex-1 overflow-y-auto p-6 pt-0">
             <TabsContent value="upload" className="mt-0 h-full">
               <ImageUpload
-                onImageSelect={setSelectedImage}
+                onSelect={setSelectedImage}
                 onFolderValidationChange={setIsUploadFolderValid}
               />
             </TabsContent>
             <TabsContent value="gallery" className="mt-0 h-full">
-              Gallery Content
+              <Gallery
+                onSelect={setSelectedImage}
+                selectedImageUrl={selectedImage}
+              />
             </TabsContent>
             <TabsContent value="link" className="mt-0 h-full">
-              <EmbedImageUrl onImageSelect={setSelectedImage} />
+              <EmbedImageUrl onSelect={setSelectedImage} />
             </TabsContent>
             <TabsContent
               value="unsplash"

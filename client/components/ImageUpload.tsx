@@ -12,12 +12,12 @@ import {
 } from "./ui/select";
 
 type ImageUploadProps = {
-  onImageSelect?: (image: string | null) => void;
+  onSelect?: (image: string | null) => void;
   onFolderValidationChange?: (isValid: boolean) => void;
 };
 
-export function ImageUpload({
-  onImageSelect,
+export default function ImageUpload({
+  onSelect,
   onFolderValidationChange,
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
@@ -51,12 +51,12 @@ export function ImageUpload({
         reader.onloadend = () => {
           const result = reader.result as string;
           setPreview(result);
-          onImageSelect?.(result);
+          onSelect?.(result);
         };
         reader.readAsDataURL(file);
       }
     },
-    [onImageSelect],
+    [onSelect],
   );
 
   function handleUpload() {
@@ -91,7 +91,7 @@ export function ImageUpload({
 
   const removePreview = () => {
     setPreview(null);
-    onImageSelect?.(null);
+    onSelect?.(null);
   };
 
   const invalidFileType = useMemo(() => {

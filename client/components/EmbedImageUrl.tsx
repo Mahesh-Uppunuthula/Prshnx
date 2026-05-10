@@ -7,10 +7,10 @@ import { X } from "lucide-react";
 const IMAGE_URL_REGEX = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/i;
 
 interface EmbedImageUrlProps {
-  onImageSelect?: (url: string | null) => void;
+  onSelect?: (url: string | null) => void;
 }
 
-function EmbedImageUrl({ onImageSelect }: EmbedImageUrlProps) {
+function EmbedImageUrl({ onSelect }: EmbedImageUrlProps) {
   const [url, setUrl] = useState("");
 
   const isValidUrl = useMemo(() => {
@@ -21,18 +21,18 @@ function EmbedImageUrl({ onImageSelect }: EmbedImageUrlProps) {
   function handleOnChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newUrl = e.target.value;
     setUrl(newUrl);
-    onImageSelect?.(IMAGE_URL_REGEX.test(newUrl) ? newUrl : null);
+    onSelect?.(IMAGE_URL_REGEX.test(newUrl) ? newUrl : null);
   }
 
   function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
     const newUrl = e.target.value;
     setUrl(newUrl);
-    onImageSelect?.(IMAGE_URL_REGEX.test(newUrl) ? newUrl : null);
+    onSelect?.(IMAGE_URL_REGEX.test(newUrl) ? newUrl : null);
   }
 
   function handleClear() {
     setUrl("");
-    onImageSelect?.(null);
+    onSelect?.(null);
   }
 
   return (
