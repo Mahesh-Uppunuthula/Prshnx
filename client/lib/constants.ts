@@ -99,6 +99,11 @@ export const QUERY_KEYS = {
       publicLink,
     ],
   },
+  assets: {
+    getUserAssetFolders: ["assets", "getUserAssetFolders"],
+    getUserAssets: (folder: string) => ["assets", "getUserAssets", folder],
+    uploadAsset: ["assets", "uploadAsset"],
+  },
 };
 
 export const NEW_FORM_ID = "new";
