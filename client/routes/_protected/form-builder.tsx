@@ -15,7 +15,8 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { cn, createFirstPageScreenShot } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { createFirstPageScreenShot } from "@/lib/helper";
 import { createFileRoute, Link, useLocation } from "@tanstack/react-router";
 import {
   ArrowRight,

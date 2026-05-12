@@ -41,7 +41,6 @@ import { PerformanceTrendChart } from "@/components/FormPerformanceTrendChart";
 import {
   isBuilderEmpty,
   // isFormEmpty,
-  toStructuredPages,
 } from "@/lib/helper";
 import {
   useFormConfigurationById,
@@ -50,9 +49,9 @@ import {
 } from "@/hooks/use-forms";
 import { toast } from "sonner";
 // import { MultiPageFormProvider } from "@/context/MultiPageFormProvider";
-import { FormConfiguration } from "@/types/form.types";
+
 import Show from "@/components/utils/Show";
-import FormPreview from "@/pages/LegacyFormPreview";
+import FormPreview from "@/components/builder/FormPreview";
 import Builder from "@/pages/builder";
 import { useBuilderStore } from "@/hooks/use-builder-store";
 import { BuilderProvider } from "@/context/BuilderProvider";
@@ -278,9 +277,9 @@ function FormDashboardContent({
         //     );
         //   }
         //   break;
-        // case "previewForm":
-        //   setPreview(true);
-        //   break;
+        case "previewForm":
+          setPreview(true);
+          break;
       }
     },
     [

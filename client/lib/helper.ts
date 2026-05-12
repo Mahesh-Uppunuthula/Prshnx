@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { DateTime } from "luxon";
+import { toBlob } from "html-to-image";
 import type {
   ComponentVariants,
   FormElement,
@@ -26,6 +27,7 @@ import {
   Node,
 } from "@/types/builder.types";
 import { BuilderState } from "@/store/builder.store";
+import { BRAND } from "./constants";
 
 export function createFormElement(type: ComponentVariants): FormElement {
   const id = `${type}_${nanoid().slice(0, 5)}`;
@@ -381,15 +383,14 @@ export function createDefaultField(
         required: false,
         disabled: false,
         questioner: {
-          name: "Jason",
+          name: `${BRAND.name} Assistant`,
           avatar: "https://avatar.vercel.sh/assistant",
         },
         respondent: {
-          name: "Office Q&A assistant",
+          name: "You",
           avatar: "https://avatar.vercel.sh/user",
         },
-        question:
-          "How can I help you today?",
+        question: "How can I help you today?",
         response: createDefaultField(
           "single-line-input",
           fieldCount,
@@ -441,4 +442,71 @@ export function isBuilderEmpty(pages: BuilderState["pages"]) {
 
     return hasContent;
   });
+}
+
+export async function createFirstPageScreenShot(
+  formRef: React.RefObject<HTMLDivElement | null>,
+): Promise<{ success: false; error: string } | { success: true; data: Blob }> {
+  if (!formRef || !formRef.current)
+    return { success: false, error: "Invalid formRef" };
+  const screenshot = await toBlob(formRef.current, {
+    backgroundColor: "white",
+    quality: 0.1,
+    pixelRatio: 0.3,
+    width: 600,
+    height: 500,
+    preferredFontFormat: "sans-serif",
+  });
+
+  return { success: true, data: screenshot! };
+}
+
+type ToHumanReadableFormatOptions = {
+  addAgo?: boolean;
+};
+export function toHumanReadableFormat(
+  utcDateString: string,
+  options?: ToHumanReadableFormatOptions,
+) {
+  const addAgo = options?.addAgo ?? false;
+  console.log("utcDateString", utcDateString);
+  const now = DateTime.now().setZone("UTC");
+  const dateTime = DateTime.fromSQL(utcDateString, { zone: "UTC" });
+
+  const diff = now
+    .diff(dateTime, ["years", "months", "days", "hours", "minutes"])
+    .rescale();
+
+  if (diff.as("minutes") < 1) return "just now";
+
+  const parts: Record<string, number> = {
+    years: diff.years,
+    months: diff.months,
+    days: diff.days,
+    hours: diff.hours,
+    minutes: diff.minutes,
+  };
+
+  const [unit, value] = Object.entries(parts).find(([, v]) => v >= 1) || [
+    "minutes",
+    0,
+  ];
+
+  const rounded = Math.floor(value);
+  const unitLabel = unit.replace(/s$/, "");
+
+  const label = `${rounded} ${unitLabel}${rounded !== 1 ? "s" : ""}`;
+  if (addAgo) {
+    return `${label} ago`;
+  }
+  return label;
+}
+
+export function copyToClipboard(text: string) {
+  try {
+    navigator.clipboard.writeText(text);
+    console.log("Copied to clipboard", text);
+  } catch (error) {
+    console.error("Failed to copy to clipboard", error);
+  }
 }
