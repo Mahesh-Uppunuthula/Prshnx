@@ -67,13 +67,13 @@ export default function FieldNode({ pageId, nodeId }: FieldNodeProps) {
             {/* options */}
             <FieldOptions pageId={pageId} nodeId={nodeId} />
           </div>
-          {
+          {node.description && (
             <div className="-mt-1 mb-1">
               <span className="text-[11px] text-muted-foreground mx-1">
                 {node.description}
               </span>
             </div>
-          }
+          )}
           <div className="mt-1">
             <div className="w-full min-h-[36px] bg-white border border-input rounded-md px-3 py-1 flex items-center shadow-sm">
               <span className="text-sm text-muted-foreground truncate">
@@ -103,25 +103,13 @@ export function FieldOptions({ pageId, nodeId }: FieldOptionsProps) {
   if (!node) return null;
   assertInputFieldNode(node);
 
-  const handleToggle =
-    (key: "required" | "descriptionToggle" | "placeholderToggle") =>
-    (checked: boolean) => {
-      console.log({ pageId, nodeId }, "key ", key, " checked ", checked);
-      switch (key) {
-        case "descriptionToggle":
-          if (!checked) {
-            updateField(pageId, nodeId, { description: "" });
-          }
-          break;
-        case "placeholderToggle":
-          if (!checked) {
-            updateField(pageId, nodeId, { placeholder: "" });
-          }
-          break;
-        case "required":
-          updateField(pageId, nodeId, { required: checked });
-      }
-    };
+  const handleToggle = (key: "required") => (checked: boolean) => {
+    console.log({ pageId, nodeId }, "key ", key, " checked ", checked);
+    switch (key) {
+      case "required":
+        updateField(pageId, nodeId, { required: checked });
+    }
+  };
 
   return (
     <div className="w-fit flex place-items-center">

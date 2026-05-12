@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "../ui/input";
 import { ToggleSwitch } from "../ui/toggle-switch";
 import { ConventionalFields } from "@/types/builder.types";
@@ -15,7 +15,16 @@ export function OptionalInput({ label, value, onChange }: OptionalInputProps) {
     <div>
       <div className="flex justify-between place-items-center gap-2 mb-2">
         <span className="text-sm">{label}</span>
-        <ToggleSwitch size="sm" checked={toggle} onCheckedChange={setToggle} />
+        <ToggleSwitch
+          size="sm"
+          checked={toggle}
+          onCheckedChange={(checked) => {
+            setToggle(checked);
+            if (!checked) {
+              onChange("");
+            }
+          }}
+        />
       </div>
       {toggle && (
         <Input
