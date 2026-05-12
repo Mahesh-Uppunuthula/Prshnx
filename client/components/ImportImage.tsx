@@ -133,7 +133,7 @@ function ImportImage({
         }
         break;
 
-      case "link":
+      case "embed":
         {
           if (importImage?.type === "embed" && importImage?.payload.url) {
             onImport?.(importImage.payload.url);

@@ -20,6 +20,7 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
   if (!node) return null;
 
   assertChatBlockNode(node);
+  const { questioner, respondent, question, response } = node;
 
   // states
   const [importImageOpen, setImportImageOpen] = useState<
@@ -35,13 +36,21 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
       }
     };
 
+  const handleNameChange =
+    (fieldKey: "questioner" | "respondent") =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      const target = fieldKey === "questioner" ? questioner : respondent;
+      updateField(pageId, nodeId, {
+        [fieldKey]: { ...target, name: value },
+      });
+    };
+
   function handleOnClick(event: MouseEvent<HTMLDivElement>) {
     event.stopPropagation();
     if (!node || !node.id || !node.type) return;
     setActive({ page: { id: pageId }, node: { id: node.id, type: node.type } });
   }
-
-  const { questioner, respondent, question, response } = node;
 
   function handleAvatarChange(
     fieldKey: "questioner" | "respondent",
@@ -90,14 +99,18 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
         </div>
         <div className="w-full flex flex-col justify-start gap-0 bg-red-20">
           <div className="w-full flex justify-between bg-blue-20">
-            <span className="w-fit font-medium flex gap-2 place-items-center">
-              {questioner.name}
+            <div className="w-fit font-medium flex gap-2 place-items-center">
+              <InlineEdit
+                className="max-w-50 font-medium"
+                value={questioner.name}
+                onChange={handleNameChange("questioner")}
+              />
               {node.required && (
                 <div className="bg-muted rounded-full">
                   <LuAsterisk className="scale-90 text-muted-foreground" />
                 </div>
               )}
-            </span>
+            </div>
             <FieldOptions pageId={pageId} nodeId={nodeId} />
           </div>
           <InlineEdit
@@ -128,7 +141,13 @@ function ChatBlock({ nodeId, pageId }: ChatBlockProps) {
           />
         </div>
         <div className="w-full flex flex-col">
-          <span className="w-fit font-medium ">{respondent.name}</span>
+          <InlineEdit
+            className="max-w-50 font-medium"
+            value={respondent.name}
+            onChange={handleNameChange("respondent")}
+            placeholder="Respondent name"
+            maxLength={56}
+          />
           {/* <span>{response.type}</span> */}
           <div className="mt-1">
             <div className="w-full min-h-[36px] bg-white border border-input rounded-md px-3 py-1 flex items-center shadow-sm">
