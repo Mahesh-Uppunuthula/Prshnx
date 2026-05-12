@@ -38,7 +38,7 @@ import Switch from "@/components/utils/Switch";
 import InlineEdit from "@/components/custom/InlineEdit";
 import FormPlayground from "@/pages/FormPlayground";
 import Show from "@/components/utils/Show";
-import FormPreview from "@/pages/FormPreview";
+import FormPreview from "@/pages/LegacyFormPreview";
 import { useMultiPageFormBuilder } from "@/store/form-builder.store";
 import { useSaveForm } from "@/hooks/use-forms";
 import { Spinner } from "@/components/ui/spinner";
@@ -81,7 +81,7 @@ function FormBuilder() {
   const setTitle = useMultiPageFormBuilder((s) => s.setTitle);
   const setActivePageId = useMultiPageFormBuilder((s) => s.setActivePageId);
   const setActiveFormElement = useMultiPageFormBuilder(
-    (s) => s.setActiveFormElement
+    (s) => s.setActiveFormElement,
   );
 
   // hooks
@@ -103,7 +103,7 @@ function FormBuilder() {
     (sectionId: number) => () => {
       setSection(sectionId);
     },
-    []
+    [],
   );
 
   const handleSave = useCallback(async () => {
@@ -121,13 +121,13 @@ function FormBuilder() {
     const formData = new FormData();
     formData.append(
       "form",
-      JSON.stringify(toStructuredPages(formTitle, pageSettings, pages))
+      JSON.stringify(toStructuredPages(formTitle, pageSettings, pages)),
     );
     if (formPreviewResponse && formPreviewResponse.success)
       formData.append(
         "preview",
         formPreviewResponse.data,
-        `${formTitle}_preview.png`
+        `${formTitle}_preview.png`,
       );
 
     saveForm(formData, {
@@ -156,8 +156,7 @@ function FormBuilder() {
   return (
     <Show
       when={!preview}
-      fallback={<FormPreview goBack={() => setPreview(false)} />}
-    >
+      fallback={<FormPreview goBack={() => setPreview(false)} />}>
       <section className="py-1 px-3 h-screen">
         <NavBar className="h-[7%] flex place-items-center gap-2 justify-between">
           <div>
@@ -168,8 +167,7 @@ function FormBuilder() {
                   className={cn({
                     "text-foreground": section === sections["form-builder"],
                   })}
-                  onClick={handleSectionUpdate(sections["form-builder"])}
-                >
+                  onClick={handleSectionUpdate(sections["form-builder"])}>
                   <BreadcrumbLink asChild>
                     <Link to={pathname}>
                       <span className="capitalize">{currentPath}</span>
@@ -200,16 +198,14 @@ function FormBuilder() {
               variant={"secondary"}
               className="rounded"
               disabled={isFormEmpty}
-              onClick={() => setPreview(true)}
-            >
+              onClick={() => setPreview(true)}>
               <Eye /> Preview
             </Button>
             <Button
               size="sm"
               className="rounded"
               disabled={isFormEmpty || savingForm}
-              onClick={handleSave}
-            >
+              onClick={handleSave}>
               {savingForm && <Spinner />}
               Save
             </Button>
@@ -321,7 +317,7 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
       setSelectedTemplate(templateId);
       if (onSelect) onSelect(templateId);
     },
-    [onSelect]
+    [onSelect],
   );
 
   return (
@@ -331,8 +327,7 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
         <Button
           size={"sm"}
           disabled={selectedTemplate === null}
-          onClick={onSubmit}
-        >
+          onClick={onSubmit}>
           <span className="hidden md:block">Next</span>
           <ArrowRight />
         </Button>
@@ -347,10 +342,9 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({
                   {
                     "ring-1 ring-foreground/20":
                       template.id === selectedTemplate,
-                  }
+                  },
                 )}
-                onClick={handleSelection(template.id)}
-              >
+                onClick={handleSelection(template.id)}>
                 <div className="w-full px-2 flex place-items-start gap-3">
                   <div>{template.avatar}</div>
                   <div>

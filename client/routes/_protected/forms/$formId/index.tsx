@@ -52,7 +52,7 @@ import { toast } from "sonner";
 // import { MultiPageFormProvider } from "@/context/MultiPageFormProvider";
 import { FormConfiguration } from "@/types/form.types";
 import Show from "@/components/utils/Show";
-import FormPreview from "@/pages/FormPreview";
+import FormPreview from "@/pages/LegacyFormPreview";
 import Builder from "@/pages/builder";
 import { useBuilderStore } from "@/hooks/use-builder-store";
 import { BuilderProvider } from "@/context/BuilderProvider";

@@ -1,4 +1,4 @@
-import FormInstance from "@/components/FormInstance";
+import LegacyFormInstance from "@/components/LegacyFormInstance";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -20,7 +20,7 @@ export default function FormPreview({ goBack }: FormPreviewProps) {
   const pages = useMultiPageFormStore((s) => s.pages);
   const structuredConfiguration = useMemo(() => {
     const _config = toStructuredPages(title, pageSettings, pages);
-    return _config
+    return _config;
   }, [pages, pageSettings]);
   return (
     <div className="w-full h-screen p-1">
@@ -37,7 +37,7 @@ export default function FormPreview({ goBack }: FormPreviewProps) {
         </Tooltip>
       </div>
       <div className="w-full h-[95%]">
-        <FormInstance configuration={structuredConfiguration} devMode />
+        <LegacyFormInstance configuration={structuredConfiguration} devMode />
       </div>
     </div>
   );

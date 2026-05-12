@@ -206,7 +206,7 @@ type FormInstanceProps = {
   configuration: FormConfiguration
 }
 
-export default function FormInstance({ configuration, devMode }: FormInstanceProps) {
+export default function LegacyFormInstance({ configuration, devMode }: FormInstanceProps) {
   // const pageSettings = useMultiPageFormBuilder((s) => s.pageSettings);
   // const pages = useMultiPageFormBuilder((s) => s.pages);
   const pages = configuration.pages;
