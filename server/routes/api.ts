@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { authRoute } from "./auth";
-import { Bindings } from "../app";
+import { Env } from "../types/Env";
 import protectedRoute from "./protected";
 import publicRoute from "./public";
 
-const apiRoute = new Hono<{ Bindings: Bindings }>()
+const apiRoute = new Hono<Env>()
   .basePath("/api")
   .route("/auth", authRoute)
   .route("/public", publicRoute)
