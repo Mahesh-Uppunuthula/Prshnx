@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 
-import { cn, createFirstPageScreenShot } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
 import { LuEye, LuCircle, LuSave } from "react-icons/lu";
 import {
@@ -81,7 +81,9 @@ function FormDashboard() {
   const navigate = Route.useNavigate();
 
   // queries
-  const { data: formConfig, isLoading } = useFormConfigurationById(formId);
+  const { data: formConfig, isLoading } = useFormConfigurationById(formId, {
+    enabled: search.tab === "build" && !!formId && formId !== NEW_FORM_ID,
+  });
 
   const initialBuilderState: InitialBuilderState | undefined = useMemo(() => {
     if (!formConfig) {
@@ -89,11 +91,15 @@ function FormDashboard() {
       return undefined;
     }
     console.log("multipageformprovider", { formConfig });
+    const config = (formConfig as any).configuration;
+    const pages = config.pages ?? {};
+    const pagesOrder = config.pagesOrder ?? Object.keys(pages);
+
     const res: InitialBuilderState = {
-      title: formConfig.title,
+      title: formConfig.title ?? "Untitled Form",
       version: formConfig.version ?? 1,
-      pages: formConfig.pages,
-      pagesOrder: formConfig.pagesOrder,
+      pages,
+      pagesOrder,
       active: {
         node: null,
         page: null,
@@ -145,7 +151,7 @@ function FormDashboardContent({
 
   // mutations
   const { mutate: saveForm, isPending: isSavingForm } = useSaveForm();
-  const { mutate: updateForm, isPending: isUpdatingForm } = useUpdateForm();
+  const { mutate: _updateForm, isPending: isUpdatingForm } = useUpdateForm();
 
   // states
   const [preview, setPreview] = useState(false);
@@ -153,11 +159,11 @@ function FormDashboardContent({
   // store states
   const formTitle = useBuilderStore((s) => s.title);
   const pages = useBuilderStore((s) => s.pages);
-  const pagesOrder = useBuilderStore((s) => s.pagesOrder);
+  // const pagesOrder = useBuilderStore((s) => s.pagesOrder);
   const version = useBuilderStore((s) => s.version);
   const pageSettings = useMultiPageFormStore((s) => s.pageSettings);
   const isDirty = useMultiPageFormStore((s) => s.isDirty);
-  const markSaved = useMultiPageFormStore((s) => s.markSaved);
+  // const _markSaved = useMultiPageFormStore((s) => s.markSaved);
 
   const setActivePageId = useMultiPageFormStore((s) => s.setActivePageId);
   const setActiveFormElement = useMultiPageFormStore(
@@ -207,7 +213,7 @@ function FormDashboardContent({
                 version: version,
                 configuration: {
                   pages: pages,
-                  pagesOrder: pagesOrder,
+                  // pagesOrder: pagesOrder, TODO - Fix this error  - make the db schema more specific than any
                 },
               },
               {
@@ -385,6 +391,7 @@ type DashboardHeaderProps = {
   };
 };
 function DashboardHeader({ formId, dispatch, state }: DashboardHeaderProps) {
+  const search = Route.useSearch();
   const newForm = formId === NEW_FORM_ID;
   const title = useBuilderStore((s) => s.title);
   const setTitle = useBuilderStore((s) => s.setTitle);
@@ -396,8 +403,10 @@ function DashboardHeader({ formId, dispatch, state }: DashboardHeaderProps) {
   // mutation is in flight; show/enable the button based on builder content.
   const isSyncDisabled = state.isSyncing;
 
-  const { data: formConfig } = useFormConfigurationById(formId);
-  const isPublished = !!formConfig?.isPublished;
+  const { data: formConfig } = useFormConfigurationById(formId, {
+    enabled: search.tab === "build" && !!formId && formId !== NEW_FORM_ID,
+  });
+  const isPublished = formConfig?.status === "published";
   // const a = useMultiPageFormStore((s) => s.isPublished);
   return (
     <header className="h-[9%] flex justify-center place-items-center sticky top-0 z-10 border-b bg-background px-6 py-3">

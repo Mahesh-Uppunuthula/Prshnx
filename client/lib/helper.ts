@@ -432,6 +432,7 @@ export function scrollToPage(id: string) {
 }
 
 export function isBuilderEmpty(pages: BuilderState["pages"]) {
+  if(!pages || typeof pages !== "object") return true;
   return !Object.values(pages).some((page) => {
     const rootNode = page.nodes[page.rootId];
     const hasContent =

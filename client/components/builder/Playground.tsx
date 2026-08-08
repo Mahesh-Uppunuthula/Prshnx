@@ -8,8 +8,8 @@ export default function Playground() {
   const pagesOrder = useBuilderStore((s) => s.pagesOrder);
   const sortedPages: PageType[] = useMemo(() => {
     const _sortedPages: PageType[] = [];
-    pagesOrder.forEach((pageId: PageType["id"]) => {
-      if (pages[pageId]) {
+    (pagesOrder || []).forEach((pageId: PageType["id"]) => {
+      if (pages && pages[pageId]) {
         _sortedPages.push(pages[pageId]);
       }
     });

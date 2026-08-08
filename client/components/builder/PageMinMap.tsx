@@ -71,8 +71,8 @@ export default function PagesMinMap() {
   }
   const sortedPages: Page[] = useMemo(() => {
     const _sortedPages: Page[] = [];
-    pagesOrder.forEach((pageId: Page["id"]) => {
-      if (pages[pageId]) {
+    (pagesOrder || []).forEach((pageId: Page["id"]) => {
+      if (pages && pages[pageId]) {
         _sortedPages.push(pages[pageId]);
       }
     });

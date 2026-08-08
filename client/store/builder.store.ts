@@ -451,14 +451,22 @@ const defaultInitialBuilderState: InitialBuilderState = {
 };
 
 export function createBuilderStore(
-  initialBuilderState = defaultInitialBuilderState,
+  initialBuilderState?: InitialBuilderState,
 ) {
+  const config = initialBuilderState ?? defaultInitialBuilderState;
+  const pages = config.pages ?? defaultInitialBuilderState.pages;
+  const pagesOrder =
+    config.pagesOrder ??
+    (config.pages && Object.keys(config.pages).length > 0
+      ? Object.keys(config.pages)
+      : defaultInitialBuilderState.pagesOrder);
+
   const store = createStore<BuilderStore>((set, get) => ({
-    title: initialBuilderState.title,
-    version: initialBuilderState.version,
-    active: initialBuilderState.active,
-    pages: initialBuilderState.pages,
-    pagesOrder: initialBuilderState.pagesOrder,
+    title: config.title ?? defaultInitialBuilderState.title,
+    version: config.version ?? defaultInitialBuilderState.version,
+    active: config.active ?? defaultInitialBuilderState.active,
+    pages,
+    pagesOrder,
     // core actions
     setTitle: (title) => {
       set({ title });
@@ -473,6 +481,7 @@ export function createBuilderStore(
         } else {
           updatedPagesOrder.push(page.id);
         }
+        console.log({updatedPagesOrder})
         return {
           pages: {
             ...state.pages,
