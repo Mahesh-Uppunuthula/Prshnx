@@ -16,8 +16,8 @@ export const getForms = async (c: Context) => {
     id: true,
     title: true,
     description: true,
-    previewLink: true,
-    isPublished: true,
+    // previewLink: true, // TODO fix this error
+    status: true,
     publicLink: true,
     updatedAt: true,
   });
