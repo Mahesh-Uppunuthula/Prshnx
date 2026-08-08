@@ -61,11 +61,14 @@ export const useFormEmbed = (formId: string) => {
   });
 };
 
-export const useFormConfigurationById = (formId: string) => {
+export const useFormConfigurationById = (
+  formId: string,
+  { enabled = true } = {},
+) => {
   return useQuery({
     queryKey: QUERY_KEYS.forms.getFormConfigurationById(formId),
     queryFn: () => formsApi.getFormConfigurationById(formId),
-    enabled: !!formId && formId !== NEW_FORM_ID,
-    retry: 2
+    enabled: enabled,
+    retry: 2,
   });
 };
