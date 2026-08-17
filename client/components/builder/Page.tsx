@@ -81,14 +81,14 @@ export function PageFooter({ page, idx }: PageFooterProps) {
         open={open}
         onOpenChange={setOpen}
         onSubmit={handleSubmit}
-        title="Insert Page"
-        buttonText="Insert"
+        title="Add Page"
+        buttonText="Add"
         trigger={
           <Button
             variant={"ghost"}
             size={"xs"}
             className="w-fit cursor-pointer text-xs text-slate-600 flex gap-2 items-center px-2 py-1 mt-1 rounded hover:bg-muted">
-            <LuPlus /> Insert Page
+            <LuPlus /> Add Page
           </Button>
         }
       />

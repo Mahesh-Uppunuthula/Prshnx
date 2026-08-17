@@ -1,5 +1,5 @@
 {
-  "id": "13db5f34-2a81-44cf-ae1a-fb76348af094",
+  "id": "b6cb60f1-d3f8-4aa3-b16c-a913d3deb4b1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -11,8 +11,9 @@
         "id": {
           "name": "id",
           "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "formId": {
           "name": "formId",
@@ -37,7 +38,7 @@
           "name": "updatedAt",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -86,18 +87,24 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version": {
+          "name": "version",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
         "ownerId": {
           "name": "ownerId",
           "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true
         },
-        "isPublished": {
-          "name": "isPublished",
-          "type": "boolean",
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true,
-          "default": false
+          "notNull": true
         },
         "publicLink": {
           "name": "publicLink",
@@ -111,15 +118,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "previewLink": {
-          "name": "previewLink",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "previewKey": {
-          "name": "previewKey",
-          "type": "varchar",
+        "settings": {
+          "name": "settings",
+          "type": "json",
           "primaryKey": false,
           "notNull": false
         },
@@ -155,7 +156,16 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.status": {
+      "name": "status",
+      "schema": "public",
+      "values": [
+        "draft",
+        "published"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

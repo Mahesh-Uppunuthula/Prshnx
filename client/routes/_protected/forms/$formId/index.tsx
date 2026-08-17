@@ -29,15 +29,9 @@ import {
 } from "react";
 import { NEW_FORM_ID } from "@/lib/constants";
 import InlineEdit from "@/components/custom/InlineEdit";
-// import { useMultiPageFormStore } from "@/store/form-builder.store";
-import {
-  MultiPageFormProvider,
-  useMultiPageFormStore,
-} from "@/context/MultiPageFormProvider";
 import { FormHealth } from "@/components/FormHealth";
 import { Insights } from "@/components/FormInsights";
 import { PerformanceTrendChart } from "@/components/FormPerformanceTrendChart";
-// import FormPlayground from "@/pages/FormPlayground";
 import {
   isBuilderEmpty,
   // isFormEmpty,
@@ -48,7 +42,6 @@ import {
   useUpdateForm,
 } from "@/hooks/use-forms";
 import { toast } from "sonner";
-// import { MultiPageFormProvider } from "@/context/MultiPageFormProvider";
 
 import Show from "@/components/utils/Show";
 import FormPreview from "@/components/builder/FormPreview";
@@ -127,9 +120,7 @@ function FormDashboard() {
 
   return (
     <BuilderProvider initialBuilderState={initialBuilderState}>
-      <MultiPageFormProvider initialForm={undefined}>
-        <FormDashboardContent formId={formId} isLoading={isLoading} />
-      </MultiPageFormProvider>
+      <FormDashboardContent formId={formId} isLoading={isLoading} />
     </BuilderProvider>
   );
 }
@@ -161,14 +152,7 @@ function FormDashboardContent({
   const pages = useBuilderStore((s) => s.pages);
   // const pagesOrder = useBuilderStore((s) => s.pagesOrder);
   const version = useBuilderStore((s) => s.version);
-  const pageSettings = useMultiPageFormStore((s) => s.pageSettings);
-  const isDirty = useMultiPageFormStore((s) => s.isDirty);
-  // const _markSaved = useMultiPageFormStore((s) => s.markSaved);
 
-  const setActivePageId = useMultiPageFormStore((s) => s.setActivePageId);
-  const setActiveFormElement = useMultiPageFormStore(
-    (s) => s.setActiveFormElement,
-  );
 
   // computed states
   const tab = search.tab || "overview";
@@ -209,7 +193,7 @@ function FormDashboardContent({
               {
                 title: formTitle,
                 description: "",
-                settings: pageSettings,
+                settings: {}, // TODO: fix this the value used to be pageSettings from MultiPageFormProvider,
                 version: version,
                 configuration: {
                   pages: pages,
@@ -290,11 +274,11 @@ function FormDashboardContent({
     },
     [
       formTitle,
-      pageSettings,
+      {}, // pageSettings,
       pages,
       // firstPageHasElements,
-      setActivePageId,
-      setActiveFormElement,
+      "", // setActivePageId,
+      "", // setActiveFormElement,
       saveForm,
       navigate,
     ],
@@ -327,7 +311,7 @@ function FormDashboardContent({
           dispatch={dispatch}
           state={{
             isSyncing: isSavingForm || isUpdatingForm,
-            isSyncDisabled: isSavingForm || isUpdatingForm || !isDirty,
+            isSyncDisabled: isSavingForm || isUpdatingForm  // || TODO: fix this - the value used to come from MultiPageFormProvider !isDirty,
           }}
         />
 
